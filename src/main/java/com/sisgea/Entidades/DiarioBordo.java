@@ -1,33 +1,88 @@
 package com.sisgea.Entidades;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+@Entity
 public class DiarioBordo {
+
+    @Id
+    @Column(name = "id")
     private UUID id;
+
+    @Column(name = "nro_diario")
     private Integer nroDiario;
+
+    @Column(name = "data")
     private Date data;
+
+    @Column(name = "funcao_aluno")
     private String funcaoAluno;
+
+    @Column(name = "funcao_instrutor")
     private String funcaoInstrutor;
+
+    @Column(name = "hora_aeronave")
     private Float horaAeronave;
+
+    @Column(name = "data_decolagem")
     private Date dataDecolagem;
+
+    @Column(name = "data_pouso")
     private Date dataPouso;
+
+    @Column(name = "local_decolagem")
     private String localDecolagem;
+
+    @Column(name = "local_pouso")
     private String localPouso;
+
+    @Column(name = "data_corte")
     private Date dataCorte;
+
+    @Column(name = "horas_diu")
     private Float horasDiu;
+
+    @Column(name = "horas_not")
     private Float horasNot;
+
+    @Column(name = "horas_vfr")
     private Float horasVfr;
+
+    @Column(name = "horas_ifr")
     private Float horasIfr;
+
+    @Column(name = "horas_ifr_c")
     private Float horasIfrC;
+
+    @Column(name = "combustivel_utilizado")
     private Float combustivelUtilizado;
+
+    @Column(name = "ciclos")
     private Integer ciclos;
-    private Integer pob; // POB -> Pessoas a Bordo
+
+    @Column(name = "pob")
+    private Integer pob;
+
+    @Column(name = "carga")
     private Float carga;
-    private String nat;  // NAT -> Natureza do voo
+
+    @Column(name = "nat")
+    private String nat;
+
+    @Column(name = "ocorrencias")
     private String ocorrencias;
+
+    @OneToMany
     private List<Discrepancia> discrepancias;
+
+    @ManyToOne
     private Agendamento agendamento;
 
     public UUID getId() {

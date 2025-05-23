@@ -1,18 +1,45 @@
 package com.sisgea.Entidades;
 
+import jakarta.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
+@Entity
 public class Agendamento {
+
+    @Id
+    @Column(name = "id")
     private UUID id;
+
+    @ManyToOne
+    @JoinColumn(name = "aeronave_id")
     private Aeronave aeronave;
+
+    @ManyToOne
+    @JoinColumn(name = "aluno_id")
     private Aluno aluno;
+
+    @ManyToOne
+    @JoinColumn(name = "instrutor_id")
     private Instrutor instrutor;
+
+    @Column(name = "partida")
     private String partida;
+
+    @Column(name = "destino")
     private String destino;
+
+    @Column(name = "tipo_voo")
     private String tipo_voo;
+
+    @Column(name = "status")
     private String status;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "data_agendamento")
     private Date data_agendamento;
+
+    public Agendamento() {}
 
     public Agendamento(Aeronave aeronave, Aluno aluno, Instrutor instrutor, String partida, String destino, String tipo_voo, String status, Date data_agendamento) {
         this.aeronave = aeronave;
@@ -95,5 +122,5 @@ public class Agendamento {
 
     public void setData_agendamento(Date data_agendamento) {
         this.data_agendamento = data_agendamento;
-    } 
+    }
 }

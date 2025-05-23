@@ -1,13 +1,28 @@
 package com.sisgea.Entidades;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
 import java.sql.Date;
 import java.util.UUID;
 
+@Entity
 public class Discrepancia {
+
+    @Id
+    @Column(name = "id")
     private UUID id;
+
+    @Column(name = "data")
     private Date data;
+
+    @Column(name = "sistema")
     private String sistema;
+
+    @Column(name = "discrepancia")
     private String discrepancia;
+
+    @Column(name = "correcao")
     private String correcao;
 
     public Discrepancia(UUID id, Date data, String sistema, String discrepancia, String correcao) {

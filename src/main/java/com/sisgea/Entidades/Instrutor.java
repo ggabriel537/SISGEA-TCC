@@ -1,12 +1,34 @@
 package com.sisgea.Entidades;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.Column;
+import jakarta.persistence.OneToOne;
+
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Instrutor extends Usuario {
+
+    @Column(name = "canac")
     private Integer canac;
+
+    @Column(name = "cpf")
     private String cpf;
+
+    @Column(name = "nome")
     private String nome;
+
+    @Column(name = "telefone")
     private String telefone;
+
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "habilitacao")
     private String habilitacao;
+
+    @OneToOne
     private Endereco endereco;
 
     public Instrutor(String usuario, String senha, Integer permissao, String nome, String cpf, String telefone, String email) {
@@ -56,7 +78,7 @@ public class Instrutor extends Usuario {
     public void setCanac(Integer canac) {
         this.canac = canac;
     }
-    
+
     public String getHabilitacao() {
         return habilitacao;
     }

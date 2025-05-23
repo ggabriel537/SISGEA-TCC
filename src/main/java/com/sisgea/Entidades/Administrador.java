@@ -1,9 +1,15 @@
 package com.sisgea.Entidades;
 
+import jakarta.persistence.*;
+
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Administrador extends Usuario {
+
+    @Column(name = "nome")
     private String nome;
 
-    public Administrador(String usuario, String senha, Integer permissao, String nome, String cpf, String telefone, String email) {
+    public Administrador(String usuario, String senha, Integer permissao, String nome) {
         super(usuario, senha, permissao);
         this.nome = nome;
     }

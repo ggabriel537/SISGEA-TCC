@@ -1,15 +1,36 @@
 package com.sisgea.Entidades;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
 import java.util.UUID;
 
+@Entity
 public class Endereco {
+
+    @Id
+    @Column(name = "id")
     private UUID id;
+
+    @Column(name = "cep")
     private String cep;
+
+    @Column(name = "logradouro")
     private String logradouro;
+
+    @Column(name = "bairro")
     private String bairro;
+
+    @Column(name = "complemento")
     private String complemento;
+
+    @Column(name = "numero")
     private String numero;
+
+    @Column(name = "cidade")
     private String cidade;
+
+    @Column(name = "uf")
     private String UF;
 
     public Endereco(String cep, String logradouro, String bairro, String complemento, String numero, String cidade, String UF) {
@@ -56,7 +77,7 @@ public class Endereco {
 
     public String getComplemento() {
         return complemento;
-    }   
+    }
 
     public void setComplemento(String complemento) {
         this.complemento = complemento;
