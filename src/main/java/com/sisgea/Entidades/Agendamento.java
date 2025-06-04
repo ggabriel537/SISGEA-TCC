@@ -35,6 +35,7 @@ public class Agendamento {
     @Column(name = "status")
     private String status;
 
+    @SuppressWarnings("deprecation")
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "data_agendamento")
     private Date data_agendamento;
