@@ -16,6 +16,9 @@ public class DiarioBordo {
     @Column(name = "id")
     private UUID id;
 
+    @Column(name = "aeronave_id")
+    private String aeronaveId;
+
     @Column(name = "nro_diario")
     private Integer nroDiario;
 
@@ -85,12 +88,24 @@ public class DiarioBordo {
     @ManyToOne
     private Agendamento agendamento;
 
+    public DiarioBordo(){
+        this.id = UUID.randomUUID();
+    }
+
     public UUID getId() {
         return id;
     }
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public String getAeronaveId() {
+        return aeronaveId;
+    }
+
+    public void setAeronaveId(String aeronaveId) {
+        this.aeronaveId = aeronaveId;
     }
 
     public Integer getNroDiario() {

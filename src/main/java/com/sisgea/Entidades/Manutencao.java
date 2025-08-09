@@ -29,6 +29,10 @@ public class Manutencao {
         this.status = status;
     }
 
+    public Manutencao() {
+        this.id = UUID.randomUUID();
+    }
+
     public UUID getId() {
         return id;
     }

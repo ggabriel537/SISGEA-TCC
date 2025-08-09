@@ -23,12 +23,15 @@ public class Usuario {
         this.permissao = permissao;
     }
 
+    public Usuario() {
+    }
+
     public String getUsuario() {
         return usuario;
     }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
+    public void setUsuario(String nomeUsuario) {
+        this.usuario = nomeUsuario;
     }
 
     public String getSenha() {

@@ -39,6 +39,9 @@ public class Instrutor extends Usuario {
         this.email = email;
     }
 
+    public Instrutor() {
+    }
+
     public String getNome() {
         return nome;
     }

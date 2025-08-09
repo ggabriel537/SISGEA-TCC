@@ -3,7 +3,7 @@ package com.sisgea.Entidades;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
-import java.sql.Date;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -31,6 +31,10 @@ public class Discrepancia {
         this.sistema = sistema;
         this.discrepancia = discrepancia;
         this.correcao = correcao;
+    }
+
+    public Discrepancia() {
+        this.id = UUID.randomUUID();
     }
 
     public UUID getId() {

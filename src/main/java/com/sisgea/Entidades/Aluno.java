@@ -38,7 +38,9 @@ public class Aluno {
     @Column(name = "horas_voadas")
     private Float horas_voadas;
 
-    public Aluno() {}
+    public Aluno() {
+        this.id = UUID.randomUUID();
+    }
 
     public Aluno(String nome, String cpf, String telefone, String email, String curso) {
         this.nome = nome;

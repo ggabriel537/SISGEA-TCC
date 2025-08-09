@@ -43,6 +43,10 @@ public class Endereco {
         this.UF = UF;
     }
 
+    public Endereco() {
+        this.id = UUID.randomUUID();
+    }
+
     public UUID getId() {
         return id;
     }

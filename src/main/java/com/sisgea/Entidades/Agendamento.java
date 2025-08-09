@@ -40,7 +40,9 @@ public class Agendamento {
     @Column(name = "data_agendamento")
     private Date data_agendamento;
 
-    public Agendamento() {}
+    public Agendamento() {
+        this.id = UUID.randomUUID();
+    }
 
     public Agendamento(Aeronave aeronave, Aluno aluno, Instrutor instrutor, String partida, String destino, String tipo_voo, String status, Date data_agendamento) {
         this.aeronave = aeronave;
