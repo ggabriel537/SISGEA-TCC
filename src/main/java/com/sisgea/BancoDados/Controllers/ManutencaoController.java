@@ -2,7 +2,6 @@ package com.sisgea.BancoDados.Controllers;
 
 import java.util.List;
 import java.util.Date;
-import java.util.UUID;
 import com.sisgea.BancoDados.Models.ManutencaoModel;
 import com.sisgea.Entidades.Manutencao;
 
