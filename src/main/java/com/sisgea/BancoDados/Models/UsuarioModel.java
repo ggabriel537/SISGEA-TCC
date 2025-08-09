@@ -24,4 +24,22 @@ public class UsuarioModel {
         em.close();
         return usuarios;
     }
+
+    public static void atualizarUsuario(Usuario usuario) {
+        EntityManager em = JPAUtil.getEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
+        em.merge(usuario);
+        tx.commit();
+        em.close();
+    }
+
+    public static void excluirUsuario(Usuario usuario) {
+        EntityManager em = JPAUtil.getEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
+        em.remove(em.contains(usuario) ? usuario : em.merge(usuario));
+        tx.commit();
+        em.close();
+    }
 }
