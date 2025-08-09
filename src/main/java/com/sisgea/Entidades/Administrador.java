@@ -3,7 +3,6 @@ package com.sisgea.Entidades;
 import jakarta.persistence.*;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
 public class Administrador extends Usuario {
 
     @Column(name = "nome")

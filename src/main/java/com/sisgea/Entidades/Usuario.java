@@ -1,20 +1,17 @@
 package com.sisgea.Entidades;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Usuario {
 
     @Id
-    @Column(name = "usuario")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String usuario;
-
-    @Column(name = "senha")
     private String senha;
-
-    @Column(name = "permissao")
     private Integer permissao;
 
     public Usuario(String usuario, String senha, Integer permissao) {

@@ -2,6 +2,8 @@ package com.sisgea.Entidades;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Column;
 import java.util.Date;
 import java.util.UUID;
@@ -21,6 +23,10 @@ public class Manutencao {
 
     @Column(name = "status")
     private String status;
+
+    @ManyToOne
+    @JoinColumn(name = "matricula_aeronave")
+    private Aeronave aeronave;
     
     public Manutencao(UUID id, String descricao, Date data_est_man, String status) {
         this.id = id;
