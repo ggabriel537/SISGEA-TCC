@@ -10,39 +10,60 @@ import com.sisgea.Entidades.DiarioBordo;
 import com.sisgea.Entidades.Discrepancia;
 
 public class DiarioBordoController {
-    public DiarioBordoController(UUID id, String aeronaveId, Integer nroDiario, Date data, String funcaoAluno, String funcaoInstrutor,
-                                Float horaAeronave, Date dataDecolagem, Date dataPouso, String localDecolagem,
-                                String localPouso, Date dataCorte, Float horasDiu, Float horasNot, Float horasVfr,
-                                Float horasIfr, Float horasIfrC, Float combustivelUtilizado, Integer ciclos,
-                                Integer pob, Float carga, String nat, String ocorrencias, List<Discrepancia> discrepancias,
-    Agendamento agendamento) {
-        DiarioBordo diarioBordo = new DiarioBordo();
-        diarioBordo.setId(id);
-        diarioBordo.setAeronaveId(aeronaveId);
-        diarioBordo.setNroDiario(nroDiario);
-        diarioBordo.setData(data);
-        diarioBordo.setFuncaoAluno(funcaoAluno);
-        diarioBordo.setFuncaoInstrutor(funcaoInstrutor);
-        diarioBordo.setHoraAeronave(horaAeronave);
-        diarioBordo.setDataDecolagem(dataDecolagem);
-        diarioBordo.setDataPouso(dataPouso);
-        diarioBordo.setLocalDecolagem(localDecolagem);
-        diarioBordo.setLocalPouso(localPouso);
-        diarioBordo.setDataCorte(dataCorte);
-        diarioBordo.setHorasDiu(horasDiu);
-        diarioBordo.setHorasNot(horasNot);
-        diarioBordo.setHorasVfr(horasVfr);
-        diarioBordo.setHorasIfr(horasIfr);
-        diarioBordo.setHorasIfrC(horasIfrC);
-        diarioBordo.setCombustivelUtilizado(combustivelUtilizado);
-        diarioBordo.setCiclos(ciclos);
-        diarioBordo.setPob(pob);
-        diarioBordo.setCarga(carga);
-        diarioBordo.setNat(nat);
-        diarioBordo.setOcorrencias(ocorrencias);
-        diarioBordo.setDiscrepancias(discrepancias);
-        diarioBordo.setAgendamento(agendamento);
-        DiarioBordoModel.salvarDiarioBordo(diarioBordo);
+    public static void salvarDiarioBordo(
+            UUID id,
+            String aeronaveId,
+            Integer nroDiario,
+            Date data,
+            String funcaoAluno,
+            String funcaoInstrutor,
+            Float horaAeronave,
+            Date dataDecolagem,
+            Date dataPouso,
+            String localDecolagem,
+            String localPouso,
+            Date dataCorte,
+            Float horasDiu,
+            Float horasNot,
+            Float horasVfr,
+            Float horasIfr,
+            Float horasIfrC,
+            Float combustivelUtilizado,
+            Integer ciclos,
+            Integer pob,
+            Float carga,
+            String nat,
+            String ocorrencias,
+            List<Discrepancia> discrepancias,
+            Agendamento agendamento) {
+        DiarioBordo diario = new DiarioBordo();
+        diario.setId(id);
+        diario.setAeronaveId(aeronaveId);
+        diario.setNroDiario(nroDiario);
+        diario.setData(data);
+        diario.setFuncaoAluno(funcaoAluno);
+        diario.setFuncaoInstrutor(funcaoInstrutor);
+        diario.setHoraAeronave(horaAeronave);
+        diario.setDataDecolagem(dataDecolagem);
+        diario.setDataPouso(dataPouso);
+        diario.setLocalDecolagem(localDecolagem);
+        diario.setLocalPouso(localPouso);
+        diario.setDataCorte(dataCorte);
+        diario.setHorasDiu(horasDiu);
+        diario.setHorasNot(horasNot);
+        diario.setHorasVfr(horasVfr);
+        diario.setHorasIfr(horasIfr);
+        diario.setHorasIfrC(horasIfrC);
+        diario.setCombustivelUtilizado(combustivelUtilizado);
+        diario.setCiclos(ciclos);
+        diario.setPob(pob);
+        diario.setCarga(carga);
+        diario.setNat(nat);
+        diario.setOcorrencias(ocorrencias);
+        diario.setDiscrepancias(discrepancias);
+        diario.setAgendamento(agendamento);
+
+        DiarioBordoModel.salvarDiarioBordo(diario);
     }
 
     public static List<DiarioBordo> listarDiariosBordo() {

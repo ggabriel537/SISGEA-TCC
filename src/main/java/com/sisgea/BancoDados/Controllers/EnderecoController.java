@@ -6,11 +6,13 @@ import com.sisgea.BancoDados.Models.EnderecoModel;
 import com.sisgea.Entidades.Endereco;
 
 public class EnderecoController {
-    public static void salvarEndereco(String rua, String numero, String bairro, String cidade, String estado) {
+    public static void salvarEndereco(String cep, String rua, String bairro, String complemento, String numero, String cidade, String estado) {
         Endereco endereco = new Endereco();
+        endereco.setCep(cep);
         endereco.setLogradouro(rua);
-        endereco.setNumero(numero);
         endereco.setBairro(bairro);
+        endereco.setComplemento(complemento);
+        endereco.setNumero(numero);
         endereco.setCidade(cidade);
         endereco.setUF(estado);
         EnderecoModel.salvarEndereco(endereco);

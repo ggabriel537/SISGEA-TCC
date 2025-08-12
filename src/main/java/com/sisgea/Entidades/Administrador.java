@@ -8,6 +8,10 @@ public class Administrador extends Usuario {
     @Column(name = "nome")
     private String nome;
 
+    public Administrador() {
+        super();
+    }
+
     public Administrador(String usuario, String senha, Integer permissao, String nome) {
         super(usuario, senha, permissao);
         this.nome = nome;
