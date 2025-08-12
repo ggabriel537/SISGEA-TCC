@@ -1,4 +1,4 @@
-package com.sisgea.sisgea;
+package com.sisgea.sisgea.TestCRUD;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -15,12 +15,13 @@ import com.sisgea.BancoDados.Controllers.DiarioBordoController;
 import com.sisgea.Entidades.Agendamento;
 import com.sisgea.Entidades.DiarioBordo;
 import com.sisgea.Entidades.Discrepancia;
+import com.sisgea.sisgea.Uteis;
 
 class TesteDiarioBordo {
     @Test
     void testSalvarDiarioBordo() {
         UUID id = UUID.randomUUID();
-        String aeronaveId = "PT-AAA";
+        String aeronaveId = Uteis.gerarMatriculaAleatoria();
         Integer nroDiario = 1;
         Date data = new Date(System.currentTimeMillis());
         String funcaoAluno = "AlunoFunc";
@@ -73,7 +74,7 @@ class TesteDiarioBordo {
     @Test
     void testAtualizarDiarioBordo() {
         UUID id = UUID.randomUUID();
-        String aeronaveId = "PT-BBB";
+        String aeronaveId = Uteis.gerarMatriculaAleatoria();
         Agendamento agendamento = new Agendamento();
         List<Discrepancia> discrepancias = new ArrayList<>();
 
@@ -108,7 +109,7 @@ class TesteDiarioBordo {
     @Test
     void testDeletarDiarioBordo() {
         UUID id = UUID.randomUUID();
-        String aeronaveId = "PT-CCC";
+        String aeronaveId = Uteis.gerarMatriculaAleatoria();
         Agendamento agendamento = new Agendamento();
         List<Discrepancia> discrepancias = new ArrayList<>();
 

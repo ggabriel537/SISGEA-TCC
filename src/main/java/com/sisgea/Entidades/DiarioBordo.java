@@ -2,6 +2,8 @@ package com.sisgea.Entidades;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.ManyToOne;
@@ -82,10 +84,12 @@ public class DiarioBordo {
     @Column(name = "ocorrencias")
     private String ocorrencias;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "diario_bordo_id")
     private List<Discrepancia> discrepancias;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "agendamento_id")
     private Agendamento agendamento;
 
     public DiarioBordo(){

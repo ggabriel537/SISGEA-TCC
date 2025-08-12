@@ -11,15 +11,15 @@ public class Agendamento {
     @Column(name = "id")
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "aeronave_id")
     private Aeronave aeronave;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "aluno_id")
     private Aluno aluno;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "instrutor_id")
     private Instrutor instrutor;
 
@@ -35,7 +35,6 @@ public class Agendamento {
     @Column(name = "status")
     private String status;
 
-    @SuppressWarnings("deprecation")
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "data_agendamento")
     private Date data_agendamento;
@@ -45,6 +44,7 @@ public class Agendamento {
     }
 
     public Agendamento(Aeronave aeronave, Aluno aluno, Instrutor instrutor, String partida, String destino, String tipo_voo, String status, Date data_agendamento) {
+        this();
         this.aeronave = aeronave;
         this.aluno = aluno;
         this.instrutor = instrutor;

@@ -1,4 +1,4 @@
-package com.sisgea.sisgea;
+package com.sisgea.sisgea.TestCRUD;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

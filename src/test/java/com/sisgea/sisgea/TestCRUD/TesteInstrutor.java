@@ -1,4 +1,4 @@
-package com.sisgea.sisgea;
+package com.sisgea.sisgea.TestCRUD;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -24,17 +24,7 @@ class TesteInstrutor {
         endereco.setUF("ST");
         EnderecoModel.salvarEndereco(endereco);
 
-        InstrutorController.salvarInstrutor(
-                "Instrutor A",
-                "usuarioA",
-                "senha123",
-                1,
-                1234,
-                "111.222.333-44",
-                "12345-6789",
-                "instrutora@email.com",
-                "Habilitação X",
-                endereco);
+        InstrutorController.salvarInstrutor("Instrutor A", "usuarioA", "senha123", 1, 1234, "111.222.333-44","12345-6789", "instrutora@email.com", "Habilitação X", endereco);
 
         List<Instrutor> lista = InstrutorController.listarInstrutores();
         assertFalse(lista.isEmpty());
@@ -49,6 +39,12 @@ class TesteInstrutor {
     }
 
     @Test
+    void testListarInstrutores() {
+        List<Instrutor> lista = InstrutorController.listarInstrutores();
+        assertNotNull(lista, "Lista null.");
+    }
+
+    @Test
     void testAtualizarInstrutor() {
         Endereco endereco = new Endereco();
         endereco.setLogradouro("Rua Atualizar");
@@ -58,21 +54,11 @@ class TesteInstrutor {
         endereco.setUF("AT");
         EnderecoModel.salvarEndereco(endereco);
 
-        InstrutorController.salvarInstrutor(
-                "Instrutor B",
-                "usuarioB",
-                "senha456",
-                1,
-                5678,
-                "555.666.777-88",
-                "98765-4321",
-                "instrutorb@email.com",
-                "Habilitação Y",
-                endereco);
+        InstrutorController.salvarInstrutor("Instrutor C", "usuarioC", "senha789", 1, 9012, "999.888.777-66","11111-2222", "instrutorc@email.com", "Habilitação Z", endereco);
 
         Instrutor instrutor = null;
         for (Instrutor i : InstrutorController.listarInstrutores()) {
-            if ("Instrutor B".equals(i.getNome())) {
+            if ("Instrutor C".equals(i.getNome())) {
                 instrutor = i;
                 break;
             }
@@ -100,17 +86,7 @@ class TesteInstrutor {
         endereco.setUF("DL");
         EnderecoModel.salvarEndereco(endereco);
 
-        InstrutorController.salvarInstrutor(
-                "Instrutor C",
-                "usuarioC",
-                "senha789",
-                1,
-                9012,
-                "999.888.777-66",
-                "11111-2222",
-                "instrutorc@email.com",
-                "Habilitação Z",
-                endereco);
+        InstrutorController.salvarInstrutor("Instrutor C", "usuarioC", "senha789", 1, 9012, "999.888.777-66","11111-2222", "instrutorc@email.com", "Habilitação Z", endereco);
 
         Instrutor instrutor = null;
         for (Instrutor i : InstrutorController.listarInstrutores()) {

@@ -1,4 +1,4 @@
-package com.sisgea.sisgea;
+package com.sisgea.sisgea.TestCRUD;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -11,11 +11,12 @@ import org.junit.jupiter.api.Test;
 
 import com.sisgea.BancoDados.Controllers.AeronaveController;
 import com.sisgea.Entidades.Aeronave;
+import com.sisgea.sisgea.Uteis;
 
 class TesteAeronave {
     @Test
     void testSalvarAeronave() {
-        AeronaveController.salvarAeronave("PT-AAA", "Cessna", "Cessna Co", "PPA", "VFR", 100f, new ArrayList<>());
+        AeronaveController.salvarAeronave(Uteis.gerarMatriculaAleatoria(), "Cessna", "Cessna Co", "PPA", "VFR", 100f, new ArrayList<>());
         List<Aeronave> lista = AeronaveController.listarAeronaves();
         assertFalse(lista.isEmpty(), "Nenhuma aeronave salva.");
         Aeronave aeronave = null;
@@ -36,7 +37,7 @@ class TesteAeronave {
 
     @Test
     void testAtualizarAeronave() {
-        AeronaveController.salvarAeronave("PT-BBB", "Cessna", "Cessna Co", "PPA", "VFR", 100f, new ArrayList<>());
+        AeronaveController.salvarAeronave(Uteis.gerarMatriculaAleatoria(), "Cessna", "Cessna Co", "PPA", "VFR", 100f, new ArrayList<>());
         Aeronave aeronave = null;
         for (Aeronave a : AeronaveController.listarAeronaves()) {
             if ("PT-BBB".equals(a.getMatricula())) {
@@ -58,24 +59,29 @@ class TesteAeronave {
     }
 
     @Test
-    void testDeletarAeronave() {
-        AeronaveController.salvarAeronave("PT-CCC", "Cessna", "Cessna Co", "PPA", "VFR", 100f, new ArrayList<>());
-        Aeronave aeronave = null;
-        for (Aeronave a : AeronaveController.listarAeronaves()) {
-            if ("PT-CCC".equals(a.getMatricula())) {
-                aeronave = a;
-                break;
-            }
+void testDeletarAeronave() {
+    String matricula = Uteis.gerarMatriculaAleatoria();
+    AeronaveController.salvarAeronave(matricula, "Cessna", "Cessna Co", "PPA", "VFR", 100f, new ArrayList<>());
+
+    Aeronave aeronave = null;
+    for (Aeronave a : AeronaveController.listarAeronaves()) {
+        if (matricula.equals(a.getMatricula())) {
+            aeronave = a;
+            break;
         }
-        assertNotNull(aeronave, "Aeronave para deletar não encontrada.");
-        new AeronaveController().deletarAeronave(aeronave);
-        Aeronave deletada = null;
-        for (Aeronave a : AeronaveController.listarAeronaves()) {
-            if ("PT-CCC".equals(a.getMatricula())) {
-                deletada = a;
-                break;
-            }
-        }
-        assertNull(deletada, "Aeronave não foi deletada.");
     }
+
+    assertNotNull(aeronave, "Aeronave para deletar não encontrada.");
+    new AeronaveController().deletarAeronave(aeronave);
+
+    Aeronave deletada = null;
+    for (Aeronave a : AeronaveController.listarAeronaves()) {
+        if (matricula.equals(a.getMatricula())) {
+            deletada = a;
+            break;
+        }
+    }
+    assertNull(deletada, "Aeronave não foi deletada.");
+}
+
 }
