@@ -16,12 +16,13 @@ import com.sisgea.sisgea.Uteis;
 class TesteAeronave {
     @Test
     void testSalvarAeronave() {
-        AeronaveController.salvarAeronave(Uteis.gerarMatriculaAleatoria(), "Cessna", "Cessna Co", "PPA", "VFR", 100f, new ArrayList<>());
+        String matricula = Uteis.gerarMatriculaAleatoria();
+        AeronaveController.salvarAeronave(matricula, "Cessna", "Cessna Co", "PPA", "VFR", 100f, new ArrayList<>());
         List<Aeronave> lista = AeronaveController.listarAeronaves();
         assertFalse(lista.isEmpty(), "Nenhuma aeronave salva.");
         Aeronave aeronave = null;
         for (Aeronave a : lista) {
-            if ("PT-AAA".equals(a.getMatricula())) {
+            if (matricula.equals(a.getMatricula())) {
                 aeronave = a;
                 break;
             }
@@ -37,10 +38,11 @@ class TesteAeronave {
 
     @Test
     void testAtualizarAeronave() {
-        AeronaveController.salvarAeronave(Uteis.gerarMatriculaAleatoria(), "Cessna", "Cessna Co", "PPA", "VFR", 100f, new ArrayList<>());
+        String matricula = Uteis.gerarMatriculaAleatoria();
+        AeronaveController.salvarAeronave(matricula, "Cessna", "Cessna Co", "PPA", "VFR", 100f, new ArrayList<>());
         Aeronave aeronave = null;
         for (Aeronave a : AeronaveController.listarAeronaves()) {
-            if ("PT-BBB".equals(a.getMatricula())) {
+            if (matricula.equals(a.getMatricula())) {
                 aeronave = a;
                 break;
             }

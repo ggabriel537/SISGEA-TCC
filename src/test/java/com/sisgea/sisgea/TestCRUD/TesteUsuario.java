@@ -46,7 +46,7 @@ class TesteUsuario{
         }
         assertNotNull(usuario, "Usuário para update não encontrado.");
         usuario.setUsuario("updateOK");
-        new UsuarioController().atualizarItem(usuario);
+        new UsuarioController().atualizarUsuario(usuario);
         Usuario atualizado = null;
         for (Usuario u : UsuarioController.listarUsuarios()) {
             if ("updateOK".equals(u.getUsuario())) {

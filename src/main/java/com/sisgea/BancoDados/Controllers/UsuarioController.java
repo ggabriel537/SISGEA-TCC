@@ -19,11 +19,21 @@ public class UsuarioController {
         return UsuarioModel.listarUsuarios();
     }
 
-    public void deletarUsuario(Usuario usuario) {
+    public static Usuario buscarUsuario(String id) {
+        List<Usuario> usuarios = UsuarioModel.listarUsuarios();
+        for (Usuario usuario : usuarios) {
+            if (usuario.getUsuario().equals(id)) {
+                return usuario;
+            }
+        }
+        return null;
+    }
+
+    public static void deletarUsuario(Usuario usuario) {
         UsuarioModel.excluirUsuario(usuario);
     }
 
-    public void atualizarItem(Usuario usuario) {
+    public static void atualizarUsuario(Usuario usuario) {
         UsuarioModel.atualizarUsuario(usuario);
     }
 }
