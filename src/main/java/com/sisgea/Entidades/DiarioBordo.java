@@ -1,12 +1,6 @@
 package com.sisgea.Entidades;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -15,16 +9,17 @@ import java.util.UUID;
 public class DiarioBordo {
 
     @Id
-    @Column(name = "id")
-    private UUID id;
+    @Column(name = "id", nullable = false, updatable = false)
+    private UUID id = UUID.randomUUID();
 
-    @Column(name = "aeronave_id")
+    @Column(name = "aeronave_id", nullable = false)
     private String aeronaveId;
 
-    @Column(name = "nro_diario")
+    @Column(name = "nro_diario", nullable = false)
     private Integer nroDiario;
 
-    @Column(name = "data")
+    @Temporal(TemporalType.DATE)
+    @Column(name = "data", nullable = false)
     private Date data;
 
     @Column(name = "funcao_aluno")
@@ -36,9 +31,11 @@ public class DiarioBordo {
     @Column(name = "hora_aeronave")
     private Float horaAeronave;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "data_decolagem")
     private Date dataDecolagem;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "data_pouso")
     private Date dataPouso;
 
@@ -48,6 +45,7 @@ public class DiarioBordo {
     @Column(name = "local_pouso")
     private String localPouso;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "data_corte")
     private Date dataCorte;
 
@@ -81,20 +79,18 @@ public class DiarioBordo {
     @Column(name = "nat")
     private String nat;
 
-    @Column(name = "ocorrencias")
+    @Column(name = "ocorrencias", length = 2000)
     private String ocorrencias;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "diario_bordo_id")
     private List<Discrepancia> discrepancias;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "agendamento_id")
     private Agendamento agendamento;
 
-    public DiarioBordo(){
-        this.id = UUID.randomUUID();
-    }
+    public DiarioBordo() {}
 
     public UUID getId() {
         return id;
