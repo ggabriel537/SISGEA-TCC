@@ -1,0 +1,62 @@
+package com.sisgea.sisgea.API.Controller;
+
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.sisgea.BancoDados.Controllers.AdministradorController;
+import com.sisgea.Entidades.Administrador;
+
+@CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/api/administradores")
+public class AdministradorAPI {
+    @GetMapping("/{id}")
+    public Administrador buscarId(@PathVariable String id) {
+        Administrador adm = AdministradorController.buscarId(id);
+        if (adm == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Administrador não encontrado");
+        }
+        return adm;
+    }
+
+    @GetMapping
+    public List<Administrador> listar() {
+        return AdministradorController.listarAdministradores();
+    }
+
+    @PostMapping
+    public Administrador criar(@RequestBody Administrador adm) {
+        AdministradorController.salvarAdministrador(adm);
+        return adm;
+    }
+
+    @PutMapping("/{id}")
+    public Administrador atualizar(@PathVariable String id, @RequestBody Administrador adm) {
+        Administrador existente = AdministradorController.buscarId(id);
+        if (existente == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Administrador não encontrado");
+        }
+        AdministradorController.atualizarAdministrador(adm);
+        return adm;
+    }
+
+    @DeleteMapping("/{id}")
+    public void deletar(@PathVariable String id) {
+        Administrador adm = AdministradorController.buscarId(id);
+        if (adm == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Administrador não encontrado");
+        }
+        AdministradorController.deletarAdministrador(adm);
+    }
+}

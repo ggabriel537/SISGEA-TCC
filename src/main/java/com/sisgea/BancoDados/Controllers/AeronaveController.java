@@ -20,15 +20,23 @@ public class AeronaveController {
         AeronaveModel.salvarAeronave(aeronave);
     }
 
+    public static void salvarAeronave(Aeronave aeronave) {
+        AeronaveModel.salvarAeronave(aeronave);
+    }
+
     public static List<Aeronave> listarAeronaves() {
         return AeronaveModel.listarAeronaves();
     }
 
-    public void deletarAeronave(Aeronave aeronave) {
+    public static Aeronave buscarId(String id) {
+        return AeronaveModel.buscarAeronave(id);
+    }
+
+    public static void deletarAeronave(Aeronave aeronave) {
         AeronaveModel.excluirAeronave(aeronave);
     }
 
-    public void atualizarAeronave(Aeronave aeronave) {
+    public static void atualizarAeronave(Aeronave aeronave) {
         AeronaveModel.atualizarAeronave(aeronave);
     }
 }

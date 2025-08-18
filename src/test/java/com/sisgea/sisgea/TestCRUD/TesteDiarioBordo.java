@@ -94,7 +94,7 @@ class TesteDiarioBordo {
         assertNotNull(diarioBordo, "Diario para update não encontrado.");
 
         diarioBordo.setFuncaoAluno("AlunoFuncAtualizado");
-        new DiarioBordoController().atualizarDiarioBordo(diarioBordo);
+        DiarioBordoController.atualizarDiarioBordo(diarioBordo);
 
         DiarioBordo atualizado = null;
         for (DiarioBordo d : DiarioBordoController.listarDiariosBordo()) {
@@ -128,7 +128,7 @@ class TesteDiarioBordo {
         }
         assertNotNull(diarioBordo, "Diario para deletar não encontrado.");
 
-        new DiarioBordoController().deletarDiarioBordo(diarioBordo);
+        DiarioBordoController.deletarDiarioBordo(diarioBordo);
 
         DiarioBordo deletado = null;
         for (DiarioBordo d : DiarioBordoController.listarDiariosBordo()) {

@@ -46,7 +46,7 @@ class TesteUsuario{
         }
         assertNotNull(usuario, "Usuário para update não encontrado.");
         usuario.setUsuario("updateOK");
-        new UsuarioController().atualizarUsuario(usuario);
+        UsuarioController.atualizarUsuario(usuario);
         Usuario atualizado = null;
         for (Usuario u : UsuarioController.listarUsuarios()) {
             if ("updateOK".equals(u.getUsuario())) {
@@ -68,7 +68,7 @@ class TesteUsuario{
             }
         }
         assertNotNull(usuario, "Usuário para deletar não encontrado.");
-        new UsuarioController().deletarUsuario(usuario);
+        UsuarioController.deletarUsuario(usuario);
         Usuario deletado = null;
         for (Usuario u : UsuarioController.listarUsuarios()) {
             if ("delete".equals(u.getUsuario())) {

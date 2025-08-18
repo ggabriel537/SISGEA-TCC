@@ -33,15 +33,23 @@ public class InstrutorController {
         InstrutorModel.salvarInstrutor(instrutor);
     }
 
+    public static void salvarInstrutor(Instrutor instrutor) {
+        InstrutorModel.salvarInstrutor(instrutor);
+    }
+
     public static List<Instrutor> listarInstrutores() {
         return InstrutorModel.listarInstrutores();
     }
 
-    public void deletarInstrutor(Instrutor instrutor) {
+    public static Instrutor buscarId(String id) {
+        return InstrutorModel.buscarInstrutor(id);
+    }
+
+    public static void deletarInstrutor(Instrutor instrutor) {
         InstrutorModel.excluirInstrutor(instrutor);
     }
 
-    public void atualizarInstrutor(Instrutor instrutor) {
+    public static void atualizarInstrutor(Instrutor instrutor) {
         InstrutorModel.atualizarInstrutor(instrutor);
     }
 }

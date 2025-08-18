@@ -24,6 +24,13 @@ public class AlunoModel {
         return lista;
     }
 
+    public static Aluno buscarAluno(String cpf) {
+        EntityManager em = JPAUtil.getEntityManager();
+        Aluno aluno = em.find(Aluno.class, cpf);
+        em.close();
+        return aluno;
+    }
+
     public static void atualizarAluno(Aluno aluno) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();

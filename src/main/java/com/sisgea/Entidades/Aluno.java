@@ -1,20 +1,15 @@
 package com.sisgea.Entidades;
 
 import jakarta.persistence.*;
-import java.util.UUID;
 
 @Entity
 public class Aluno {
-
     @Id
-    @Column(name = "id")
-    private UUID id;
+    @Column(name = "cpf")
+    private String cpf;
 
     @Column(name = "canac")
     private Integer canac;
-
-    @Column(name = "cpf")
-    private String cpf;
 
     @Column(name = "nome")
     private String nome;
@@ -38,9 +33,7 @@ public class Aluno {
     @Column(name = "horas_voadas")
     private Float horas_voadas;
 
-    public Aluno() {
-        this.id = UUID.randomUUID();
-    }
+    public Aluno() {}
 
     public Aluno(String nome, String cpf, String telefone, String email, String curso) {
         this.nome = nome;
@@ -48,14 +41,6 @@ public class Aluno {
         this.telefone = telefone;
         this.email = email;
         this.curso = curso;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public String getNome() {

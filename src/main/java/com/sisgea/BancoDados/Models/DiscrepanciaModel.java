@@ -24,6 +24,13 @@ public class DiscrepanciaModel {
         return lista;
     }
 
+    public static Discrepancia buscarDiscrepancia(String id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        Discrepancia discrepancia = em.find(Discrepancia.class, id);
+        em.close();
+        return discrepancia;
+    }
+
     public static void atualizarDiscrepancia(Discrepancia discrepancia) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();

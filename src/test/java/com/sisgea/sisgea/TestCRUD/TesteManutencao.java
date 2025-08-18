@@ -48,7 +48,7 @@ class TesteManutencao {
         manutencaoAtualizada.setDescricao("Revisão completa");
         manutencaoAtualizada.setData_est_man(new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000));
         manutencaoAtualizada.setStatus("Concluída");
-        new ManutencaoController().atualizarManutencao(manutencaoAtualizada);
+        ManutencaoController.atualizarManutencao(manutencaoAtualizada);
         Manutencao manutencaoVerificada = null;
         for (Manutencao m : ManutencaoController.listarManutencoes()) {
             if ("Revisão completa".equals(m.getDescricao()) && "Concluída".equals(m.getStatus())) {
@@ -70,7 +70,7 @@ class TesteManutencao {
             }
         }
         assertNotNull(manutencao, "Manutencao para deletar não encontrada.");
-        new ManutencaoController().deletarManutencao(manutencao);
+        ManutencaoController.deletarManutencao(manutencao);
         Manutencao deletado = null;
         for (Manutencao m : ManutencaoController.listarManutencoes()) {
             if ("Deletar Manutencao".equals(m.getDescricao()) && "Pendente".equals(m.getStatus())) {

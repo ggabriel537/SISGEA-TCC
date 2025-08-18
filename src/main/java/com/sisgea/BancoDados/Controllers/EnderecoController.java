@@ -18,15 +18,23 @@ public class EnderecoController {
         EnderecoModel.salvarEndereco(endereco);
     }
 
+    public static void salvarEndereco(Endereco endereco) {
+        EnderecoModel.salvarEndereco(endereco);
+    }
+
     public static List<Endereco> listarEnderecos() {
         return EnderecoModel.listarEnderecos();
     }
 
-    public void deletarEndereco(Endereco endereco) {
+    public static Endereco buscarId(String id) {
+        return EnderecoModel.buscarEndereco(id);
+    }
+
+    public static void deletarEndereco(Endereco endereco) {
         EnderecoModel.excluirEndereco(endereco);
     }   
 
-    public void atualizarEndereco(Endereco endereco) {
+    public static void atualizarEndereco(Endereco endereco) {
         EnderecoModel.atualizarEndereco(endereco);
     }
 }

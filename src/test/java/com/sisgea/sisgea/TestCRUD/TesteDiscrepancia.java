@@ -49,7 +49,7 @@ class TesteDiscrepancia {
         }
         assertNotNull(discrepancia, "Discrepancia para update não encontrada.");
         discrepancia.setDiscrepancia("Descricao Atualizada OK");
-        new DiscrepanciaController().atualizarDiscrepancia(discrepancia);
+        DiscrepanciaController.atualizarDiscrepancia(discrepancia);
         Discrepancia atualizado = null;
         for (Discrepancia d : DiscrepanciaController.listarDiscrepancias()) {
             if ("Descricao Atualizada OK".equals(d.getDiscrepancia())) {
@@ -72,7 +72,7 @@ class TesteDiscrepancia {
             }
         }
         assertNotNull(discrepancia, "Discrepancia para deletar não encontrada.");
-        new DiscrepanciaController().deletarDiscrepancia(discrepancia);
+        DiscrepanciaController.deletarDiscrepancia(discrepancia);
         Discrepancia deletado = null;
         for (Discrepancia d : DiscrepanciaController.listarDiscrepancias()) {
             if ("Descricao Deletar".equals(d.getDiscrepancia())) {

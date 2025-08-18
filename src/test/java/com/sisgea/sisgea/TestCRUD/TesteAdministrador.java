@@ -44,7 +44,7 @@ class TesteAdministrador{
         }
         assertNotNull(adm, "Administrador não encontrado para update.");
         adm.setNome("adm2OK");
-        new AdministradorController().atualizarAdministrador(adm);
+        AdministradorController.atualizarAdministrador(adm);
         Administrador atualizado = null;
         for (Administrador a : AdministradorController.listarAdministradores()) {
             if ("adm2OK".equals(a.getNome())) {
@@ -66,7 +66,7 @@ class TesteAdministrador{
             }
         }
         assertNotNull(adm, "Administrador não encontrado para deletar.");
-        new AdministradorController().deletarAdministrador(adm);
+        AdministradorController.deletarAdministrador(adm);
         Administrador deletado = null;
         for (Administrador a : AdministradorController.listarAdministradores()) {
             if ("admuser3".equals(a.getUsuario())) {

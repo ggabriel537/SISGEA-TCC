@@ -11,15 +11,23 @@ public class AdministradorController {
         AdministradorModel.salvarAdministrador(administrador);
     }
 
+    public static void salvarAdministrador(Administrador administrador) {
+        AdministradorModel.salvarAdministrador(administrador);
+    }
+
     public static List<Administrador> listarAdministradores() {
         return AdministradorModel.listarAdministradores();
     }
 
-    public void deletarAdministrador(Administrador administrador) {
+    public static Administrador buscarId(String id) {
+        return AdministradorModel.buscarAdministrador(id);
+    }
+
+    public static void deletarAdministrador(Administrador administrador) {
         AdministradorModel.excluirAdministrador(administrador);
     }
 
-    public void atualizarAdministrador(Administrador administrador) {
+    public static void atualizarAdministrador(Administrador administrador) {
         AdministradorModel.atualizarAdministrador(administrador);
     }
 }

@@ -24,15 +24,23 @@ public class AgendamentoController {
         AgendamentoModel.salvarAgendamento(agendamento);
     }
 
+    public static void salvarAgendamento(Agendamento agendamento) {
+        AgendamentoModel.salvarAgendamento(agendamento);
+    }
+
     public static List<Agendamento> listarAgendamentos() {
         return AgendamentoModel.listarAgendamentos();
     } 
 
-    public void deletarAgendamento(Agendamento agendamento) {
+    public static Agendamento buscarId(String id) {
+        return AgendamentoModel.buscarAgendamento(id);
+    }
+
+    public static void deletarAgendamento(Agendamento agendamento) {
         AgendamentoModel.excluirAgendamento(agendamento);
     }
 
-    public void atualizarAgendamento(Agendamento agendamento) {
+    public static void atualizarAgendamento(Agendamento agendamento) {
         AgendamentoModel.atualizarAgendamento(agendamento);
     }
 }

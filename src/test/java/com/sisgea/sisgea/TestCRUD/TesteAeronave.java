@@ -49,7 +49,7 @@ class TesteAeronave {
         }
         assertNotNull(aeronave, "Aeronave para update não encontrada.");
         aeronave.setModelo("Atualizado");
-        new AeronaveController().atualizarAeronave(aeronave);
+        AeronaveController.atualizarAeronave(aeronave);
         Aeronave atualizado = null;
         for (Aeronave a : AeronaveController.listarAeronaves()) {
             if ("Atualizado".equals(a.getModelo())) {
@@ -74,7 +74,7 @@ void testDeletarAeronave() {
     }
 
     assertNotNull(aeronave, "Aeronave para deletar não encontrada.");
-    new AeronaveController().deletarAeronave(aeronave);
+    AeronaveController.deletarAeronave(aeronave);
 
     Aeronave deletada = null;
     for (Aeronave a : AeronaveController.listarAeronaves()) {

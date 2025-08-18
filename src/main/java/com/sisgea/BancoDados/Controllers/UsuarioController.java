@@ -15,6 +15,10 @@ public class UsuarioController {
         UsuarioModel.salvarUsuario(usuario);
     }
 
+    public static void salvarUsuario(Usuario usuario) {
+        UsuarioModel.salvarUsuario(usuario);
+    }
+
     public static List<Usuario> listarUsuarios() {
         return UsuarioModel.listarUsuarios();
     }

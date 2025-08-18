@@ -24,6 +24,13 @@ public class AeronaveModel {
         return lista;
     }
 
+    public static Aeronave buscarAeronave(String id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        Aeronave aeronave = em.find(Aeronave.class, id);
+        em.close();
+        return aeronave;
+    }
+
     public static void atualizarAeronave(Aeronave aeronave) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();

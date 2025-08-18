@@ -66,15 +66,23 @@ public class DiarioBordoController {
         DiarioBordoModel.salvarDiarioBordo(diario);
     }
 
+    public static void salvarDiarioBordo(DiarioBordo diarioBordo) {
+        DiarioBordoModel.salvarDiarioBordo(diarioBordo);
+    }
+
     public static List<DiarioBordo> listarDiariosBordo() {
         return DiarioBordoModel.listarDiariosBordo();
     }
 
-    public void deletarDiarioBordo(DiarioBordo diarioBordo) {
+    public static DiarioBordo buscarId(String id) {
+        return DiarioBordoModel.buscarDiarioBordo(id);
+    }
+
+    public static void deletarDiarioBordo(DiarioBordo diarioBordo) {
         DiarioBordoModel.excluirDiarioBordo(diarioBordo);
     }
 
-    public void atualizarDiarioBordo(DiarioBordo diarioBordo) {
+    public static void atualizarDiarioBordo(DiarioBordo diarioBordo) {
         DiarioBordoModel.atualizarDiarioBordo(diarioBordo);
     }
 }

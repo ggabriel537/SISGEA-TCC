@@ -24,6 +24,13 @@ public class InstrutorModel {
         return lista;
     }
 
+    public static Instrutor buscarInstrutor(String id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        Instrutor instrutor = em.find(Instrutor.class, id);
+        em.close();
+        return instrutor;
+    }
+
     public static void atualizarInstrutor(Instrutor instrutor) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();

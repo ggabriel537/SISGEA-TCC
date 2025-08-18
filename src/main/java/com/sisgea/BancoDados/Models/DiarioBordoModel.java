@@ -24,6 +24,13 @@ public class DiarioBordoModel {
         return lista;
     }
 
+    public static DiarioBordo buscarDiarioBordo(String id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        DiarioBordo diarioBordo = em.find(DiarioBordo.class, id);
+        em.close();
+        return diarioBordo;
+    }
+
     public static void atualizarDiarioBordo(DiarioBordo diario) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();

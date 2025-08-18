@@ -10,7 +10,7 @@ import com.sisgea.Entidades.Usuario;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/api/usuarios")
 public class UsuarioAPI {
 
     @GetMapping("/{id}")
@@ -31,7 +31,7 @@ public class UsuarioAPI {
 
     @PostMapping
     public Usuario criar(@RequestBody Usuario usuario) {
-        UsuarioController.salvarUsuario(usuario.getUsuario(), usuario.getSenha(), usuario.getPermissao());
+        UsuarioController.salvarUsuario(usuario);
         return usuario;
     }
 

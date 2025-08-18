@@ -46,7 +46,7 @@ class TesteEndereco {
         }
         assertNotNull(endereco, "Endereco para update não encontrado.");
         endereco.setLogradouro("Rua B Atualizada");
-        new EnderecoController().atualizarEndereco(endereco);
+        EnderecoController.atualizarEndereco(endereco);
         Endereco atualizado = null;
         for (Endereco e : EnderecoController.listarEnderecos()) {
             if ("Rua B Atualizada".equals(e.getLogradouro())) {
@@ -69,7 +69,7 @@ class TesteEndereco {
             }
         }
         assertNotNull(endereco, "Endereco para deletar não encontrado.");
-        new EnderecoController().deletarEndereco(endereco);
+        EnderecoController.deletarEndereco(endereco);
         Endereco deletado = null;
         for (Endereco e : EnderecoController.listarEnderecos()) {
             if ("Rua C".equals(e.getLogradouro())) {

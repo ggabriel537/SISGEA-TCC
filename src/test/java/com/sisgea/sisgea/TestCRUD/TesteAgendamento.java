@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.Date;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +22,6 @@ class TesteAgendamento {
     void testSalvarAgendamento() {
         Aeronave aeronave = new Aeronave(Uteis.gerarMatriculaAleatoria(), "Cessna 172", "Cessna", "VFR", "Treinamento");
         Aluno aluno = new Aluno("João Silva", "12345678901", "99999-9999", "joao@email.com", "Aviação");
-        aluno.setId(UUID.randomUUID());
         Instrutor instrutor = new Instrutor("instrutor1", "senha", 2, "Carlos Souza", "98765432100", "98888-8888",
                 "carlos@email.com");
         Date dataAgendamento = new Date(System.currentTimeMillis());
@@ -57,7 +54,6 @@ class TesteAgendamento {
     void testAtualizarAgendamento() {
         Aeronave aeronave = new Aeronave(Uteis.gerarMatriculaAleatoria(), "Piper PA-28", "Piper", "IFR", "Treinamento");
         Aluno aluno = new Aluno("Maria Oliveira", "11122233344", "97777-7777", "maria@email.com", "Aviação");
-        aluno.setId(UUID.randomUUID());
         Instrutor instrutor = new Instrutor("instrutor2", "senha2", 2, "Paulo Lima", "99988877766", "96666-6666",
                 "paulo@email.com");
         Date dataAgendamento = new Date(System.currentTimeMillis());
@@ -75,7 +71,7 @@ class TesteAgendamento {
         assertNotNull(agendamentoParaUpdate, "Agendamento para update não encontrado.");
 
         agendamentoParaUpdate.setStatus("Confirmado");
-        new AgendamentoController().atualizarAgendamento(agendamentoParaUpdate);
+        AgendamentoController.atualizarAgendamento(agendamentoParaUpdate);
 
         Agendamento atualizado = null;
         for (Agendamento a : AgendamentoController.listarAgendamentos()) {
@@ -92,7 +88,6 @@ class TesteAgendamento {
     void testDeletarAgendamento() {
         Aeronave aeronave = new Aeronave(Uteis.gerarMatriculaAleatoria(), "Embraer 190", "Embraer", "IFR", "Comercial");
         Aluno aluno = new Aluno("Pedro Santos", "22233344455", "95555-5555", "pedro@email.com", "Aviação");
-        aluno.setId(UUID.randomUUID());
         Instrutor instrutor = new Instrutor("instrutor3", "senha3", 2, "Lucas Costa", "77766655544", "94444-4444",
                 "lucas@email.com");
         Date dataAgendamento = new Date(System.currentTimeMillis());
@@ -109,7 +104,7 @@ class TesteAgendamento {
         }
         assertNotNull(agendamentoParaDeletar, "Agendamento para deletar não encontrado.");
 
-        new AgendamentoController().deletarAgendamento(agendamentoParaDeletar);
+        AgendamentoController.deletarAgendamento(agendamentoParaDeletar);
 
         Agendamento deletado = null;
         for (Agendamento a : AgendamentoController.listarAgendamentos()) {

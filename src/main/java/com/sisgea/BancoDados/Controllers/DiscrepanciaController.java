@@ -16,15 +16,23 @@ public class DiscrepanciaController {
         DiscrepanciaModel.salvarDiscrepancia(discrepanciaObj);
     }
 
+    public static void salvarDiscrepancia(Discrepancia discrepancia) {
+        DiscrepanciaModel.salvarDiscrepancia(discrepancia);
+    }
+
     public static List<Discrepancia> listarDiscrepancias() {
         return DiscrepanciaModel.listarDiscrepancias();
     }
 
-    public void deletarDiscrepancia(Discrepancia discrepancia) {
+    public static Discrepancia buscarId(String id) {
+        return DiscrepanciaModel.buscarDiscrepancia(id);
+    }
+
+    public static void deletarDiscrepancia(Discrepancia discrepancia) {
         DiscrepanciaModel.excluirDiscrepancia(discrepancia);
     }
 
-    public void atualizarDiscrepancia(Discrepancia discrepancia) {
+    public static void atualizarDiscrepancia(Discrepancia discrepancia) {
         DiscrepanciaModel.atualizarDiscrepancia(discrepancia);
     }
 }

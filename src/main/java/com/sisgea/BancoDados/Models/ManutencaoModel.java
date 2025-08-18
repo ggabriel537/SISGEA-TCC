@@ -3,6 +3,7 @@ package com.sisgea.BancoDados.Models;
 import java.util.List;
 
 import com.sisgea.Entidades.Manutencao;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 
@@ -22,6 +23,13 @@ public class ManutencaoModel {
         List<Manutencao> lista = em.createQuery("SELECT m FROM Manutencao m", Manutencao.class).getResultList();
         em.close();
         return lista;
+    }
+
+    public static Manutencao buscarId(String id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        Manutencao manutencao = em.find(Manutencao.class, id);
+        em.close();
+        return manutencao;
     }
 
     public static void atualizarManutencao(Manutencao manutencao) {

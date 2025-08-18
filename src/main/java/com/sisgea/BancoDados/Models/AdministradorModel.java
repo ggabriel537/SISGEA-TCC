@@ -24,6 +24,13 @@ public class AdministradorModel {
         return lista;
     }
 
+    public static Administrador buscarAdministrador(String id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        Administrador administrador = em.find(Administrador.class, id);
+        em.close();
+        return administrador;
+    }
+
     public static void atualizarAdministrador(Administrador administrador) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();

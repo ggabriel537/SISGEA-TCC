@@ -24,6 +24,13 @@ public class AgendamentoModel {
         return lista;
     }
 
+    public static Agendamento buscarAgendamento(String id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        Agendamento agendamento = em.find(Agendamento.class, id);
+        em.close();
+        return agendamento;
+    }
+
     public static void atualizarAgendamento(Agendamento agendamento) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();

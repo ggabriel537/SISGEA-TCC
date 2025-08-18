@@ -1,18 +1,16 @@
 package com.sisgea.BancoDados.Controllers;
 
 import java.util.List;
-import java.util.UUID;
 
 import com.sisgea.BancoDados.Models.AlunoModel;
 import com.sisgea.Entidades.Aluno;
 import com.sisgea.Entidades.Endereco;
 
 public class AlunoController {
-    public static void salvarAluno(UUID id, Integer canac, String cpf, String nome, String telefone, String email, String curso, Endereco endereco, Float horas_compradas, Float horas_voadas) {
+    public static void salvarAluno(String cpf, Integer canac, String nome, String telefone, String email, String curso, Endereco endereco, Float horas_compradas, Float horas_voadas) {
         Aluno aluno = new Aluno();
-        aluno.setId(id);
-        aluno.setCanac(canac);
         aluno.setCpf(cpf);
+        aluno.setCanac(canac);
         aluno.setNome(nome);
         aluno.setTelefone(telefone);
         aluno.setEmail(email);
@@ -23,15 +21,23 @@ public class AlunoController {
         AlunoModel.salvarAluno(aluno);
     }
 
+    public static void salvarAluno(Aluno aluno) {
+        AlunoModel.salvarAluno(aluno);
+    }
+
     public static List<Aluno> listarAlunos() {
         return AlunoModel.listarAlunos();
     }
 
-    public void deletarAluno(Aluno aluno) {
+    public static Aluno buscarId(String id) {
+        return AlunoModel.buscarAluno(id);
+    }
+
+    public static void deletarAluno(Aluno aluno) {
         AlunoModel.excluirAluno(aluno);
     }
 
-    public void atualizarAluno(Aluno aluno) {
+    public static void atualizarAluno(Aluno aluno) {
         AlunoModel.atualizarAluno(aluno);
     }   
 }

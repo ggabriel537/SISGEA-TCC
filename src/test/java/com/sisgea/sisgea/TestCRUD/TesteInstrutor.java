@@ -65,7 +65,7 @@ class TesteInstrutor {
         }
         assertNotNull(instrutor);
         instrutor.setNome("Instrutor B Atualizado");
-        new InstrutorController().atualizarInstrutor(instrutor);
+        InstrutorController.atualizarInstrutor(instrutor);
         Instrutor atualizado = null;
         for (Instrutor i : InstrutorController.listarInstrutores()) {
             if ("Instrutor B Atualizado".equals(i.getNome())) {
@@ -96,7 +96,7 @@ class TesteInstrutor {
             }
         }
         assertNotNull(instrutor);
-        new InstrutorController().deletarInstrutor(instrutor);
+        InstrutorController.deletarInstrutor(instrutor);
         Instrutor deletado = null;
         for (Instrutor i : InstrutorController.listarInstrutores()) {
             if ("Instrutor C".equals(i.getNome())) {

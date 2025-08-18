@@ -24,6 +24,13 @@ public class EnderecoModel {
         return lista;
     }
 
+    public static Endereco buscarEndereco(String id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        Endereco endereco = em.find(Endereco.class, id);
+        em.close();
+        return endereco;
+    }
+
     public static void atualizarEndereco(Endereco endereco) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();

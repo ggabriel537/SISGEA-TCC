@@ -14,15 +14,23 @@ public class ManutencaoController {
         ManutencaoModel.salvarManutencao(manutencao);
     }
 
+    public static void salvarManutencao(Manutencao manutencao) {
+        ManutencaoModel.salvarManutencao(manutencao);
+    }
+
     public static List<Manutencao> listarManutencoes() {
         return ManutencaoModel.listarManutencoes();
     }
 
-    public void deletarManutencao(Manutencao manutencao) {
+    public static Manutencao buscarId(String id) {
+        return ManutencaoModel.buscarId(id);
+    }
+
+    public static void deletarManutencao(Manutencao manutencao) {
         ManutencaoModel.excluirManutencao(manutencao);
     }
 
-    public void atualizarManutencao(Manutencao manutencao) {
+    public static void atualizarManutencao(Manutencao manutencao) {
         ManutencaoModel.atualizarManutencao(manutencao);
     }
 }
