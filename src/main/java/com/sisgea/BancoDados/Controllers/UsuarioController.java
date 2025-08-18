@@ -20,13 +20,7 @@ public class UsuarioController {
     }
 
     public static Usuario buscarUsuario(String id) {
-        List<Usuario> usuarios = UsuarioModel.listarUsuarios();
-        for (Usuario usuario : usuarios) {
-            if (usuario.getUsuario().equals(id)) {
-                return usuario;
-            }
-        }
-        return null;
+        return UsuarioModel.buscarUsuario(id);
     }
 
     public static void deletarUsuario(Usuario usuario) {

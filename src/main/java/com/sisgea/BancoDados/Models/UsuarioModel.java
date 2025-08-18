@@ -25,6 +25,13 @@ public class UsuarioModel {
         return usuarios;
     }
 
+    public static Usuario buscarUsuario(String id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        Usuario usuario = em.find(Usuario.class, id);
+        em.close();
+        return usuario;
+    }
+
     public static void atualizarUsuario(Usuario usuario) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
