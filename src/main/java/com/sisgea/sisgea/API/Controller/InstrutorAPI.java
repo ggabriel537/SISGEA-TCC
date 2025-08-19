@@ -22,9 +22,9 @@ import com.sisgea.Entidades.Instrutor;
 @RequestMapping("/api/instrutores")
 public class InstrutorAPI {
     
-    @GetMapping("/{id}") 
-    public Instrutor buscarId(@PathVariable String id) {
-        Instrutor instrutor = InstrutorController.buscarId(id);
+    @GetMapping("/{usuario}") 
+    public Instrutor buscarId(@PathVariable String usuario) {
+        Instrutor instrutor = InstrutorController.buscarId(usuario);
         if (instrutor == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Instrutor não encontrado");
         }
@@ -42,20 +42,20 @@ public class InstrutorAPI {
         return instrutor; 
     }
 
-    @PutMapping("/{id}") 
-    public Instrutor atualizar(@PathVariable String id, @RequestBody Instrutor instrutor) {
-        Instrutor existente = InstrutorController.buscarId(id);
+    @PutMapping("/{usuario}") 
+    public Instrutor atualizar(@PathVariable String usuario, @RequestBody Instrutor instrutor) {
+        Instrutor existente = InstrutorController.buscarId(usuario);
         if (existente == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Instrutor não encontrado");
         }
-        instrutor.setUsuario(id);
+        instrutor.setUsuario(usuario);
         InstrutorController.atualizarInstrutor(instrutor);
         return instrutor;
     }
 
-    @DeleteMapping("/{id}") 
-    public void deletar(@PathVariable String id) {
-        Instrutor instrutor = InstrutorController.buscarId(id);
+    @DeleteMapping("/{usuario}") 
+    public void deletar(@PathVariable String usuario) {
+        Instrutor instrutor = InstrutorController.buscarId(usuario);
         if (instrutor == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Instrutor não encontrado");
         }

@@ -86,7 +86,7 @@ public class DiarioBordo {
     @JoinColumn(name = "diario_bordo_id")
     private List<Discrepancia> discrepancias;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "agendamento_id")
     private Agendamento agendamento;
 

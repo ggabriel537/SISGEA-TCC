@@ -13,9 +13,9 @@ import com.sisgea.Entidades.Usuario;
 @RequestMapping("/api/usuarios")
 public class UsuarioAPI {
 
-    @GetMapping("/{id}")
-    public Usuario buscarId(@PathVariable String id) {
-        Usuario usuario = UsuarioController.buscarUsuario(id);
+    @GetMapping("/{usuariostr}")
+    public Usuario buscarId(@PathVariable String usuariostr) {
+        Usuario usuario = UsuarioController.buscarUsuario(usuariostr);
         if (usuario == null) {
             throw new ResponseStatusException(
                 org.springframework.http.HttpStatus.NOT_FOUND, "Usuário não encontrado"
@@ -35,22 +35,22 @@ public class UsuarioAPI {
         return usuario;
     }
 
-    @PutMapping("/{id}")
-    public Usuario atualizar(@PathVariable String id, @RequestBody Usuario usuario) {
-        Usuario existente = UsuarioController.buscarUsuario(id);
+    @PutMapping("/{usuariostr}")
+    public Usuario atualizar(@PathVariable String usuariostr, @RequestBody Usuario usuario) {
+        Usuario existente = UsuarioController.buscarUsuario(usuariostr);
         if (existente == null) {
             throw new ResponseStatusException(
                 org.springframework.http.HttpStatus.NOT_FOUND, "Usuário não encontrado"
             );
         }
-        usuario.setUsuario(id);
+        usuario.setUsuario(usuariostr);
         UsuarioController.atualizarUsuario(usuario);
         return usuario;
     }
 
-    @DeleteMapping("/{id}")
-    public void deletar(@PathVariable String id) {
-        Usuario usuario = UsuarioController.buscarUsuario(id);
+    @DeleteMapping("/{usuariostr}")
+    public void deletar(@PathVariable String usuariostr) {
+        Usuario usuario = UsuarioController.buscarUsuario(usuariostr);
         if (usuario == null) {
             throw new ResponseStatusException(
                 org.springframework.http.HttpStatus.NOT_FOUND, "Usuário não encontrado"

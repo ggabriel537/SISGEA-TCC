@@ -21,9 +21,9 @@ import com.sisgea.Entidades.Administrador;
 @RestController
 @RequestMapping("/api/administradores")
 public class AdministradorAPI {
-    @GetMapping("/{id}")
-    public Administrador buscarId(@PathVariable String id) {
-        Administrador adm = AdministradorController.buscarId(id);
+    @GetMapping("/{usuario}")
+    public Administrador buscarId(@PathVariable String usuario) {
+        Administrador adm = AdministradorController.buscarId(usuario);
         if (adm == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Administrador não encontrado");
         }
@@ -41,9 +41,9 @@ public class AdministradorAPI {
         return adm;
     }
 
-    @PutMapping("/{id}")
-    public Administrador atualizar(@PathVariable String id, @RequestBody Administrador adm) {
-        Administrador existente = AdministradorController.buscarId(id);
+    @PutMapping("/{usuario}")
+    public Administrador atualizar(@PathVariable String usuario, @RequestBody Administrador adm) {
+        Administrador existente = AdministradorController.buscarId(usuario);
         if (existente == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Administrador não encontrado");
         }
@@ -51,9 +51,9 @@ public class AdministradorAPI {
         return adm;
     }
 
-    @DeleteMapping("/{id}")
-    public void deletar(@PathVariable String id) {
-        Administrador adm = AdministradorController.buscarId(id);
+    @DeleteMapping("/{usuario}")
+    public void deletar(@PathVariable String usuario) {
+        Administrador adm = AdministradorController.buscarId(usuario);
         if (adm == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Administrador não encontrado");
         }

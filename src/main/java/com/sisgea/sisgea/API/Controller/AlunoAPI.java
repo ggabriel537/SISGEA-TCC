@@ -22,9 +22,9 @@ import com.sisgea.Entidades.Aluno;
 @RestController
 @RequestMapping("/api/alunos")
 public class AlunoAPI {
-    @GetMapping("/{id}")
-    public Aluno buscarId(@PathVariable String id) {
-        Aluno a = AlunoController.buscarId(id);
+    @GetMapping("/{cpf}")
+    public Aluno buscarId(@PathVariable String cpf) {
+        Aluno a = AlunoController.buscarId(cpf);
         if (a == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado");
         }
@@ -42,9 +42,9 @@ public class AlunoAPI {
         return a;
     }
 
-    @PutMapping("/{id}")
-    public Aluno atualizar(@PathVariable String id, @RequestBody Aluno a) {
-        Aluno existente = AlunoController.buscarId(id);
+    @PutMapping("/{cpf}")
+    public Aluno atualizar(@PathVariable String cpf, @RequestBody Aluno a) {
+        Aluno existente = AlunoController.buscarId(cpf);
         if (existente == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado");
         }
@@ -52,7 +52,7 @@ public class AlunoAPI {
         return a;
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{cpf}")
     public void deletar(@PathVariable String cpf) {
         Aluno a = AlunoController.buscarId(cpf);
         if (a == null) {
