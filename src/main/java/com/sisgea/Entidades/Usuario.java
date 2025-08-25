@@ -8,9 +8,12 @@ public class Usuario {
 
     @Id
     private String usuario;
-    
+
     private String senha;
     private Integer permissao;
+
+    public Usuario() {
+    }
 
     public Usuario(String usuario, String senha, Integer permissao) {
         this.usuario = usuario;
@@ -18,15 +21,12 @@ public class Usuario {
         this.permissao = permissao;
     }
 
-    public Usuario() {
-    }
-
     public String getUsuario() {
         return usuario;
     }
 
-    public void setUsuario(String nomeUsuario) {
-        this.usuario = nomeUsuario;
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
     }
 
     public String getSenha() {

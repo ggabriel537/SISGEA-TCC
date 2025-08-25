@@ -1,19 +1,15 @@
 package com.sisgea.Entidades;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
-import jakarta.persistence.Column;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-public class Instrutor extends Usuario {
+public class Instrutor {
 
     @Column(name = "canac")
     private Integer canac;
 
-    @Column(name = "cpf")
+    @Id
+    @Column(name = "cpf", unique = true)
     private String cpf;
 
     @Column(name = "nome")
@@ -31,23 +27,29 @@ public class Instrutor extends Usuario {
     @OneToOne
     private Endereco endereco;
 
-    public Instrutor(String usuario, String senha, Integer permissao, String nome, String cpf, String telefone, String email) {
-        super(usuario, senha, permissao);
-        this.nome = nome;
-        this.cpf = cpf;
-        this.telefone = telefone;
-        this.email = email;
-    }
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "usuario_id", unique = true, nullable = false)
+    private Usuario usuario;
 
     public Instrutor() {
     }
 
-    public String getNome() {
-        return nome;
+    public Instrutor(Usuario usuario, String nome, String cpf, String telefone, String email, Integer canac, String habilitacao) {
+        this.usuario = usuario;
+        this.nome = nome;
+        this.cpf = cpf;
+        this.telefone = telefone;
+        this.email = email;
+        this.canac = canac;
+        this.habilitacao = habilitacao;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public Integer getCanac() {
+        return canac;
+    }
+
+    public void setCanac(Integer canac) {
+        this.canac = canac;
     }
 
     public String getCpf() {
@@ -56,6 +58,14 @@ public class Instrutor extends Usuario {
 
     public void setCpf(String cpf) {
         this.cpf = cpf;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getTelefone() {
@@ -74,14 +84,6 @@ public class Instrutor extends Usuario {
         this.email = email;
     }
 
-    public Integer getCanac() {
-        return canac;
-    }
-
-    public void setCanac(Integer canac) {
-        this.canac = canac;
-    }
-
     public String getHabilitacao() {
         return habilitacao;
     }
@@ -96,5 +98,13 @@ public class Instrutor extends Usuario {
 
     public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 }

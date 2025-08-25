@@ -36,8 +36,8 @@ public class AgendamentoController {
         return AgendamentoModel.buscarAgendamento(id);
     }
 
-    public static void deletarAgendamento(Agendamento agendamento) {
-        AgendamentoModel.excluirAgendamento(agendamento);
+    public static void deletarAgendamento(String id) {
+        AgendamentoModel.excluirAgendamento(id);
     }
 
     public static void atualizarAgendamento(Agendamento agendamento) {

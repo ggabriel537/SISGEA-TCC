@@ -11,15 +11,15 @@ public class Agendamento {
     @Column(name = "id")
     private UUID id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "aeronave_id")
     private Aeronave aeronave;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "aluno_id")
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "aluno_id", referencedColumnName = "cpf")
     private Aluno aluno;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "instrutor_id")
     private Instrutor instrutor;
 
@@ -43,7 +43,8 @@ public class Agendamento {
         this.id = UUID.randomUUID();
     }
 
-    public Agendamento(Aeronave aeronave, Aluno aluno, Instrutor instrutor, String partida, String destino, String tipo_voo, String status, Date data_agendamento) {
+    public Agendamento(Aeronave aeronave, Aluno aluno, Instrutor instrutor, String partida, String destino,
+            String tipo_voo, String status, Date data_agendamento) {
         this();
         this.aeronave = aeronave;
         this.aluno = aluno;

@@ -25,7 +25,7 @@ public class Aeronave {
     @Column(name = "horas_de_voo")
     private Float horas_de_voo;
 
-    @OneToMany(mappedBy = "aeronave", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "aeronave", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Manutencao> manutencoes;
 
     public Aeronave() {}

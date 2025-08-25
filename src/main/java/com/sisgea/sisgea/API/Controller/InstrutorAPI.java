@@ -48,7 +48,6 @@ public class InstrutorAPI {
         if (existente == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Instrutor não encontrado");
         }
-        instrutor.setUsuario(usuario);
         InstrutorController.atualizarInstrutor(instrutor);
         return instrutor;
     }

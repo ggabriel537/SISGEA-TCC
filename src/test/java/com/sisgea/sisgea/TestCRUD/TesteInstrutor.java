@@ -12,8 +12,10 @@ import com.sisgea.BancoDados.Controllers.InstrutorController;
 import com.sisgea.BancoDados.Models.EnderecoModel;
 import com.sisgea.Entidades.Endereco;
 import com.sisgea.Entidades.Instrutor;
+import com.sisgea.Entidades.Usuario;
 
 class TesteInstrutor {
+
     @Test
     void testSalvarInstrutor() {
         Endereco endereco = new Endereco();
@@ -24,24 +26,20 @@ class TesteInstrutor {
         endereco.setUF("ST");
         EnderecoModel.salvarEndereco(endereco);
 
-        InstrutorController.salvarInstrutor("Instrutor A", "usuarioA", "senha123", 1, 1234, "111.222.333-44","12345-6789", "instrutora@email.com", "Habilitação X", endereco);
+        Usuario usuario = new Usuario("usuarioDA1235", "senha123", 1);
+        Instrutor instrutor = new Instrutor(usuario, "Instrutor DA123", "111.222.333-44", "12345-6789",
+                "instrutora@email.com", null, null);
+        instrutor.setEndereco(endereco);
+
+        InstrutorController.salvarInstrutor(instrutor);
 
         List<Instrutor> lista = InstrutorController.listarInstrutores();
         assertFalse(lista.isEmpty());
-        Instrutor instrutor = null;
-        for (Instrutor i : lista) {
-            if ("Instrutor A".equals(i.getNome())) {
-                instrutor = i;
-                break;
-            }
-        }
-        assertNotNull(instrutor);
-    }
-
-    @Test
-    void testListarInstrutores() {
-        List<Instrutor> lista = InstrutorController.listarInstrutores();
-        assertNotNull(lista, "Lista null.");
+        Instrutor salvo = lista.stream()
+                .filter(i -> "Instrutor DA123".equals(i.getNome()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(salvo);
     }
 
     @Test
@@ -54,25 +52,20 @@ class TesteInstrutor {
         endereco.setUF("AT");
         EnderecoModel.salvarEndereco(endereco);
 
-        InstrutorController.salvarInstrutor("Instrutor C", "usuarioC", "senha789", 1, 9012, "999.888.777-66","11111-2222", "instrutorc@email.com", "Habilitação Z", endereco);
+        Usuario usuario = new Usuario("usuarioDA1245", "senha123", 1);
+        Instrutor instrutor = new Instrutor(usuario, "Instrutor DA124", "999.888.777-66", "11111-2222",
+                "instrutorc@email.com", null, null);
+        instrutor.setEndereco(endereco);
 
-        Instrutor instrutor = null;
-        for (Instrutor i : InstrutorController.listarInstrutores()) {
-            if ("Instrutor C".equals(i.getNome())) {
-                instrutor = i;
-                break;
-            }
-        }
-        assertNotNull(instrutor);
-        instrutor.setNome("Instrutor B Atualizado");
+        InstrutorController.salvarInstrutor(instrutor);
+
+        instrutor.setNome("Instrutor DA124 Atualizado");
         InstrutorController.atualizarInstrutor(instrutor);
-        Instrutor atualizado = null;
-        for (Instrutor i : InstrutorController.listarInstrutores()) {
-            if ("Instrutor B Atualizado".equals(i.getNome())) {
-                atualizado = i;
-                break;
-            }
-        }
+
+        Instrutor atualizado = InstrutorController.listarInstrutores().stream()
+                .filter(i -> "Instrutor DA124 Atualizado".equals(i.getNome()))
+                .findFirst()
+                .orElse(null);
         assertNotNull(atualizado);
     }
 
@@ -86,24 +79,25 @@ class TesteInstrutor {
         endereco.setUF("DL");
         EnderecoModel.salvarEndereco(endereco);
 
-        InstrutorController.salvarInstrutor("Instrutor C", "usuarioC", "senha789", 1, 9012, "999.888.777-66","11111-2222", "instrutorc@email.com", "Habilitação Z", endereco);
+        Usuario usuario = new Usuario("usuarioDA1255", "senha123", 1);
+        Instrutor instrutor = new Instrutor(usuario, "Instrutor DA125", "999.777.555-44", "94444-4444",
+                "instrutord@email.com", null, null);
+        instrutor.setEndereco(endereco);
 
-        Instrutor instrutor = null;
-        for (Instrutor i : InstrutorController.listarInstrutores()) {
-            if ("Instrutor C".equals(i.getNome())) {
-                instrutor = i;
-                break;
-            }
-        }
-        assertNotNull(instrutor);
+        InstrutorController.salvarInstrutor(instrutor);
+
         InstrutorController.deletarInstrutor(instrutor);
-        Instrutor deletado = null;
-        for (Instrutor i : InstrutorController.listarInstrutores()) {
-            if ("Instrutor C".equals(i.getNome())) {
-                deletado = i;
-                break;
-            }
-        }
+
+        Instrutor deletado = InstrutorController.listarInstrutores().stream()
+                .filter(i -> "Instrutor DA125".equals(i.getNome()))
+                .findFirst()
+                .orElse(null);
         assertNull(deletado);
+    }
+
+    @Test
+    void testListarInstrutores() {
+        List<Instrutor> lista = InstrutorController.listarInstrutores();
+        assertNotNull(lista, "Lista null.");
     }
 }

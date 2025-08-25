@@ -4,10 +4,13 @@ import java.util.List;
 
 import com.sisgea.BancoDados.Models.AdministradorModel;
 import com.sisgea.Entidades.Administrador;
+import com.sisgea.Entidades.Usuario;
 
 public class AdministradorController {
+
     public static void salvarAdministrador(String nome, String usuario, String senha, Integer permissao) {
-        Administrador administrador = new Administrador(usuario, senha, permissao, nome);
+        Usuario user = new Usuario(usuario, senha, permissao);
+        Administrador administrador = new Administrador(user, nome);
         AdministradorModel.salvarAdministrador(administrador);
     }
 

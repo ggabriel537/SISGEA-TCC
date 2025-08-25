@@ -3,38 +3,20 @@ package com.sisgea.BancoDados.Controllers;
 import java.util.List;
 
 import com.sisgea.BancoDados.Models.InstrutorModel;
-import com.sisgea.Entidades.Endereco;
 import com.sisgea.Entidades.Instrutor;
+import com.sisgea.Entidades.Usuario;
 
 public class InstrutorController {
-    public static void salvarInstrutor(
-        String nome,
-        String usuario,
-        String senha,
-        Integer permissao,
-        Integer canac,
-        String cpf,
-        String telefone,
-        String email,
-        String habilitacao,
-        Endereco endereco
-    ) {
-        Instrutor instrutor = new Instrutor();
-        instrutor.setNome(nome);
-        instrutor.setUsuario(usuario);
-        instrutor.setSenha(senha);
-        instrutor.setPermissao(permissao);
-        instrutor.setCanac(canac);
-        instrutor.setCpf(cpf);
-        instrutor.setTelefone(telefone);
-        instrutor.setEmail(email);
-        instrutor.setHabilitacao(habilitacao);
-        instrutor.setEndereco(endereco);
-        InstrutorModel.salvarInstrutor(instrutor);
+
+    public static void salvarInstrutor(String nome, String cpf, String telefone, String email,
+                                       String usuarioStr, String senha, Integer permissao) {
+        Usuario usuario = new Usuario(usuarioStr, senha, permissao);
+        Instrutor instrutor = new Instrutor(usuario, nome, cpf, telefone, email, null, null);
+        InstrutorModel.salvarInstrutor(instrutor); // cascade salva Usuario também
     }
 
     public static void salvarInstrutor(Instrutor instrutor) {
-        InstrutorModel.salvarInstrutor(instrutor);
+        InstrutorModel.salvarInstrutor(instrutor); // sem UsuarioController
     }
 
     public static List<Instrutor> listarInstrutores() {
@@ -50,6 +32,6 @@ public class InstrutorController {
     }
 
     public static void atualizarInstrutor(Instrutor instrutor) {
-        InstrutorModel.atualizarInstrutor(instrutor);
+        InstrutorModel.atualizarInstrutor(instrutor); // cascade MERGE cuida do Usuario
     }
 }

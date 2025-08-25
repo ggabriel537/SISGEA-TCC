@@ -12,7 +12,7 @@ public class InstrutorModel {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
         tx.begin();
-        em.persist(instrutor);
+        em.merge(instrutor);
         tx.commit();
         em.close();
     }

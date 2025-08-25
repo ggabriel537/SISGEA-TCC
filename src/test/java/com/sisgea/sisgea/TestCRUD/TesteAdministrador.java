@@ -10,15 +10,18 @@ import org.junit.jupiter.api.Test;
 import com.sisgea.BancoDados.Controllers.AdministradorController;
 import com.sisgea.Entidades.Administrador;
 
-class TesteAdministrador{
+class TesteAdministrador {
+
     @Test
     void testSalvarAdministrador() {
         AdministradorController.salvarAdministrador("adm", "admuser", "123", 1);
+
         List<Administrador> lista = AdministradorController.listarAdministradores();
         assertFalse(lista.isEmpty(), "Lista vazia! Administrador não salvo.");
+
         Administrador adm = null;
         for (Administrador a : lista) {
-            if ("admuser".equals(a.getUsuario())) {
+            if ("admuser".equals(a.getUsuario().getUsuario())) {
                 adm = a;
                 break;
             }
@@ -35,16 +38,19 @@ class TesteAdministrador{
     @Test
     void testAtualizarAdministrador() {
         AdministradorController.salvarAdministrador("adm2", "admuser2", "123", 1);
+
         Administrador adm = null;
         for (Administrador a : AdministradorController.listarAdministradores()) {
-            if ("admuser2".equals(a.getUsuario())) {
+            if ("admuser2".equals(a.getUsuario().getUsuario())) {
                 adm = a;
                 break;
             }
         }
         assertNotNull(adm, "Administrador não encontrado para update.");
+
         adm.setNome("adm2OK");
         AdministradorController.atualizarAdministrador(adm);
+
         Administrador atualizado = null;
         for (Administrador a : AdministradorController.listarAdministradores()) {
             if ("adm2OK".equals(a.getNome())) {
@@ -58,18 +64,21 @@ class TesteAdministrador{
     @Test
     void testDeletarAdministrador() {
         AdministradorController.salvarAdministrador("adm3", "admuser3", "123", 1);
+
         Administrador adm = null;
         for (Administrador a : AdministradorController.listarAdministradores()) {
-            if ("admuser3".equals(a.getUsuario())) {
+            if ("admuser3".equals(a.getUsuario().getUsuario())) {
                 adm = a;
                 break;
             }
         }
         assertNotNull(adm, "Administrador não encontrado para deletar.");
+
         AdministradorController.deletarAdministrador(adm);
+
         Administrador deletado = null;
         for (Administrador a : AdministradorController.listarAdministradores()) {
-            if ("admuser3".equals(a.getUsuario())) {
+            if ("admuser3".equals(a.getUsuario().getUsuario())) {
                 deletado = a;
                 break;
             }
@@ -77,4 +86,3 @@ class TesteAdministrador{
         assertNull(deletado, "Administrador não foi deletado.");
     }
 }
-

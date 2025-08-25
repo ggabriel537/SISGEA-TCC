@@ -3,18 +3,29 @@ package com.sisgea.Entidades;
 import jakarta.persistence.*;
 
 @Entity
-public class Administrador extends Usuario {
+public class Administrador {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @Column(name = "nome")
     private String nome;
 
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "usuario_id", unique = true)
+    private Usuario usuario;
+
     public Administrador() {
-        super();
     }
 
-    public Administrador(String usuario, String senha, Integer permissao, String nome) {
-        super(usuario, senha, permissao);
+    public Administrador(Usuario usuario, String nome) {
+        this.usuario = usuario;
         this.nome = nome;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getNome() {
@@ -23,5 +34,13 @@ public class Administrador extends Usuario {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 }
