@@ -82,13 +82,9 @@ public class DiarioBordo {
     @Column(name = "ocorrencias", length = 2000)
     private String ocorrencias;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "diario_bordo_id")
     private List<Discrepancia> discrepancias;
-
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "agendamento_id")
-    private Agendamento agendamento;
 
     public DiarioBordo() {}
 
@@ -282,13 +278,5 @@ public class DiarioBordo {
 
     public void setDiscrepancias(List<Discrepancia> discrepancias) {
         this.discrepancias = discrepancias;
-    }
-
-    public Agendamento getAgendamento() {
-        return agendamento;
-    }
-
-    public void setAgendamento(Agendamento agendamento) {
-        this.agendamento = agendamento;
     }
 }

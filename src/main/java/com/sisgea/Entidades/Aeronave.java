@@ -28,6 +28,9 @@ public class Aeronave {
     @OneToMany(mappedBy = "aeronave", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Manutencao> manutencoes;
 
+    @OneToMany(mappedBy = "aeronaveId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<DiarioBordo> diarioBordos;
+
     public Aeronave() {}
 
     public Aeronave(String matricula, String modelo, String fabricante, String habilitacao, String tipo_de_voo) {
@@ -36,6 +39,14 @@ public class Aeronave {
         this.fabricante = fabricante;
         this.habilitacao = habilitacao;
         this.tipo_de_voo = tipo_de_voo;
+    }
+
+    public List<DiarioBordo> getDiarioBordos() {
+        return diarioBordos;
+    }
+
+    public void setDiarioBordos(List<DiarioBordo> diarioBordos) {
+        this.diarioBordos = diarioBordos;
     }
 
     public String getMatricula() {

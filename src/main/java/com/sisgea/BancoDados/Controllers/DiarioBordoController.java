@@ -61,7 +61,6 @@ public class DiarioBordoController {
         diario.setNat(nat);
         diario.setOcorrencias(ocorrencias);
         diario.setDiscrepancias(discrepancias);
-        diario.setAgendamento(agendamento);
 
         DiarioBordoModel.salvarDiarioBordo(diario);
     }
