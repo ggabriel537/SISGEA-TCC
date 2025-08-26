@@ -2,16 +2,12 @@ package com.sisgea.BancoDados.Controllers;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import com.sisgea.BancoDados.Models.DiarioBordoModel;
-import com.sisgea.Entidades.Agendamento;
 import com.sisgea.Entidades.DiarioBordo;
-import com.sisgea.Entidades.Discrepancia;
 
 public class DiarioBordoController {
     public static void salvarDiarioBordo(
-            UUID id,
             String aeronaveId,
             Integer nroDiario,
             Date data,
@@ -33,11 +29,8 @@ public class DiarioBordoController {
             Integer pob,
             Float carga,
             String nat,
-            String ocorrencias,
-            List<Discrepancia> discrepancias,
-            Agendamento agendamento) {
+            String ocorrencias) {
         DiarioBordo diario = new DiarioBordo();
-        diario.setId(id);
         diario.setAeronaveId(aeronaveId);
         diario.setNroDiario(nroDiario);
         diario.setData(data);
@@ -60,7 +53,6 @@ public class DiarioBordoController {
         diario.setCarga(carga);
         diario.setNat(nat);
         diario.setOcorrencias(ocorrencias);
-        diario.setDiscrepancias(discrepancias);
 
         DiarioBordoModel.salvarDiarioBordo(diario);
     }
@@ -77,8 +69,8 @@ public class DiarioBordoController {
         return DiarioBordoModel.buscarDiarioBordo(id);
     }
 
-    public static void deletarDiarioBordo(DiarioBordo diarioBordo) {
-        DiarioBordoModel.excluirDiarioBordo(diarioBordo);
+    public static void deletarDiarioBordo(String id) {
+        DiarioBordoModel.excluirDiarioBordo(id);
     }
 
     public static void atualizarDiarioBordo(DiarioBordo diarioBordo) {

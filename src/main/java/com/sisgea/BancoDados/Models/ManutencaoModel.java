@@ -1,6 +1,7 @@
 package com.sisgea.BancoDados.Models;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.sisgea.Entidades.Manutencao;
 
@@ -41,11 +42,15 @@ public class ManutencaoModel {
         em.close();
     }
 
-    public static void excluirManutencao(Manutencao manutencao) {
+    public static void excluirManutencao(String id) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
         tx.begin();
-        em.remove(em.contains(manutencao) ? manutencao : em.merge(manutencao));
+        UUID uuid = UUID.fromString(id);
+        Manutencao man = em.find(Manutencao.class, uuid);
+        if (man != null) {
+            em.remove(man);
+        }
         tx.commit();
         em.close();
     }

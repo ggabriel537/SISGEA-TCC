@@ -1,6 +1,7 @@
 package com.sisgea.BancoDados.Models;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.sisgea.Entidades.DiarioBordo;
 import jakarta.persistence.EntityManager;
@@ -26,9 +27,10 @@ public class DiarioBordoModel {
 
     public static DiarioBordo buscarDiarioBordo(String id) {
         EntityManager em = JPAUtil.getEntityManager();
-        DiarioBordo diarioBordo = em.find(DiarioBordo.class, id);
+        UUID uuid = UUID.fromString(id);
+        DiarioBordo diario = em.find(DiarioBordo.class, uuid);
         em.close();
-        return diarioBordo;
+        return diario;
     }
 
     public static void atualizarDiarioBordo(DiarioBordo diario) {
@@ -40,11 +42,15 @@ public class DiarioBordoModel {
         em.close();
     }
 
-    public static void excluirDiarioBordo(DiarioBordo diario) {
+    public static void excluirDiarioBordo(String id) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
         tx.begin();
-        em.remove(em.contains(diario) ? diario : em.merge(diario));
+        UUID uuid = UUID.fromString(id);
+        DiarioBordo diario = em.find(DiarioBordo.class, uuid);
+        if (diario != null) {
+            em.remove(diario);
+        }
         tx.commit();
         em.close();
     }

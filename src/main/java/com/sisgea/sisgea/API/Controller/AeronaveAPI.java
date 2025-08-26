@@ -1,17 +1,11 @@
 package com.sisgea.sisgea.API.Controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.sisgea.BancoDados.Controllers.AeronaveController;
@@ -21,13 +15,14 @@ import com.sisgea.Entidades.Aeronave;
 @RestController
 @RequestMapping("/api/aeronaves")
 public class AeronaveAPI {
-    @GetMapping("/{id}")
-    public Aeronave buscarId(@PathVariable String id) {
-        Aeronave ar = AeronaveController.buscarId(id);
-        if (ar == null) {
+
+    @GetMapping("/{matricula}")
+    public Aeronave buscar(@PathVariable String matricula) {
+        Aeronave aer = AeronaveController.buscarId(matricula);
+        if (aer == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aeronave não encontrada");
         }
-        return ar;
+        return aer;
     }
 
     @GetMapping
@@ -36,27 +31,77 @@ public class AeronaveAPI {
     }
 
     @PostMapping
-    public Aeronave criar(@RequestBody Aeronave ar) {
-        AeronaveController.salvarAeronave(ar);
-        return ar;
+    public ResponseEntity<?> criar(@RequestBody Aeronave aer) {
+        // Limitações de Cadastro das aeronaves
+        // Conflito -> Bloqueia o cadastro
+        String conflito_str = "";
+        boolean conflito = false;
+
+        //
+        // DADOS OBRIGATÓRIOS
+        //
+        String erro = validarAeronave(aer);
+        if (!erro.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", erro));
+        }
+
+        //
+        // CONFLITOS
+        //
+        // Matrícula é única
+        if (AeronaveController.buscarId(aer.getMatricula()) != null) {
+            conflito = true;
+            conflito_str += "Já existe uma aeronave com esta matrícula.\n";
+        }
+
+        if (conflito) {
+            return ResponseEntity.badRequest().body(Map.of("error", conflito_str));
+        }
+
+        //
+        // CADASTRO DA AERONAVE
+        //
+        AeronaveController.salvarAeronave(aer);
+        return ResponseEntity.ok(Map.of("status", "sucesso", "matricula", aer.getMatricula()));
     }
 
-    @PutMapping("/{id}")
-    public Aeronave atualizar(@PathVariable String id, @RequestBody Aeronave ar) {
-        Aeronave existente = AeronaveController.buscarId(id);
+    @PutMapping("/{matricula}")
+    public ResponseEntity<?> atualizar(@PathVariable String matricula, @RequestBody Aeronave aer) {
+        // Busca aeronave existente
+        Aeronave existente = AeronaveController.buscarId(matricula);
         if (existente == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aeronave não encontrada");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Aeronave não encontrada"));
         }
-        AeronaveController.atualizarAeronave(ar);
-        return ar;
+
+        // DADOS OBRIGATÓRIOS
+        String erro = validarAeronave(aer);
+        if (!erro.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", erro));
+        }
+
+        //
+        // ATUALIZAÇÃO DA AERONAVE
+        //
+        aer.setMatricula(matricula);
+        AeronaveController.atualizarAeronave(aer);
+        return ResponseEntity.ok(Map.of("status", "sucesso", "matricula", aer.getMatricula()));
     }
 
-    @DeleteMapping("/{id}")
-    public void deletar(@PathVariable String id) {
-        Aeronave ar = AeronaveController.buscarId(id);
-        if (ar == null) {
+    @DeleteMapping("/{matricula}")
+    public void deletar(@PathVariable String matricula) {
+        Aeronave aer = AeronaveController.buscarId(matricula);
+        if (aer == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aeronave não encontrada");
         }
-        AeronaveController.deletarAeronave(ar);
+        AeronaveController.deletarAeronave(aer);
+    }
+
+    private String validarAeronave(Aeronave aer) {
+        String msg = "";
+        if (aer.getMatricula() == null || aer.getMatricula().isBlank()) msg += "Matrícula é obrigatória. ";
+        if (aer.getModelo() == null || aer.getModelo().isBlank()) msg += "Modelo é obrigatório. ";
+        if (aer.getFabricante() == null || aer.getFabricante().isBlank()) msg += "Fabricante é obrigatório.";
+        return msg;
     }
 }

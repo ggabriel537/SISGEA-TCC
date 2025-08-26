@@ -12,11 +12,11 @@ public class InstrutorController {
                                        String usuarioStr, String senha, Integer permissao) {
         Usuario usuario = new Usuario(usuarioStr, senha, permissao);
         Instrutor instrutor = new Instrutor(usuario, nome, cpf, telefone, email, null, null);
-        InstrutorModel.salvarInstrutor(instrutor); // cascade salva Usuario também
+        InstrutorModel.salvarInstrutor(instrutor);
     }
 
     public static void salvarInstrutor(Instrutor instrutor) {
-        InstrutorModel.salvarInstrutor(instrutor); // sem UsuarioController
+        InstrutorModel.salvarInstrutor(instrutor);
     }
 
     public static List<Instrutor> listarInstrutores() {
@@ -27,11 +27,11 @@ public class InstrutorController {
         return InstrutorModel.buscarInstrutor(id);
     }
 
-    public static void deletarInstrutor(Instrutor instrutor) {
-        InstrutorModel.excluirInstrutor(instrutor);
+    public static void deletarInstrutor(String id) {
+        InstrutorModel.excluirInstrutor(id);
     }
 
     public static void atualizarInstrutor(Instrutor instrutor) {
-        InstrutorModel.atualizarInstrutor(instrutor); // cascade MERGE cuida do Usuario
+        InstrutorModel.atualizarInstrutor(instrutor);
     }
 }

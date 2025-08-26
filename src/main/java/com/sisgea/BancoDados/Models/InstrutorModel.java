@@ -40,11 +40,14 @@ public class InstrutorModel {
         em.close();
     }
 
-    public static void excluirInstrutor(Instrutor instrutor) {
+    public static void excluirInstrutor(String id) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
         tx.begin();
-        em.remove(em.contains(instrutor) ? instrutor : em.merge(instrutor));
+        Instrutor inst = em.find(Instrutor.class, id);
+        if (inst != null) {
+            em.remove(inst);
+        }
         tx.commit();
         em.close();
     }

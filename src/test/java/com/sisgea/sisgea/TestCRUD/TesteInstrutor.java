@@ -86,7 +86,7 @@ class TesteInstrutor {
 
         InstrutorController.salvarInstrutor(instrutor);
 
-        InstrutorController.deletarInstrutor(instrutor);
+        InstrutorController.deletarInstrutor(instrutor.getCpf());
 
         Instrutor deletado = InstrutorController.listarInstrutores().stream()
                 .filter(i -> "Instrutor DA125".equals(i.getNome()))

@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.sisgea.BancoDados.Controllers.AeronaveController;
 import com.sisgea.BancoDados.Controllers.AgendamentoController;
 import com.sisgea.BancoDados.Controllers.AlunoController;
+import com.sisgea.BancoDados.Controllers.InstrutorController;
 import com.sisgea.Entidades.Aeronave;
 import com.sisgea.Entidades.Agendamento;
 import com.sisgea.Entidades.Aluno;
@@ -151,6 +152,8 @@ public class AgendamentoAPI {
         //
         // CADASTRO DO AGENDAMENTO
         //
+
+        ag.setInstrutor(InstrutorController.buscarId(ag.getInstrutor().getCpf()));
 
         AgendamentoController.salvarAgendamento(ag);
         return ResponseEntity.ok(Map.of("status", "sucesso", "agendamento", ag.getId()));

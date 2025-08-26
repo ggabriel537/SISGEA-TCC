@@ -82,7 +82,7 @@ public class DiarioBordo {
     @Column(name = "ocorrencias", length = 2000)
     private String ocorrencias;
 
-    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "diario_bordo_id")
     private List<Discrepancia> discrepancias;
 

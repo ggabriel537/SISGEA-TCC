@@ -72,7 +72,7 @@ class TesteDiscrepancia {
             }
         }
         assertNotNull(discrepancia, "Discrepancia para deletar não encontrada.");
-        DiscrepanciaController.deletarDiscrepancia(discrepancia);
+        DiscrepanciaController.deletarDiscrepancia(discrepancia.getId().toString());
         Discrepancia deletado = null;
         for (Discrepancia d : DiscrepanciaController.listarDiscrepancias()) {
             if ("Descricao Deletar".equals(d.getDiscrepancia())) {

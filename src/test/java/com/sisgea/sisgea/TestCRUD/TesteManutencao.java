@@ -70,7 +70,7 @@ class TesteManutencao {
             }
         }
         assertNotNull(manutencao, "Manutencao para deletar não encontrada.");
-        ManutencaoController.deletarManutencao(manutencao);
+        ManutencaoController.deletarManutencao(manutencao.getId().toString());
         Manutencao deletado = null;
         for (Manutencao m : ManutencaoController.listarManutencoes()) {
             if ("Deletar Manutencao".equals(m.getDescricao()) && "Pendente".equals(m.getStatus())) {

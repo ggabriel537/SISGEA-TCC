@@ -1,17 +1,11 @@
 package com.sisgea.sisgea.API.Controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.sisgea.BancoDados.Controllers.AdministradorController;
@@ -21,9 +15,10 @@ import com.sisgea.Entidades.Administrador;
 @RestController
 @RequestMapping("/api/administradores")
 public class AdministradorAPI {
-    @GetMapping("/{usuario}")
-    public Administrador buscarId(@PathVariable String usuario) {
-        Administrador adm = AdministradorController.buscarId(usuario);
+
+    @GetMapping("/{id}")
+    public Administrador buscar(@PathVariable String id) {
+        Administrador adm = AdministradorController.buscarId(id);
         if (adm == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Administrador não encontrado");
         }
@@ -36,27 +31,76 @@ public class AdministradorAPI {
     }
 
     @PostMapping
-    public Administrador criar(@RequestBody Administrador adm) {
-        AdministradorController.salvarAdministrador(adm);
-        return adm;
-    }
+    public ResponseEntity<?> criar(@RequestBody Administrador adm) {
+        // Limitações de Cadastro dos administradores
+        // Conflito -> Bloqueia o cadastro
+        String conflito_str = "";
+        boolean conflito = false;
 
-    @PutMapping("/{usuario}")
-    public Administrador atualizar(@PathVariable String usuario, @RequestBody Administrador adm) {
-        Administrador existente = AdministradorController.buscarId(usuario);
-        if (existente == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Administrador não encontrado");
+        //
+        // DADOS OBRIGATÓRIOS
+        //
+        String erro = validarAdministrador(adm);
+        if (!erro.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", erro));
         }
-        AdministradorController.atualizarAdministrador(adm);
-        return adm;
+
+        //
+        // CONFLITOS
+        //
+        // Se vier ID preenchido e já existir, é duplicidade
+        if (adm.getId() != null && !adm.getId().isBlank()
+                && AdministradorController.buscarId(adm.getId()) != null) {
+            conflito = true;
+            conflito_str += "Já existe um administrador com este ID.\n";
+        }
+
+        if (conflito) {
+            return ResponseEntity.badRequest().body(Map.of("error", conflito_str));
+        }
+
+        //
+        // CADASTRO DO ADMINISTRADOR
+        //
+        AdministradorController.salvarAdministrador(adm);
+        return ResponseEntity.ok(Map.of("status", "sucesso", "id", adm.getId()));
     }
 
-    @DeleteMapping("/{usuario}")
-    public void deletar(@PathVariable String usuario) {
-        Administrador adm = AdministradorController.buscarId(usuario);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizar(@PathVariable String id, @RequestBody Administrador adm) {
+        // Busca administrador existente
+        Administrador existente = AdministradorController.buscarId(id);
+        if (existente == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Administrador não encontrado"));
+        }
+
+        // DADOS OBRIGATÓRIOS
+        String erro = validarAdministrador(adm);
+        if (!erro.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", erro));
+        }
+
+        //
+        // ATUALIZAÇÃO DO ADMINISTRADOR
+        //
+        adm.setId(id);
+        AdministradorController.atualizarAdministrador(adm);
+        return ResponseEntity.ok(Map.of("status", "sucesso", "id", adm.getId()));
+    }
+
+    @DeleteMapping("/{id}")
+    public void deletar(@PathVariable String id) {
+        Administrador adm = AdministradorController.buscarId(id);
         if (adm == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Administrador não encontrado");
         }
         AdministradorController.deletarAdministrador(adm);
+    }
+
+    private String validarAdministrador(Administrador adm) {
+        String msg = "";
+        if (adm.getNome() == null || adm.getNome().isBlank()) msg += "Nome do administrador é obrigatório.";
+        return msg;
     }
 }

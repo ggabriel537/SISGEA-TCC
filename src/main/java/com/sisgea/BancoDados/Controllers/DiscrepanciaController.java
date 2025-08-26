@@ -28,8 +28,8 @@ public class DiscrepanciaController {
         return DiscrepanciaModel.buscarDiscrepancia(id);
     }
 
-    public static void deletarDiscrepancia(Discrepancia discrepancia) {
-        DiscrepanciaModel.excluirDiscrepancia(discrepancia);
+    public static void deletarDiscrepancia(String id) {
+        DiscrepanciaModel.excluirDiscrepancia(id);
     }
 
     public static void atualizarDiscrepancia(Discrepancia discrepancia) {

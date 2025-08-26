@@ -1,6 +1,7 @@
 package com.sisgea.BancoDados.Models;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.sisgea.Entidades.Discrepancia;
 import jakarta.persistence.EntityManager;
@@ -40,11 +41,15 @@ public class DiscrepanciaModel {
         em.close();
     }
 
-    public static void excluirDiscrepancia(Discrepancia discrepancia) {
+    public static void excluirDiscrepancia(String id) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
         tx.begin();
-        em.remove(em.contains(discrepancia) ? discrepancia : em.merge(discrepancia));
+        UUID uuid = UUID.fromString(id);
+        Discrepancia disc = em.find(Discrepancia.class, uuid);
+        if (disc != null) {
+            em.remove(disc);
+        }
         tx.commit();
         em.close();
     }

@@ -26,8 +26,8 @@ public class ManutencaoController {
         return ManutencaoModel.buscarId(id);
     }
 
-    public static void deletarManutencao(Manutencao manutencao) {
-        ManutencaoModel.excluirManutencao(manutencao);
+    public static void deletarManutencao(String id) {
+        ManutencaoModel.excluirManutencao(id);
     }
 
     public static void atualizarManutencao(Manutencao manutencao) {

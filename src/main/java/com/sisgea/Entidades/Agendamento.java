@@ -11,16 +11,16 @@ public class Agendamento {
     @Column(name = "id")
     private UUID id;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "aeronave_id")
+    @ManyToOne
+    @JoinColumn(name = "aeronave_id", referencedColumnName = "matricula")
     private Aeronave aeronave;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "aluno_id", referencedColumnName = "cpf")
     private Aluno aluno;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "instrutor_id")
+    @ManyToOne
+    @JoinColumn(name = "instrutor_id", referencedColumnName = "cpf")
     private Instrutor instrutor;
 
     @Column(name = "partida")

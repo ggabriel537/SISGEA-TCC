@@ -7,7 +7,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.sisgea.BancoDados.Controllers.AeronaveController;
+import com.sisgea.BancoDados.Controllers.AlunoController;
 import com.sisgea.BancoDados.Controllers.AgendamentoController;
+import com.sisgea.BancoDados.Controllers.InstrutorController;
 import com.sisgea.Entidades.Aeronave;
 import com.sisgea.Entidades.Agendamento;
 import com.sisgea.Entidades.Aluno;
@@ -17,14 +20,60 @@ import com.sisgea.sisgea.Uteis;
 
 class TesteAgendamento {
 
+    // ---------- HELPERS ----------
+
+    private Aeronave getOrCreateAeronave(String modelo, String fabricante, String habilitacao, String tipoVoo) {
+        List<Aeronave> aeronaves = AeronaveController.listarAeronaves();
+        Aeronave aeronave;
+
+        if (aeronaves.isEmpty()) {
+            aeronave = new Aeronave(Uteis.gerarMatriculaAleatoria(), modelo, fabricante, habilitacao, tipoVoo);
+            AeronaveController.salvarAeronave(aeronave);
+        } else {
+            aeronave = aeronaves.get(0);
+        }
+
+        return aeronave;
+    }
+
+    private Aluno getOrCreateAluno(String nome, String cpf, String telefone, String email, String curso) {
+        List<Aluno> alunos = AlunoController.listarAlunos();
+        Aluno aluno;
+
+        if (alunos.isEmpty()) {
+            aluno = new Aluno(nome, cpf, telefone, email, curso);
+            AlunoController.salvarAluno(aluno);
+        } else {
+            aluno = alunos.get(0);
+        }
+
+        return aluno;
+    }
+
+    private Instrutor getOrCreateInstrutor(String nome, String cpf, String telefone, String email, int categoria, String habilitacao, String usuario, String senha) {
+        List<Instrutor> instrutores = InstrutorController.listarInstrutores();
+        Instrutor instrutor;
+
+        if (instrutores.isEmpty()) {
+            Usuario usuarioInstrutor = new Usuario(usuario, senha, categoria);
+            instrutor = new Instrutor(usuarioInstrutor, nome, cpf, telefone, email, categoria, habilitacao);
+            InstrutorController.salvarInstrutor(instrutor);
+        } else {
+            instrutor = instrutores.get(0);
+        }
+
+        return instrutor;
+    }
+
+    // ---------- TESTES ----------
+
     @Test
     void testSalvarAgendamento() {
-        Aeronave aeronave = new Aeronave(Uteis.gerarMatriculaAleatoria(), "Cessna 172", "Cessna", "VFR", "Treinamento");
-        Usuario usuarioInstrutor = new Usuario("instrutor1", "senha", 2);
-        Aluno aluno = new Aluno("João Silva", "12345678901", "99999-9999", "joao@email.com", "Aviação");
-        Instrutor instrutor = new Instrutor(usuarioInstrutor, "Carlos Souza", "98765432100", "98888-8888", "carlos@email.com", 2, "IFR");
-        Date dataAgendamento = new Date();
-        java.sql.Date dataAgendamentoSql = new java.sql.Date(dataAgendamento.getTime());
+        Aeronave aeronave = getOrCreateAeronave("Cessna 172", "Cessna", "VFR", "Treinamento");
+        Aluno aluno = getOrCreateAluno("João Silva", "12345678901", "99999-9999", "joao@email.com", "Aviação");
+        Instrutor instrutor = getOrCreateInstrutor("Carlos Souza", "98765432100", "98888-8888", "carlos@email.com", 2, "IFR", "instrutor1", "senha");
+
+        java.sql.Date dataAgendamentoSql = new java.sql.Date(new Date().getTime());
 
         AgendamentoController.salvarAgendamento(aeronave, aluno, instrutor, "SBSP", "SBGL", "Duplo", "Agendado", dataAgendamentoSql);
 
@@ -43,12 +92,11 @@ class TesteAgendamento {
 
     @Test
     void testAtualizarAgendamento() {
-        Aeronave aeronave = new Aeronave(Uteis.gerarMatriculaAleatoria(), "Piper PA-28", "Piper", "IFR", "Treinamento");
-        Usuario usuarioInstrutor = new Usuario("instrutor2", "senha2", 2);
-        Aluno aluno = new Aluno("Maria Oliveira", "11122233344", "97777-7777", "maria@email.com", "Aviação");
-        Instrutor instrutor = new Instrutor(usuarioInstrutor, "Paulo Lima", "99988877766", "96666-6666", "paulo@email.com", 2, "IFR");
-        Date dataAgendamento = new Date();
-        java.sql.Date dataAgendamentoSql = new java.sql.Date(dataAgendamento.getTime());
+        Aeronave aeronave = getOrCreateAeronave("Piper PA-28", "Piper", "IFR", "Treinamento");
+        Aluno aluno = getOrCreateAluno("Maria Oliveira", "11122233344", "97777-7777", "maria@email.com", "Aviação");
+        Instrutor instrutor = getOrCreateInstrutor("Paulo Lima", "99988877766", "96666-6666", "paulo@email.com", 2, "IFR", "instrutor2", "senha2");
+
+        java.sql.Date dataAgendamentoSql = new java.sql.Date(new Date().getTime());
 
         AgendamentoController.salvarAgendamento(aeronave, aluno, instrutor, "SBGR", "SBKP", "Solo", "Pendente", dataAgendamentoSql);
 
@@ -73,12 +121,11 @@ class TesteAgendamento {
 
     @Test
     void testDeletarAgendamento() {
-        Aeronave aeronave = new Aeronave(Uteis.gerarMatriculaAleatoria(), "Embraer 190", "Embraer", "IFR", "Comercial");
-        Usuario usuarioInstrutor = new Usuario("instrutor3", "senha3", 2);
-        Aluno aluno = new Aluno("Pedro Santos", "22233344455", "95555-5555", "pedro@email.com", "Aviação");
-        Instrutor instrutor = new Instrutor(usuarioInstrutor, "Lucas Costa", "77766655544", "94444-4444", "lucas@email.com", 2, "IFR");
-        Date dataAgendamento = new Date();
-        java.sql.Date dataAgendamentoSql = new java.sql.Date(dataAgendamento.getTime());
+        Aeronave aeronave = getOrCreateAeronave("Embraer 190", "Embraer", "IFR", "Comercial");
+        Aluno aluno = getOrCreateAluno("Pedro Santos", "22233344455", "95555-5555", "pedro@email.com", "Aviação");
+        Instrutor instrutor = getOrCreateInstrutor("Lucas Costa", "77766655544", "94444-4444", "lucas@email.com", 2, "IFR", "instrutor3", "senha3");
+
+        java.sql.Date dataAgendamentoSql = new java.sql.Date(new Date().getTime());
 
         AgendamentoController.salvarAgendamento(aeronave, aluno, instrutor, "SBCT", "SBPJ", "Duplo", "Agendado", dataAgendamentoSql);
 
