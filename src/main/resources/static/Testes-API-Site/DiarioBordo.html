@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD Diário de Bordo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fdf2f2;
+            color: #4d1a1a;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #b71c1c;
+        }
+
+        h2 {
+            color: #8b0000;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: #fff0f0;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(179,28,28,0.2);
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        input, textarea, select, button {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 5px;
+            border: 1px solid #b71c1c;
+        }
+
+        button {
+            background-color: #b71c1c;
+            color: white;
+            border: none;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #8b0000;
+        }
+
+        .detalhes {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #ffe5e5;
+            border-radius: 5px;
+        }
+
+        .item-title {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .seta {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .flex-row > div {
+            flex: 1 1 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CRUD Diário de Bordo</h1>
+
+    <!-- Criar -->
+    <div class="card">
+        <h2>Criar Diário de Bordo</h2>
+        <div class="flex-row">
+            <div>
+                <label>Aeronave:</label>
+                <select id="aeronaveSelect"></select>
+            </div>
+            <div>
+                <label>Número Diário:</label>
+                <input type="number" id="nroDiario">
+            </div>
+            <div>
+                <label>Data:</label>
+                <input type="date" id="data">
+            </div>
+        </div>
+        <label>Data Decolagem: <input type="datetime-local" id="dataDecolagem"></label>
+        <label>Data Pouso: <input type="datetime-local" id="dataPouso"></label>
+        <label>Horas Diurno: <input type="number" id="horasDiu"></label>
+        <label>Horas Noturno: <input type="number" id="horasNot"></label>
+        <label>Combustível Utilizado: <input type="number" id="combustivelUtilizado"></label>
+        <label>Ocorrências: <textarea id="observacoes"></textarea></label>
+        <button onclick="criarDiario()">Criar</button>
+    </div>
+
+    <!-- Buscar -->
+    <div class="card">
+        <h2>Buscar Diário de Bordo por ID</h2>
+        <input type="text" id="buscarId" placeholder="Digite o ID">
+        <button onclick="buscarDiario()">Buscar</button>
+        <pre id="resultadoBusca"></pre>
+    </div>
+
+    <!-- Atualizar -->
+    <div class="card">
+        <h2>Atualizar Diário de Bordo</h2>
+        <label>ID: <input type="text" id="updateId"></label>
+        <div class="flex-row">
+            <div>
+                <label>Aeronave:</label>
+                <select id="updateAeronaveSelect"></select>
+            </div>
+            <div>
+                <label>Número Diário:</label>
+                <input type="number" id="updateNroDiario">
+            </div>
+            <div>
+                <label>Data:</label>
+                <input type="date" id="updateData">
+            </div>
+        </div>
+        <label>Data Decolagem: <input type="datetime-local" id="updateDataDecolagem"></label>
+        <label>Data Pouso: <input type="datetime-local" id="updateDataPouso"></label>
+        <label>Horas Diurno: <input type="number" id="updateHorasDiu"></label>
+        <label>Horas Noturno: <input type="number" id="updateHorasNot"></label>
+        <label>Combustível Utilizado: <input type="number" id="updateCombustivelUtilizado"></label>
+        <label>Ocorrências: <textarea id="updateObservacoes"></textarea></label>
+        <button onclick="atualizarDiario()">Atualizar</button>
+    </div>
+
+    <!-- Deletar -->
+    <div class="card">
+        <h2>Deletar Diário de Bordo</h2>
+        <input type="text" id="deleteId" placeholder="Digite o ID">
+        <button onclick="deletarDiario()">Deletar</button>
+    </div>
+
+    <!-- Listar -->
+    <div class="card">
+        <h2>Listar Todos</h2>
+        <button onclick="listarDiarios()">Listar</button>
+        <div id="listaDiarios"></div>
+    </div>
+
+<script>
+const apiDiario = 'http://localhost:8080/api/diarios-bordo';
+const apiAeronave = 'http://localhost:8080/api/aeronaves';
+
+function carregarAeronaves() {
+    fetch(apiAeronave)
+        .then(res => res.json())
+        .then(data => {
+            const sel = document.getElementById('aeronaveSelect');
+            const selUpdate = document.getElementById('updateAeronaveSelect');
+            sel.innerHTML = '';
+            selUpdate.innerHTML = '';
+            data.forEach(a => {
+                sel.add(new Option(a.matricula + " - " + a.modelo, a.matricula));
+                selUpdate.add(new Option(a.matricula + " - " + a.modelo, a.matricula));
+            });
+        })
+        .catch(err => alert("Erro ao carregar aeronaves: " + err));
+}
+
+function tratarResposta(res) {
+    return res.json().then(data => {
+        if (!res.ok) {
+            if (data.error) throw new Error(data.error);
+            else throw new Error("Erro desconhecido: " + res.status);
+        }
+        if (data.warn) {
+            if (confirm("Aviso: " + data.warn + "\nDeseja forçar a operação?")) {
+                return { forcar: true };
+            } else {
+                throw new Error("Operação cancelada pelo usuário devido a warning.");
+            }
+        }
+        return data;
+    });
+}
+
+function criarDiario(forcar = false) {
+    const d = {
+        aeronaveId: document.getElementById('aeronaveSelect').value,
+        nroDiario: parseInt(document.getElementById('nroDiario').value),
+        data: document.getElementById('data').value,
+        dataDecolagem: document.getElementById('dataDecolagem').value,
+        dataPouso: document.getElementById('dataPouso').value,
+        horasDiu: parseInt(document.getElementById('horasDiu').value),
+        horasNot: parseInt(document.getElementById('horasNot').value),
+        combustivelUtilizado: parseFloat(document.getElementById('combustivelUtilizado').value),
+        ocorrencias: document.getElementById('observacoes').value
+    };
+
+    fetch(apiDiario + (forcar ? "?forcar=true" : ""), {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(d)
+    })
+    .then(tratarResposta)
+    .then(data => {
+        if (data.forcar) criarDiario(true);
+        else alert("Diário criado com sucesso! ID: " + data.diario);
+    })
+    .catch(err => alert(err.message));
+}
+
+function atualizarDiario(forcar = false) {
+    const id = document.getElementById('updateId').value;
+    if (!id) return alert('Informe um ID válido para atualização!');
+
+    const d = {
+        aeronaveId: document.getElementById('updateAeronaveSelect').value,
+        nroDiario: parseInt(document.getElementById('updateNroDiario').value),
+        data: document.getElementById('updateData').value,
+        dataDecolagem: document.getElementById('updateDataDecolagem').value,
+        dataPouso: document.getElementById('updateDataPouso').value,
+        horasDiu: parseInt(document.getElementById('updateHorasDiu').value),
+        horasNot: parseInt(document.getElementById('updateHorasNot').value),
+        combustivelUtilizado: parseFloat(document.getElementById('updateCombustivelUtilizado').value),
+        ocorrencias: document.getElementById('updateObservacoes').value
+    };
+
+    fetch(`${apiDiario}/${id}` + (forcar ? "?forcar=true" : ""), {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(d)
+    })
+    .then(tratarResposta)
+    .then(data => {
+        if (data.forcar) atualizarDiario(true);
+        else alert("Diário atualizado com sucesso! ID: " + data.diario);
+    })
+    .catch(err => alert(err.message));
+}
+
+function deletarDiario() {
+    const id = document.getElementById('deleteId').value;
+    if (!id) return alert('Informe um ID válido para deletar!');
+    fetch(`${apiDiario}/${id}`, { method: 'DELETE' })
+        .then(res => {
+            if (!res.ok) return res.json().then(data => { throw new Error(data.error || "Erro ao deletar"); });
+            alert('Diário deletado com sucesso!');
+        })
+        .catch(err => alert(err.message));
+}
+
+function buscarDiario() {
+    const id = document.getElementById('buscarId').value;
+    if (!id) return alert('Informe um ID válido!');
+    fetch(`${apiDiario}/${id}`)
+        .then(res => res.json())
+        .then(data => document.getElementById('resultadoBusca').textContent = JSON.stringify(data, null, 2))
+        .catch(err => alert(err.message));
+}
+
+function listarDiarios() {
+    fetch(apiDiario)
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('listaDiarios');
+            container.innerHTML = '';
+            data.forEach(d => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                const titulo = document.createElement('div');
+                titulo.className = 'item-title';
+                titulo.innerHTML = `<span>ID: ${d.id}</span><span class="seta">➤</span>`;
+                const detalhes = document.createElement('div');
+                detalhes.className = 'detalhes';
+                detalhes.innerHTML = `
+                    <p><strong>Aeronave:</strong> ${d.aeronaveId}</p>
+                    <p><strong>Número Diário:</strong> ${d.nroDiario}</p>
+                    <p><strong>Data:</strong> ${d.data}</p>
+                    <p><strong>Decolagem:</strong> ${d.dataDecolagem}</p>
+                    <p><strong>Pouso:</strong> ${d.dataPouso}</p>
+                    <p><strong>Horas Diurno:</strong> ${d.horasDiu}</p>
+                    <p><strong>Horas Noturno:</strong> ${d.horasNot}</p>
+                    <p><strong>Combustível:</strong> ${d.combustivelUtilizado}</p>
+                    <p><strong>Ocorrências:</strong> ${d.ocorrencias || ''}</p>
+                `;
+                titulo.addEventListener('click', () => {
+                    if (detalhes.style.display === 'none') {
+                        detalhes.style.display = 'block';
+                        titulo.querySelector('.seta').textContent = '▼';
+                    } else {
+                        detalhes.style.display = 'none';
+                        titulo.querySelector('.seta').textContent = '➤';
+                    }
+                });
+                card.appendChild(titulo);
+                card.appendChild(detalhes);
+                container.appendChild(card);
+            });
+        })
+        .catch(err => alert("Erro ao listar diários: " + err));
+}
+
+window.onload = carregarAeronaves;
+
+</script>
+</body>
+</html>

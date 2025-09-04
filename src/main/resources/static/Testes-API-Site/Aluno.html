@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD Alunos</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f8ff; color: #003366; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #004080; }
+        h2 { color: #00264d; margin-bottom: 10px; }
+        .card { background: #f0f8ff; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,51,102,0.2); }
+        label { display: block; margin: 10px 0 5px; font-weight: bold; }
+        input, textarea, select, button { padding: 8px; width: 100%; box-sizing: border-box; border-radius: 5px; border: 1px solid #004080; }
+        button { background-color: #004080; color: white; border: none; margin-top: 10px; cursor: pointer; transition: background 0.3s; }
+        button:hover { background-color: #00264d; }
+        .detalhes { display: none; margin-top: 10px; padding: 10px; background: #e6f0ff; border-radius: 5px; }
+        .item-title { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .seta { font-weight: bold; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <h1>CRUD Alunos</h1>
+
+    <!-- Criar -->
+    <div class="card">
+        <h2>Criar Aluno</h2>
+        <label>Nome: <input type="text" id="nome"></label>
+        <label>CPF: <input type="text" id="cpf"></label>
+        <button onclick="criarAluno()">Criar</button>
+    </div>
+
+    <!-- Buscar -->
+    <div class="card">
+        <h2>Buscar Aluno por CPF</h2>
+        <input type="text" id="buscarCpf" placeholder="Digite o CPF">
+        <button onclick="buscarAluno()">Buscar</button>
+        <pre id="resultadoBusca"></pre>
+    </div>
+
+    <!-- Atualizar -->
+    <div class="card">
+        <h2>Atualizar Aluno</h2>
+        <label>CPF: <input type="text" id="updateCpf"></label>
+        <label>Nome: <input type="text" id="updateNome"></label>
+        <button onclick="atualizarAluno()">Atualizar</button>
+    </div>
+
+    <!-- Deletar -->
+    <div class="card">
+        <h2>Deletar Aluno</h2>
+        <input type="text" id="deleteCpf" placeholder="Digite o CPF">
+        <button onclick="deletarAluno()">Deletar</button>
+    </div>
+
+    <!-- Listar -->
+    <div class="card">
+        <h2>Listar Todos</h2>
+        <button onclick="listarAlunos()">Listar</button>
+        <div id="listaAlunos"></div>
+    </div>
+
+<script>
+const apiAluno = 'http://localhost:8080/api/alunos';
+
+function tratarResposta(res) {
+    return res.json().then(data => {
+        if (!res.ok) {
+            if (data.error) throw new Error(data.error);
+            else throw new Error("Erro desconhecido: " + res.status);
+        }
+        if (data.warn) {
+            if (confirm("Aviso: " + data.warn + "\nDeseja forçar a operação?")) {
+                return { forcar: true };
+            } else {
+                throw new Error("Operação cancelada pelo usuário devido a warning.");
+            }
+        }
+        return data;
+    });
+}
+
+function criarAluno(forcar = false) {
+    const a = {
+        nome: document.getElementById('nome').value,
+        cpf: document.getElementById('cpf').value
+    };
+
+    fetch(apiAluno + (forcar ? "?forcar=true" : ""), {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(a)
+    })
+    .then(tratarResposta)
+    .then(data => {
+        if (data.forcar) criarAluno(true);
+        else alert("Aluno criado com sucesso! CPF: " + data.cpf);
+    })
+    .catch(err => alert(err.message));
+}
+
+function atualizarAluno(forcar = false) {
+    const cpf = document.getElementById('updateCpf').value;
+    if (!cpf) return alert('Informe um CPF válido para atualização!');
+
+    const a = { nome: document.getElementById('updateNome').value };
+
+    fetch(`${apiAluno}/${cpf}` + (forcar ? "?forcar=true" : ""), {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(a)
+    })
+    .then(tratarResposta)
+    .then(data => {
+        if (data.forcar) atualizarAluno(true);
+        else alert("Aluno atualizado com sucesso! CPF: " + data.cpf);
+    })
+    .catch(err => alert(err.message));
+}
+
+function deletarAluno() {
+    const cpf = document.getElementById('deleteCpf').value;
+    if (!cpf) return alert('Informe um CPF válido para deletar!');
+    fetch(`${apiAluno}/${cpf}`, { method: 'DELETE' })
+        .then(res => {
+            if (!res.ok) return res.json().then(data => { throw new Error(data.error || "Erro ao deletar"); });
+            alert('Aluno deletado com sucesso!');
+        })
+        .catch(err => alert(err.message));
+}
+
+function buscarAluno() {
+    const cpf = document.getElementById('buscarCpf').value;
+    if (!cpf) return alert('Informe um CPF válido!');
+    fetch(`${apiAluno}/${cpf}`)
+        .then(res => res.json())
+        .then(data => document.getElementById('resultadoBusca').textContent = JSON.stringify(data, null, 2))
+        .catch(err => alert(err.message));
+}
+
+function listarAlunos() {
+    fetch(apiAluno)
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('listaAlunos');
+            container.innerHTML = '';
+            data.forEach(a => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                const titulo = document.createElement('div');
+                titulo.className = 'item-title';
+                titulo.innerHTML = `<span>CPF: ${a.cpf} - Nome: ${a.nome}</span><span class="seta">➤</span>`;
+                const detalhes = document.createElement('div');
+                detalhes.className = 'detalhes';
+                detalhes.innerHTML = `
+                    <p><strong>Nome:</strong> ${a.nome}</p>
+                    <p><strong>CPF:</strong> ${a.cpf}</p>
+                `;
+                titulo.addEventListener('click', () => {
+                    if (detalhes.style.display === 'none') {
+                        detalhes.style.display = 'block';
+                        titulo.querySelector('.seta').textContent = '▼';
+                    } else {
+                        detalhes.style.display = 'none';
+                        titulo.querySelector('.seta').textContent = '➤';
+                    }
+                });
+                card.appendChild(titulo);
+                card.appendChild(detalhes);
+                container.appendChild(card);
+            });
+        })
+        .catch(err => alert("Erro ao listar alunos: " + err));
+}
+</script>
+</body>
+</html>

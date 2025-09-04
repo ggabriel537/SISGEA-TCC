@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Agendamento</title>
+    <link rel="stylesheet" href="css/adicionar.css">
+</head>
+<body>
+
+    <div class="sidebar">
+        <a href="inicio.html" id="inicial"><h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1></a>
+        <a href="agendamento.html">Agendamento</a>
+        <a href="aeronave.html">Aeronave</a>
+        <a href="aluno.html">Aluno</a>
+        <a href="instrutor.html">Instrutor</a>
+        <a href="manutencao.html">Manutenção</a>
+        <a href="diario.html">Diário</a>
+      </div>
+    <div class="main">
+        <h1>Cadastro de Agendamento</h1>
+        <div class="container" id="agendamento">
+      
+            <label>Instrutor</label>
+            <input type="text" value="Carlos Eduardo Lima" readonly class="readonly">
+      
+            <label>Aluno</label>
+            <select>
+              <option>Selecione o Aluno</option>
+              <option>João Silva</option>
+              <option>Mariana Costa</option>
+              <option>Lucas Oliveira</option>
+            </select>
+      
+            <label>Aeronave</label>
+            <select>
+              <option>Selecione a Aeronave</option>
+              <option>Cessna 150 (C150)</option>
+              <option>Aero Boero AB115</option>
+              <option>Piper PA28</option>
+            </select>
+      
+            <label>Data e Horário</label>
+            <input type="datetime-local">
+      
+            <label>Tipo de Voo</label>
+            <select>
+              <option>Selecione o tipo de voo</option>
+              <option>Treinamento VFR</option>
+              <option>Treinamento IFR</option>
+              <option>Navegação Noturna</option>
+            </select>
+      
+            <button>Cadastrar Agendamento</button>
+          </div>
+    </div>
+</body>
+</html>

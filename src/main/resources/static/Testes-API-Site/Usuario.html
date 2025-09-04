@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>CRUD Usuários</title>
+<style>
+body { font-family: Arial, sans-serif; background-color: #fdf2f2; color: #4d1a1a; margin: 0; padding: 20px; }
+h1 { text-align: center; color: #b71c1c; }
+h2 { color: #8b0000; margin-bottom: 10px; }
+.card { background: #fff0f0; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(179,28,28,0.2); }
+label { display: block; margin: 10px 0 5px; font-weight: bold; }
+input, select, button { padding: 8px; width: 100%; box-sizing: border-box; border-radius: 5px; border: 1px solid #b71c1c; }
+button { background-color: #b71c1c; color: white; border: none; margin-top: 10px; cursor: pointer; transition: background 0.3s; }
+button:hover { background-color: #8b0000; }
+</style>
+</head>
+<body>
+<h1>CRUD Usuários</h1>
+
+<div class="card">
+<h2>Criar Usuário</h2>
+<label>Nome (ID):</label>
+<input type="text" id="nome">
+<label>Senha:</label>
+<input type="password" id="senha">
+<label>Permissão:</label>
+<select id="permissao">
+    <option value="1">1</option>
+    <option value="2">2</option>
+</select>
+<button onclick="criarUsuario()">Criar</button>
+</div>
+
+<div class="card">
+<h2>Buscar Usuário</h2>
+<label>Nome:</label>
+<input type="text" id="buscarNome">
+<button onclick="buscarUsuario()">Buscar</button>
+<pre id="resultadoBusca"></pre>
+</div>
+
+<div class="card">
+<h2>Atualizar Usuário</h2>
+<label>Nome:</label>
+<input type="text" id="updateNome">
+<label>Nova senha:</label>
+<input type="password" id="updateSenha">
+<label>Nova permissão:</label>
+<select id="updatePermissao">
+    <option value="1">1</option>
+    <option value="2">2</option>
+</select>
+<button onclick="atualizarUsuario()">Atualizar</button>
+</div>
+
+<div class="card">
+<h2>Deletar Usuário</h2>
+<label>Nome:</label>
+<input type="text" id="deleteNome">
+<button onclick="deletarUsuario()">Deletar</button>
+</div>
+
+<div class="card">
+<h2>Listar Todos</h2>
+<button onclick="listarUsuarios()">Listar</button>
+<div id="listaUsuarios"></div>
+</div>
+
+<script>
+const apiUsuario = 'http://localhost:8080/api/usuarios';
+
+async function criarUsuario(forcar = false) {
+    const usuario = document.getElementById('nome').value;
+    const senha = document.getElementById('senha').value;
+    const permissao = parseInt(document.getElementById('permissao').value);
+
+    if(!usuario || !senha) return alert('Informe usuário e senha!');
+
+    try {
+        const res = await fetch(apiUsuario + (forcar ? "?forcar=true" : ""), {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ usuario, senha, permissao })
+        });
+        const data = await res.json();
+
+        if(data.warn) {
+            if(confirm(data.warn + "\nDeseja forçar a operação?")) {
+                criarUsuario(true);
+            } else {
+                alert("Operação cancelada pelo usuário.");
+            }
+        } else if(res.ok) {
+            alert("Usuário criado com sucesso: " + data.usuario);
+        } else {
+            throw new Error(data.error || "Erro desconhecido");
+        }
+    } catch(err) {
+        alert(err.message);
+    }
+}
+
+async function atualizarUsuario(forcar = false) {
+    const usuario = document.getElementById('updateNome').value;
+    const senha = document.getElementById('updateSenha').value;
+    const permissao = parseInt(document.getElementById('updatePermissao').value);
+
+    if(!usuario || !senha) return alert('Informe nome e nova senha!');
+
+    try {
+        const res = await fetch(`${apiUsuario}/${encodeURIComponent(usuario)}${forcar ? "?forcar=true" : ""}`, {
+            method: 'PUT',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ senha, permissao })
+        });
+        const data = await res.json();
+
+        if(data.warn) {
+            if(confirm(data.warn + "\nDeseja forçar a operação?")) {
+                atualizarUsuario(true);
+            } else {
+                alert("Operação cancelada pelo usuário.");
+            }
+        } else if(res.ok) {
+            alert("Usuário atualizado: " + data.usuario);
+        } else {
+            throw new Error(data.error || "Erro desconhecido");
+        }
+    } catch(err) {
+        alert(err.message);
+    }
+}
+
+async function deletarUsuario() {
+    const usuario = document.getElementById('deleteNome').value;
+    if(!usuario) return alert('Informe o nome do usuário!');
+
+    try {
+        const res = await fetch(`${apiUsuario}/${encodeURIComponent(usuario)}`, { method: 'DELETE' });
+        const data = await res.json();
+        if(res.ok) {
+            alert("Usuário deletado: " + data.usuario);
+        } else {
+            throw new Error(data.error || "Erro ao deletar");
+        }
+    } catch(err) {
+        alert(err.message);
+    }
+}
+
+async function buscarUsuario() {
+    const usuario = document.getElementById('buscarNome').value;
+    if(!usuario) return alert('Informe um nome!');
+
+    try {
+        const res = await fetch(`${apiUsuario}/${encodeURIComponent(usuario)}`);
+        const data = await res.json();
+        if(res.ok) {
+            document.getElementById('resultadoBusca').textContent =
+                `Usuário: ${data.usuario}\nSenha (hash): ${data.senha}\nPermissão: ${data.permissao}`;
+        } else {
+            throw new Error(data.error || "Usuário não encontrado");
+        }
+    } catch(err) {
+        alert(err.message);
+    }
+}
+
+async function listarUsuarios() {
+    try {
+        const res = await fetch(apiUsuario);
+        const data = await res.json();
+        const container = document.getElementById('listaUsuarios');
+        container.innerHTML = '';
+        if(data.length === 0) {
+            container.textContent = 'Nenhum usuário cadastrado.';
+        } else {
+            data.forEach(u => {
+                const div = document.createElement('div');
+                div.textContent = `Usuário: ${u.usuario}, Permissão: ${u.permissao}`;
+                container.appendChild(div);
+            });
+        }
+    } catch(err) {
+        alert(err.message);
+    }
+}
+</script>
+</body>
+</html>

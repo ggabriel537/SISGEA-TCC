@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Manutenção</title>
+    <link rel="stylesheet" href="css/adicionar.css">
+</head>
+<body>
+
+    <div class="sidebar">
+        <a href="inicio.html" id="inicial"><h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1></a>
+        <a href="agendamento.html">Agendamento</a>
+        <a href="aeronave.html">Aeronave</a>
+        <a href="aluno.html">Aluno</a>
+        <a href="instrutor.html">Instrutor</a>
+        <a href="manutencao.html">Manutenção</a>
+        <a href="diario.html">Diário</a>
+      </div>
+
+    <div class="main">
+        <h1>Cadastro de Manutenção</h1>
+        <div class="container" id="manutencao">
+            
+            <label>Matrícula</label>
+            <select>
+                <option value="PT-KLM">PT-KLM - Cessna 150</option>
+                <option value="PR-ABC">PR-ABC - Piper PA-28</option>
+                <option value="PT-ZYX">PT-ZYX - Beechcraft Bonanza</option>
+            </select>
+            
+            <label>Fabricante e Modelo</label>
+            <input type="text" value="Cessna 150">
+            
+            <label>Última Manutenção</label>
+            <input type="date" value="2025-04-15">
+            
+            <label>Horas Totais</label>
+            <input type="number" value="1530">
+            
+            <label>Status de Manutenção</label>
+            <select>
+                <option>Concluída</option>
+                <option>Pendente</option>
+                <option>Em andamento</option>
+            </select>
+            
+            <button>Salvar</button>
+        </div>
+    </div>
+</body>
+</html>

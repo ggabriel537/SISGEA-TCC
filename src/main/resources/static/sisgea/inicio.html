@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SISGEA</title>
+  <link rel="stylesheet" href="css/listagem.css">
+  <style>
+    .welcome {
+      margin: 50px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin: 50px;
+    }
+
+    .feature {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 240px;
+      height: 120px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      text-align: center;
+      text-decoration: none;
+      color: #333;
+      font-size: 18px;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .feature:hover {
+      background: #f0f0f0;
+      transform: translateY(-5px);
+    }
+
+    .feature-icon {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <a href="inicio.html" id="inicial"><h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1></a>
+    <a href="agendamento.html">Agendamento</a>
+    <a href="aeronave.html">Aeronave</a>
+    <a href="aluno.html">Aluno</a>
+    <a href="instrutor.html">Instrutor</a>
+    <a href="manutencao.html">Manutenção</a>
+    <a href="diario.html">Diário</a>
+  </div>
+
+  <div class="main">
+    <div class="welcome" id="welcome-message">
+      <!-- A mensagem será inserida aqui via JavaScript -->
+    </div>
+
+    <div class="features">
+      <a class="feature" href="agendamento.html">
+        <div class="feature-icon">📅</div>
+        Agendamento
+      </a>
+
+      <a class="feature" href="aeronave.html">
+        <div class="feature-icon">✈️</div>
+        Aeronave
+      </a>
+
+      <a class="feature" href="aluno.html">
+        <div class="feature-icon">👨‍🎓</div>
+        Aluno
+      </a>
+
+      <a class="feature" href="instrutor.html">
+        <div class="feature-icon">🧑‍🏫</div>
+        Instrutor
+      </a>
+
+      <a class="feature" href="manutencao.html">
+        <div class="feature-icon">🛠️</div>
+        Manutenção
+      </a>
+
+      <a class="feature" href="diario.html">
+        <div class="feature-icon">📖</div>
+        Diário
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const welcomeElement = document.getElementById('welcome-message');
+    const now = new Date();
+    const hour = now.getHours();
+    let greeting = '';
+
+    if (hour >= 5 && hour < 12) {
+      greeting = 'Bom dia';
+    } else if (hour >= 12 && hour < 18) {
+      greeting = 'Boa tarde';
+    } else {
+      greeting = 'Boa noite';
+    }
+
+    welcomeElement.textContent = `${greeting}, Gabriel! Seja bem-vindo ao SISGEA.`;
+  </script>
+
+</body>
+</html>

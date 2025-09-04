@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login - SISGEA</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .login-container {
+      background: #fff;
+      padding: 40px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    .login-container h1 {
+      text-align: center;
+      color: #000;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .login-container img {
+      width: 40px;
+      margin-left: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      color: #333;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      margin-top: 8px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #c00;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #900;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1><img src="/sisgea/css/aviao.png" alt="Logo do Avião">SISGEA</h1>
+    <form id="loginForm">
+      <label for="usuario">Usuário</label>
+      <input type="text" id="usuario" name="usuario" placeholder="Digite seu usuário" required>
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <div class="footer">
+      © 2025 SISGEA
+      <br>
+      José Carlos Gabriel e Luca Just
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const username = document.getElementById('usuario').value;
+      const password = document.getElementById('senha').value;
+      try {
+        const response = await fetch('/login/logar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ username, password })
+        });
+        if (response.status === 200) {
+          const token = await response.text();
+          localStorage.setItem('jwt', token);
+          window.location.href = 'inicio.html';
+        } else if (response.status === 401) {
+          Toastify({ text: "Usuário ou senha incorretos", duration: 3000, close: true, gravity: "top", position: "right", backgroundColor: "rgb(221,0,0)" }).showToast();
+        } else {
+          Toastify({ text: "Erro no login. Tente novamente.", duration: 3000, close: true, gravity: "top", position: "right", backgroundColor: "rgb(221,0,0)" }).showToast();
+        }
+      } catch (err) {
+        Toastify({ text: "Erro de conexão. Tente novamente.", duration: 3000, close: true, gravity: "top", position: "right", backgroundColor: "rgb(221,0,0)" }).showToast();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Diario de Bordo</title>
+    <link rel="stylesheet" href="css/adicionar.css">
+</head>
+<body>
+
+    <div class="sidebar">
+        <a href="inicio.html" id="inicial"><h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1></a>
+        <a href="agendamento.html">Agendamento</a>
+        <a href="aeronave.html">Aeronave</a>
+        <a href="aluno.html">Aluno</a>
+        <a href="instrutor.html">Instrutor</a>
+        <a href="manutencao.html">Manutenção</a>
+        <a href="diario.html">Diário</a>
+      </div>
+
+    <div class="main">
+        <h1>Cadastro de Diário de Bordo</h1>
+        <div class="container" id="diario">
+            
+            <label>Matrícula</label>
+            <select>
+                <option value="PT-KLM">PT-KLM - Cessna 172</option>
+                <option value="PR-ABC">PR-ABC - Piper PA-28</option>
+                <option value="PT-ZYX">PT-ZYX - Beechcraft Bonanza</option>
+            </select>
+            
+            <label>Data</label>
+            <input type="date" value="2025-05-22">
+            
+            <label>Aluno</label>
+            <select>
+                <option value="joao_silva">João Silva - CANAC: 987654</option>
+                <option value="mariana_costa">Mariana Costa - CANAC: 654321</option>
+                <option value="lucas_oliveira">Lucas Oliveira - CANAC: 123789</option>
+            </select>
+            
+            <label>Instrutor</label>
+            <select>
+                <option value="carlos_eduardo">Carlos Eduardo Lima - CANAC: 123987</option>
+                <option value="fernanda_souza">Fernanda Souza - CANAC: 987321</option>
+                <option value="rafael_almeida">Rafael Almeida - CANAC: 654789</option>
+            </select>
+            
+            <label>Origem</label>
+            <select>
+              <option value="SBBR">SBBR (Brasília)</option>
+              <option value="SBSP">SBSP (Congonhas)</option>
+              <option value="SBCT">SBCT (Curitiba)</option>
+            </select>
+            
+            <label>Destino</label>
+            <select>
+              <option value="SBSP">SBSP (Congonhas)</option>
+              <option value="SBRJ">SBRJ (Santos Dumont)</option>
+              <option value="SBPA">SBPA (Porto Alegre)</option>
+            </select>
+            
+            <label>Decolagem</label>
+            <input type="time" value="08:30">
+            
+            <label>Pouso</label>
+            <input type="time" value="10:00">
+            
+            <label>Tempo de Voo (DIU)</label>
+            <input type="text" value="01:30">
+            
+            <label>Ocorrências</label>
+            <textarea rows="3" placeholder="Preencher Discrepâncias"></textarea>
+
+            <button>Preencher Ocorrências</button>
+            
+            <button>Salvar Diário</button>
+        </div>
+    </div>
+</body>
+</html>

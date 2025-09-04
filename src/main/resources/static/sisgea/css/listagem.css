@@ -1,0 +1,168 @@
+    * {
+      box-sizing: border-box;
+    }
+
+    img {
+      width: 40px;
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      background: #f4f4f4;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    ul li {
+      background: #f9f9f9;
+      margin-bottom: 10px;
+      padding: 15px 20px;
+      border-left: 5px solid #c00;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+      transition: background 0.3s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    ul li:hover {
+      background: #f1f1f1;
+    }
+
+    .list-buttons {
+      display: flex;
+      gap: 5px;
+    }
+
+    .list-buttons button {
+      width: auto;
+      padding: 5px 10px;
+      font-size: 12px;
+      margin: 0;
+      background-color: #c00;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .list-buttons button:hover {
+      background-color: #fff;
+      color: #c00;
+      border: 1px solid #c00;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: rgb(221, 0, 0);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 0;
+      position: fixed;
+      height: 100%;
+    }
+
+    .sidebar h1 {
+      color: #000;
+      text-align: center;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .sidebar a {
+      color: #000;
+      text-decoration: none;
+      padding: 15px 20px;
+      display: block;
+      transition: background 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #fff;
+    }
+
+    .main {
+      margin-left: 220px;
+      padding: 20px;
+      width: calc(100% - 220px);
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .container {
+      background: #fff;
+      padding: 20px 25px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: black;
+      border-bottom: 2px solid #c00;
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+    }
+
+    .add-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #c00;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      line-height: 50px;
+      text-align: center;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+
+    .add-button:hover {
+      background-color: #fff;
+      color: #c00;
+      border: 1px solid #c00;
+    }
+
+    .sidebar a#inicial {
+        background-color: rgb(221, 0, 0); /* mesma cor da sidebar */
+        color: #000;
+        text-decoration: none;
+        padding: 15px 20px;
+        display: block;
+        transition: background 0.3s;
+      }
+      
+      .sidebar a#inicial:hover {
+        background-color: rgb(180, 0, 0); /* tom de vermelho mais escuro no hover */
+        color: #000; /* mantém a cor do texto */
+        cursor: pointer; /* opcional: mantém estilo de link */
+      }
+      
+      .sidebar a#inicial h1 {
+        margin: 0;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+      }
+      
+      .sidebar a#inicial img {
+        height: 40px;
+        margin-right: 10px;
+      }
+      
