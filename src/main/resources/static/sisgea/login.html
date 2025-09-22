@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,6 +10,7 @@
     * {
       box-sizing: border-box;
     }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -18,14 +20,16 @@
       justify-content: center;
       align-items: center;
     }
+
     .login-container {
       background: #fff;
       padding: 40px 30px;
       border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
       width: 100%;
       max-width: 400px;
     }
+
     .login-container h1 {
       text-align: center;
       color: #000;
@@ -34,16 +38,19 @@
       justify-content: center;
       align-items: center;
     }
+
     .login-container img {
       width: 40px;
       margin-left: 10px;
     }
+
     label {
       display: block;
       margin-top: 15px;
       color: #333;
       font-weight: bold;
     }
+
     input {
       width: 100%;
       padding: 12px 15px;
@@ -51,6 +58,7 @@
       border-radius: 5px;
       border: 1px solid #ddd;
     }
+
     button {
       width: 100%;
       padding: 12px;
@@ -63,9 +71,11 @@
       cursor: pointer;
       transition: background 0.3s;
     }
+
     button:hover {
       background-color: #900;
     }
+
     .footer {
       text-align: center;
       margin-top: 20px;
@@ -74,6 +84,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="login-container">
     <h1><img src="/sisgea/css/aviao.png" alt="Logo do Avião">SISGEA</h1>
@@ -92,7 +103,7 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script>
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       const username = document.getElementById('usuario').value;
       const password = document.getElementById('senha').value;
@@ -103,8 +114,9 @@
           body: new URLSearchParams({ username, password })
         });
         if (response.status === 200) {
-          const token = await response.text();
-          localStorage.setItem('jwt', token);
+          const data = await response.json();
+          sessionStorage.setItem('jwt', data.token);
+          sessionStorage.setItem('nome', data.nome);
           window.location.href = 'inicio.html';
         } else if (response.status === 401) {
           Toastify({ text: "Usuário ou senha incorretos", duration: 3000, close: true, gravity: "top", position: "right", backgroundColor: "rgb(221,0,0)" }).showToast();
@@ -117,4 +129,5 @@
     });
   </script>
 </body>
+
 </html>

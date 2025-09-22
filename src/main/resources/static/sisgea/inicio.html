@@ -109,8 +109,9 @@
     } else {
       greeting = 'Boa noite';
     }
+    let usuario = sessionStorage.getItem('nome');
 
-    welcomeElement.textContent = `${greeting}, Gabriel! Seja bem-vindo ao SISGEA.`;
+    welcomeElement.textContent = `${greeting}, ${usuario} Seja bem-vindo ao SISGEA.`;
   </script>
 
 </body>
