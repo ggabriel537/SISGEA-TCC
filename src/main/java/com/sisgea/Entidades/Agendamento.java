@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity
 public class Agendamento {
 
@@ -39,12 +41,20 @@ public class Agendamento {
     @Column(name = "data_agendamento")
     private Date data_agendamento;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "horario_partida")
+    private Date horario_partida;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "horario_retorno")
+    private Date horario_retorno;
+
     public Agendamento() {
         this.id = UUID.randomUUID();
     }
 
     public Agendamento(Aeronave aeronave, Aluno aluno, Instrutor instrutor, String partida, String destino,
-            String tipo_voo, String status, Date data_agendamento) {
+            String tipo_voo, String status, Date data_agendamento, Date horario_partida, Date horario_retorno) {
         this();
         this.aeronave = aeronave;
         this.aluno = aluno;
@@ -54,6 +64,8 @@ public class Agendamento {
         this.tipo_voo = tipo_voo;
         this.status = status;
         this.data_agendamento = data_agendamento;
+        this.horario_partida = horario_partida;
+        this.horario_retorno = horario_retorno;
     }
 
     public UUID getId() {
@@ -126,5 +138,21 @@ public class Agendamento {
 
     public void setData_agendamento(Date data_agendamento) {
         this.data_agendamento = data_agendamento;
+    }
+
+    public Date getHorario_retorno() {
+        return horario_retorno;
+    }
+
+    public void setHorario_retorno(Date retorno) {
+        this.horario_retorno = retorno;
+    }
+
+    public Date getHorario_partida() {
+        return horario_partida;
+    }
+
+    public void setHorario_partida(Date horario_partida) {
+        this.horario_partida = horario_partida;
     }
 }

@@ -25,3 +25,19 @@
   background-color: #333 !important;
   color: #fff !important;
 }
+
+.swal2-styled.swal2-confirm {
+  background-color: #c00 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 3px !important;
+  font-weight: bold !important;
+  transition: all 0.3s ease !important;
+}
+
+.swal2-styled.swal2-confirm:hover {
+  background-color: #900 !important;
+  color: #fff !important;
+}
+
+

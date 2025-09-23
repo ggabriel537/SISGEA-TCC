@@ -52,13 +52,13 @@
         }
 
         agendamentos.forEach(ag => {
-          const data = new Date(ag.data_agendamento);
+          const data = new Date(ag.horario_partida);
           const dataFormatada = data.toLocaleDateString("pt-BR");
           const horaFormatada = data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 
           const item = document.createElement("li");
           item.innerHTML = `
-            <span>${dataFormatada} - ${horaFormatada} - ${ag.aluno?.nome || "Aluno"} - ${ag.aeronave?.modelo || "Aeronave"} - ${ag.tipo_voo || "Tipo não definido"}</span>
+            <span>${dataFormatada} - ${horaFormatada} - ${ag.aluno?.nome || "Aluno"} - ${ag.aeronave?.modelo || "Aeronave"} - ${ag.tipo_voo || "Tipo não definido"} - ${ag.status || "Status"}</span>
             <div class="list-buttons">
               <button onclick="editarAgendamento('${ag.id}')">Editar</button>
               <button onclick="deletarAgendamento('${ag.id}')">Deletar</button>

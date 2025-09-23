@@ -1,58 +1,207 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar Agendamento</title>
-    <link rel="stylesheet" href="css/adicionar.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Adicionar Agendamento - SISGEA</title>
+  <link rel="stylesheet" href="css/adicionar.css" />
+  <link rel="stylesheet" href="css/sweetalert.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
+  <div class="sidebar">
+    <a href="inicio.html" id="inicial"><h1><img src="css/aviao.png" alt="Logo do Avião" style="height:28px; vertical-align:middle; margin-right:8px;">SISGEA</h1></a>
+    <a href="agendamento.html">Agendamento</a>
+    <a href="aeronave.html">Aeronave</a>
+    <a href="aluno.html">Aluno</a>
+    <a href="instrutor.html">Instrutor</a>
+    <a href="manutencao.html">Manutenção</a>
+    <a href="diario.html">Diário</a>
+  </div>
 
-    <div class="sidebar">
-        <a href="inicio.html" id="inicial"><h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1></a>
-        <a href="agendamento.html">Agendamento</a>
-        <a href="aeronave.html">Aeronave</a>
-        <a href="aluno.html">Aluno</a>
-        <a href="instrutor.html">Instrutor</a>
-        <a href="manutencao.html">Manutenção</a>
-        <a href="diario.html">Diário</a>
-      </div>
-    <div class="main">
-        <h1>Cadastro de Agendamento</h1>
-        <div class="container" id="agendamento">
-      
-            <label>Instrutor</label>
-            <input type="text" value="Carlos Eduardo Lima" readonly class="readonly">
-      
-            <label>Aluno</label>
-            <select>
-              <option>Selecione o Aluno</option>
-              <option>João Silva</option>
-              <option>Mariana Costa</option>
-              <option>Lucas Oliveira</option>
-            </select>
-      
-            <label>Aeronave</label>
-            <select>
-              <option>Selecione a Aeronave</option>
-              <option>Cessna 150 (C150)</option>
-              <option>Aero Boero AB115</option>
-              <option>Piper PA28</option>
-            </select>
-      
-            <label>Data e Horário</label>
-            <input type="datetime-local">
-      
-            <label>Tipo de Voo</label>
-            <select>
-              <option>Selecione o tipo de voo</option>
-              <option>Treinamento VFR</option>
-              <option>Treinamento IFR</option>
-              <option>Navegação Noturna</option>
-            </select>
-      
-            <button>Cadastrar Agendamento</button>
-          </div>
+  <div class="main">
+    <h1>Cadastro de Agendamento</h1>
+
+    <div class="container" id="agendamento">
+      <label>Instrutor</label>
+      <select id="instrutorSelect">
+        <option value="">Carregando instrutores...</option>
+      </select>
+
+      <label>Aluno</label>
+      <select id="alunoSelect">
+        <option value="">Carregando alunos...</option>
+      </select>
+
+      <label>Aeronave</label>
+      <select id="aeronaveSelect">
+        <option value="">Carregando aeronaves...</option>
+      </select>
+
+      <label>Partida (data e horário)</label>
+      <input type="datetime-local" id="dataAgendamento">
+
+      <label>Retorno (data e horário)</label>
+      <input type="datetime-local" id="retorno">
+
+      <label>Origem (local)</label>
+      <input type="text" id="partida" placeholder="Ex: SBDO - Dourados">
+
+      <label>Destino (local)</label>
+      <input type="text" id="destino" placeholder="Ex: SBCG - Campo Grande">
+
+      <label>Tipo de Voo</label>
+      <select id="tipoVoo">
+        <option value="">Selecione o tipo de voo</option>
+        <option value="VFR-D">VFR-D</option>
+        <option value="VFR-N">VFR-N</option>
+        <option value="IFR">IFR</option>
+        <option value="SIM">SIM</option>
+      </select>
+
+      <input type="hidden" id="status" value="Agendado">
+
+      <button class="btn" id="btnCadastrar">Cadastrar Agendamento</button>
     </div>
+  </div>
+
+  <script>
+    const baseUrl = location.origin + '/api';
+
+    const instrutorSelect = document.getElementById('instrutorSelect');
+    const alunoSelect = document.getElementById('alunoSelect');
+    const aeronaveSelect = document.getElementById('aeronaveSelect');
+    const dataAgendamentoInput = document.getElementById('dataAgendamento');
+    const retornoInput = document.getElementById('retorno');
+    const partidaInput = document.getElementById('partida');
+    const destinoInput = document.getElementById('destino');
+    const tipoVooSelect = document.getElementById('tipoVoo');
+    const statusInput = document.getElementById('status');
+    const btnCadastrar = document.getElementById('btnCadastrar');
+
+    async function loadList(url, selectElem, valueField, textFields, placeholder) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Erro ao carregar ' + placeholder);
+        const data = await res.json();
+        selectElem.innerHTML = '<option value="">' + placeholder + '</option>';
+        data.forEach(item => {
+          const opt = document.createElement('option');
+          opt.value = item[valueField];
+          const label = textFields.map(f => item[f]).filter(Boolean).join(" - ");
+          opt.textContent = label;
+          selectElem.appendChild(opt);
+        });
+      } catch (err) {
+        selectElem.innerHTML = '<option value="">' + placeholder + ' (erro)</option>';
+        console.error(err);
+      }
+    }
+
+    loadList(baseUrl + '/aeronaves', aeronaveSelect, 'matricula', ['matricula','fabricante','modelo'], 'Selecione a Aeronave');
+    loadList(baseUrl + '/alunos', alunoSelect, 'cpf', ['canac','nome'], 'Selecione o Aluno');
+    loadList(baseUrl + '/instrutores', instrutorSelect, 'cpf', ['canac','nome'], 'Selecione o Instrutor');
+
+    btnCadastrar.addEventListener('click', async () => {
+      const instrutorCpf = instrutorSelect.value;
+      const alunoCpf = alunoSelect.value;
+      const aeronaveMatricula = aeronaveSelect.value;
+      const dataAgendamentoVal = dataAgendamentoInput.value;
+      const retornoVal = retornoInput.value;
+      const partida = partidaInput.value.trim();
+      const destino = destinoInput.value.trim();
+      const tipoVoo = tipoVooSelect.value;
+      const status = statusInput.value;
+
+      if(!instrutorCpf || !alunoCpf || !aeronaveMatricula) {
+        Swal.fire("Atenção", "Aluno, Instrutor e Aeronave são obrigatórios.", "warning");
+        return;
+      }
+      if(!dataAgendamentoVal) {
+        Swal.fire("Atenção", "Informe a data e horário de partida.", "warning");
+        return;
+      }
+      if(!retornoVal) {
+        Swal.fire("Atenção", "Informe a data e horário de retorno.", "warning");
+        return;
+      }
+
+      const partidaDate = new Date(dataAgendamentoVal);
+      const retornoDate = new Date(retornoVal);
+      if(retornoDate < partidaDate) {
+        Swal.fire("Atenção", "O retorno deve ser igual ou posterior à partida.", "warning");
+        return;
+      }
+
+      const payload = {
+        aeronave: { matricula: aeronaveMatricula },
+        aluno: { cpf: alunoCpf },
+        instrutor: { cpf: instrutorCpf },
+        partida: partida,
+        destino: destino,
+        tipo_voo: tipoVoo,
+        status: status,
+        horario_partida: partidaDate.toISOString(),
+        horario_retorno: retornoDate.toISOString()
+      };
+
+      try {
+        let res = await fetch(baseUrl + '/agendamentos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const body = await res.json();
+
+        if (!res.ok) {
+          Swal.fire("Erro", body.error || ('Erro: ' + res.statusText), "error");
+          return;
+        }
+        if (body.warn) {
+          Swal.fire({
+            title: "Atenção",
+            text: body.warn + "\n\nDeseja forçar o agendamento mesmo assim?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Forçar",
+            cancelButtonText: "Cancelar"
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              const res2 = await fetch(baseUrl + '/agendamentos?forcar=true', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              const body2 = await res2.json();
+              if (!res2.ok) {
+                Swal.fire("Erro", body2.error || ('Erro: ' + res2.statusText), "error");
+                return;
+              }
+              Swal.fire("Sucesso", "Agendamento criado com sucesso (forçado). ID: " + (body2.agendamento || ""), "success");
+            } else {
+              Swal.fire("Cancelado", "Agendamento não cadastrado.", "info");
+            }
+          });
+          return;
+        }
+
+        Swal.fire("Sucesso", "Agendamento criado com sucesso. ID: " + (body.agendamento || ""), "success");
+
+        // Limpa campos
+        partidaInput.value = '';
+        destinoInput.value = '';
+        dataAgendamentoInput.value = '';
+        retornoInput.value = '';
+        tipoVooSelect.value = '';
+        alunoSelect.value = '';
+        instrutorSelect.value = '';
+        aeronaveSelect.value = '';
+
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Erro", "Erro ao comunicar com a API: " + err.message, "error");
+      }
+    });
+  </script>
 </body>
 </html>
