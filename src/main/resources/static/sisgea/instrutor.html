@@ -31,6 +31,11 @@
   </div>
 
   <script>
+    function formatarCPF(cpf) {
+      if (!cpf) return "N/A";
+      return cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
+    }
+
     async function carregarInstrutores() {
       try {
         // Chamada à API para buscar instrutores
@@ -55,7 +60,7 @@
           const item = document.createElement("li");
           item.innerHTML = `
             <span>
-              ${inst.nome || "Sem nome"} - CPF: ${inst.cpf || "N/A"} - CANAC: ${inst.canac || "Sem CANAC"}
+              ${inst.nome || "Sem nome"} - CPF: ${formatarCPF(inst.cpf) || "N/A"} - CANAC: ${inst.canac || "Sem CANAC"}
             </span>
             <div class="list-buttons">
               <button onclick="editarInstrutor('${inst.cpf}')">Editar</button>
