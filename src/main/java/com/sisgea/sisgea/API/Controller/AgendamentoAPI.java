@@ -63,6 +63,14 @@ public class AgendamentoAPI {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", "'horario_retorno' deve ser posterior ou igual ao 'horario_partida'."));
         }
+        if (ag.getAluno() == null || ag.getInstrutor() == null || ag.getAeronave() == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Aluno, instrutor e aeronave são obrigatórios."));
+        }
+        if (ag.getPartida() == null || ag.getPartida().isBlank() || ag.getDestino() == null || ag.getDestino().isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Campos 'Origem' e 'Destino' são obrigatórios."));
+        }
 
         //
         // VERIFICAÇÃO DE CONFLITOS E REGRAS
@@ -72,10 +80,6 @@ public class AgendamentoAPI {
         boolean conflito = false;
         boolean warn = false;
 
-        if (ag.getAluno() == null || ag.getInstrutor() == null || ag.getAeronave() == null) {
-            conflito_str += "Aluno, instrutor e aeronave são obrigatórios.\n";
-            conflito = true;
-        }
         if (ag.getHorario_partida().before(new Date())) {
             conflito_str += "O horário de partida não pode ser no passado.\n";
             conflito = true;
@@ -129,14 +133,18 @@ public class AgendamentoAPI {
             if (conflito) break;
         }
 
+        //
         // Verifica horas de voo do aluno
+        //
         Aluno aluno = AlunoController.buscarId(ag.getAluno().getCpf());
         if (aluno.getHoras_compradas() <= 0) {
             conflito = true;
             conflito_str += "O aluno não possui horas de voo compradas.\n";
         }
 
+        //
         // Aviso de aeronave não homologada
+        //
         if (!conflito) {
             Aeronave aeronave = AeronaveController.buscarId(ag.getAeronave().getMatricula());
             int hora = ag.getHorario_partida().getHours();
@@ -189,6 +197,14 @@ public class AgendamentoAPI {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", "'horario_retorno' deve ser posterior ou igual ao 'horario_partida'."));
         }
+        if (ag.getAluno() == null || ag.getInstrutor() == null || ag.getAeronave() == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Aluno, instrutor e aeronave são obrigatórios."));
+        }
+        if (ag.getPartida() == null || ag.getPartida().isBlank() || ag.getDestino() == null || ag.getDestino().isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Campos 'Origem' e 'Destino' são obrigatórios."));
+        }
 
         //
         // VERIFICAÇÃO DE CONFLITOS E REGRAS
@@ -198,17 +214,12 @@ public class AgendamentoAPI {
         boolean conflito = false;
         boolean warn = false;
 
-        if (ag.getAluno() == null || ag.getInstrutor() == null || ag.getAeronave() == null) {
-            conflito_str += "Aluno, instrutor e aeronave são obrigatórios.\n";
-            conflito = true;
-        }
         if (ag.getHorario_partida().before(new Date())) {
             conflito_str += "O horário de partida não pode ser no passado.\n";
             conflito = true;
         }
 
         List<Agendamento> agendamentosExistentes = AgendamentoController.listarAgendamentos();
-
         for (Agendamento outro : agendamentosExistentes) {
             if (outro.getId().equals(ag.getId())) continue;
 
@@ -219,7 +230,6 @@ public class AgendamentoAPI {
                 Date existenteFim = outro.getHorario_retorno() != null ? outro.getHorario_retorno() : existenteInicio;
                 Date novoInicio = ag.getHorario_partida();
                 Date novoFim = ag.getHorario_retorno();
-
                 if (novoInicio.before(existenteFim) && novoFim.after(existenteInicio)) {
                     conflito = true;
                     conflito_str += "Já existe um agendamento para este aluno dentro do período selecionado.\n";
@@ -233,7 +243,6 @@ public class AgendamentoAPI {
                 Date existenteFim = outro.getHorario_retorno() != null ? outro.getHorario_retorno() : existenteInicio;
                 Date novoInicio = ag.getHorario_partida();
                 Date novoFim = ag.getHorario_retorno();
-
                 if (novoInicio.before(existenteFim) && novoFim.after(existenteInicio)) {
                     conflito = true;
                     conflito_str += "Já existe um agendamento para este instrutor dentro do período selecionado.\n";
@@ -247,7 +256,6 @@ public class AgendamentoAPI {
                 Date existenteFim = outro.getHorario_retorno() != null ? outro.getHorario_retorno() : existenteInicio;
                 Date novoInicio = ag.getHorario_partida();
                 Date novoFim = ag.getHorario_retorno();
-
                 if (novoInicio.before(existenteFim) && novoFim.after(existenteInicio)) {
                     conflito = true;
                     conflito_str += "Existe agendamento da mesma aeronave dentro do período de partida e retorno.\n";
@@ -257,14 +265,18 @@ public class AgendamentoAPI {
             if (conflito) break;
         }
 
+        //
         // Verifica horas de voo do aluno
+        //
         Aluno aluno = AlunoController.buscarId(ag.getAluno().getCpf());
         if (aluno.getHoras_compradas() <= 0) {
             conflito = true;
             conflito_str += "O aluno não possui horas de voo compradas.\n";
         }
 
+        //
         // Aviso de aeronave não homologada
+        //
         if (!conflito) {
             Aeronave aeronave = AeronaveController.buscarId(ag.getAeronave().getMatricula());
             int hora = ag.getHorario_partida().getHours();

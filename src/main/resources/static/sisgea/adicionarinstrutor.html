@@ -1,52 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=], initial-scale=1.0">
-    <title>Cadastro de instrutor</title>
-    <link rel="stylesheet" href="css/adicionar.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Instrutor</title>
+  <link rel="stylesheet" href="css/adicionar.css">
+  <link rel="stylesheet" href="css/sweetalert.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
-    <div class="sidebar">
-        <a href="inicio.html" id="inicial"><h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1></a>
-        <a href="agendamento.html">Agendamento</a>
-        <a href="aeronave.html">Aeronave</a>
-        <a href="aluno.html">Aluno</a>
-        <a href="instrutor.html">Instrutor</a>
-        <a href="manutencao.html">Manutenção</a>
-        <a href="diario.html">Diário</a>
-      </div>
+  <div class="sidebar">
+    <a href="inicio.html" id="inicial"><h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1></a>
+    <a href="agendamento.html">Agendamento</a>
+    <a href="aeronave.html">Aeronave</a>
+    <a href="aluno.html">Aluno</a>
+    <a href="instrutor.html">Instrutor</a>
+    <a href="manutencao.html">Manutenção</a>
+    <a href="diario.html">Diário</a>
+  </div>
 
-    <div class="main">
-        <h1>Cadastro de Instrutor</h1>
-        <div class="container" id="instrutor">
-            
-            <label>Nome</label>
-            <input type="text" value="Carlos Eduardo Lima">
-            
-            <label>CPF</label>
-            <input type="text" value="987.654.321-00">
-            
-            <label>CANAC</label>
-            <input type="text" value="123987">
-            
-            <label>E-mail</label>
-            <input type="email" value="carlos.lima@aeroclube.com">
-            
-            <label>Habilitação</label>
-            <select>
-              <option>INVA (Instrutor de Voo)</option>
-              <option>PLA (Piloto de Linha Aérea)</option>
-              <option>PC (Piloto Comercial)</option>
-            </select>
-            
-            <label>Telefone</label>
-            <input type="tel" value="(61) 91234-5678">
-            
-            <button>Cadastrar Instrutor</button>
-          </div>
+  <div class="main">
+    <h1>Cadastro de Instrutor</h1>
+    <div class="container" id="instrutor">
+
+      <label>Nome</label>
+      <input type="text" id="nome">
+
+      <label>CPF</label>
+      <input type="text" id="cpf">
+
+      <label>CANAC</label>
+      <input type="text" id="canac">
+
+      <label>E-mail</label>
+      <input type="email" id="email">
+
+      <label>Habilitação</label>
+      <select id="habilitacao">
+        <option value="">Selecione...</option>
+        <option>INVA (Instrutor de Voo)</option>
+        <option>PLA (Piloto de Linha Aérea)</option>
+        <option>PC (Piloto Comercial)</option>
+      </select>
+
+      <label>Telefone</label>
+      <input type="tel" id="telefone">
+
+      <h3>Dados do Usuário</h3>
+      <label>Usuário</label>
+      <input type="text" id="usuario">
+
+      <label>Senha</label>
+      <input type="password" id="senha">
+
+      <button onclick="cadastrarInstrutor()">Cadastrar Instrutor</button>
     </div>
+  </div>
+
+<script>
+async function cadastrarInstrutor(forcar = false) {
+  const nome = document.getElementById("nome").value.trim();
+  const cpf = document.getElementById("cpf").value.trim();
+  const canac = document.getElementById("canac").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const habilitacao = document.getElementById("habilitacao").value.trim();
+  const telefone = document.getElementById("telefone").value.trim();
+  const usuario = document.getElementById("usuario").value.trim();
+  const senha = document.getElementById("senha").value.trim();
+
+  // Validação rápida no front
+  if (!nome || !cpf || !email || !usuario || !senha) {
+    Swal.fire("Atenção", "Preencha todos os campos obrigatórios!", "warning");
+    return;
+  }
+
+  // Monta objeto instrutor + usuario
+  const instrutor = {
+    nome, cpf, telefone, email, habilitacao,
+    canac: canac ? parseInt(canac) : null,
+    usuario: {
+      usuario,
+      senha,
+      permissao: 0 // definido pelo sistema
+    }
+  };
+
+  try {
+    const response = await fetch(`http://localhost:8080/api/instrutores?forcar=${forcar}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(instrutor)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      // Erro bloqueante (ex: CPF, CANAC ou Usuario já existem)
+      Swal.fire("Erro", data.error || "Falha ao cadastrar instrutor.", "error");
+      return;
+    }
+
+    if (data.warn) {
+      // Apenas aviso -> usuário pode confirmar se quer forçar
+      Swal.fire({
+        title: "Atenção",
+        text: data.warn,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Confirmar mesmo assim",
+        cancelButtonText: "Cancelar"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          cadastrarInstrutor(true); // força cadastro
+        }
+      });
+      return;
+    }
+
+    if (data.status === "sucesso") {
+      Swal.fire("Sucesso", "Instrutor cadastrado com sucesso!", "success")
+        .then(() => window.location.href = "instrutor.html");
+    }
+
+  } catch (error) {
+    Swal.fire("Erro", "Não foi possível conectar à API.", "error");
+    console.error(error);
+  }
+}
+</script>
 
 </body>
 </html>

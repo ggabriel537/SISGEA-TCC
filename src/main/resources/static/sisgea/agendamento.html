@@ -37,12 +37,15 @@
   <script>
     async function carregarAgendamentos() {
       try {
-        const response = await fetch("http://localhost:8080/api/agendamentos"); // ajuste porta se necessário
-        if (!response.ok) {
-          throw new Error("Erro ao buscar agendamentos");
-        }
+        // Chamada à API para buscar agendamentos
+        const response = await fetch("http://localhost:8080/api/agendamentos");
+        if (!response.ok) throw new Error("Erro ao buscar agendamentos");
 
-        const agendamentos = await response.json();
+        let agendamentos = await response.json();
+
+        // Ordena pelo horário de partida (mais próximo primeiro)
+        agendamentos.sort((a, b) => new Date(a.horario_partida) - new Date(b.horario_partida));
+
         const lista = document.getElementById("agendamentos-list");
         lista.innerHTML = ""; // limpa lista
 
@@ -51,6 +54,7 @@
           return;
         }
 
+        // Renderiza cada agendamento na lista
         agendamentos.forEach(ag => {
           const data = new Date(ag.horario_partida);
           const dataFormatada = data.toLocaleDateString("pt-BR");
@@ -73,10 +77,12 @@
       }
     }
 
+    // Redireciona para página de edição
     function editarAgendamento(id) {
       window.location.href = `editaragendamento.html?id=${id}`;
     }
 
+    // Deleta agendamento com confirmação via SweetAlert
     async function deletarAgendamento(id) {
       Swal.fire({
         title: 'Tem certeza?',
@@ -98,7 +104,7 @@
                 icon: 'success',
                 confirmButtonColor: '#c00'
               });
-              carregarAgendamentos();
+              carregarAgendamentos(); // recarrega lista
             } else {
               Swal.fire('Erro', 'Não foi possível excluir o agendamento.', 'error');
             }
@@ -110,8 +116,7 @@
       });
     }
 
-
-    // carregar lista ao abrir a página
+    // Carrega a lista ao abrir a página
     carregarAgendamentos();
   </script>
 </body>

@@ -33,7 +33,6 @@ public class UsuarioAPI {
 
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Usuario u, @RequestParam(defaultValue = "false") boolean forcar) {
-        PasswordEncoder senhahash = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
 
         // Limitações de Cadastro dos usuários
         List<Usuario> usuariosExistentes = null;
@@ -102,7 +101,6 @@ public class UsuarioAPI {
         // CADASTRO DO USUÁRIO
         //
 
-        u.setSenha(senhahash.encode(u.getSenha()));
         UsuarioController.salvarUsuario(u);
         return ResponseEntity.ok(Map.of("status", "sucesso", "usuario", u.getUsuario()));
     }
@@ -110,7 +108,6 @@ public class UsuarioAPI {
     @PutMapping("/{usuario}")
     public ResponseEntity<?> atualizar(@PathVariable String usuario, @RequestBody Usuario u,
                                        @RequestParam(defaultValue = "false") boolean forcar) {
-        PasswordEncoder senhahash = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
         // Busca usuário existente
         Usuario existente = UsuarioController.buscarUsuario(usuario);
         if (existente == null) {
@@ -188,7 +185,6 @@ public class UsuarioAPI {
         // ATUALIZAÇÃO DO USUÁRIO
         //
         u.setUsuario(usuario);
-        u.setSenha(senhahash.encode(u.getSenha()));
         UsuarioController.atualizarUsuario(u);
         return ResponseEntity.ok(Map.of("status", "sucesso", "usuario", u.getUsuario()));
     }
