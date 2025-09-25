@@ -53,7 +53,7 @@ public class LoginController {
                     }
                     break;
                 }
-                case 2: { // Instrutor
+                case 0: { // Instrutor
                     List<Instrutor> instrutores = InstrutorController.listarInstrutores();
                     for (Instrutor instrutor : instrutores) {
                         if (instrutor.getUsuario().getUsuario().equals(user.getUsuario())) {
