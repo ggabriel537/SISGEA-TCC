@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.sisgea.BancoDados.Controllers.AdministradorController;
+import com.sisgea.BancoDados.Controllers.InstrutorController;
 import com.sisgea.Entidades.Administrador;
+import com.sisgea.Entidades.Instrutor;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -32,6 +34,8 @@ public class AdministradorAPI {
 
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Administrador adm) {
+        List<Administrador> admins = AdministradorController.listarAdministradores();
+        List<Instrutor> instrutores = InstrutorController.listarInstrutores();
         // Limitações de Cadastro dos administradores
         // Conflito -> Bloqueia o cadastro
         String conflito_str = "";
@@ -48,11 +52,22 @@ public class AdministradorAPI {
         //
         // CONFLITOS
         //
-        // Se vier ID preenchido e já existir, é duplicidade
-        if (adm.getId() != null && !adm.getId().isBlank()
-                && AdministradorController.buscarId(adm.getId()) != null) {
-            conflito = true;
-            conflito_str += "Já existe um administrador com este ID.\n";
+        // Verifica se existe um administrador com o mesmo usuario
+        for (Administrador a : admins) {
+            if (adm.getUsuario().getUsuario() != null && !adm.getUsuario().getUsuario().isBlank()
+                    && a.getUsuario().getUsuario().equals(adm.getUsuario().getUsuario())) {
+                conflito = true;
+                conflito_str += "Já existe um administrador com este usuário.\n";
+            }
+        }
+
+        // Verifica se existe um instrutor com o mesmo usuario
+        for (Instrutor i : instrutores) {
+            if (adm.getUsuario().getUsuario() != null && !adm.getUsuario().getUsuario().isBlank()
+                    && i.getUsuario() != null && i.getUsuario().getUsuario().equals(adm.getUsuario().getUsuario())) {
+                conflito = true;
+                conflito_str += "Já existe um instrutor com este usuário.\n";
+            }
         }
 
         if (conflito) {
@@ -79,6 +94,38 @@ public class AdministradorAPI {
         String erro = validarAdministrador(adm);
         if (!erro.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", erro));
+        }
+
+        List<Administrador> admins = AdministradorController.listarAdministradores();
+        List<Instrutor> instrutores = InstrutorController.listarInstrutores();
+
+        //
+        // CONFLITOS
+        //
+        String conflito_str = "";
+        boolean conflito = false;
+
+        // Verifica se existe um administrador com o mesmo usuario (exceto ele mesmo)
+        for (Administrador a : admins) {
+            if (a.getId() != null && !a.getId().equals(id) &&
+                adm.getUsuario().getUsuario() != null && !adm.getUsuario().getUsuario().isBlank() &&
+                a.getUsuario().getUsuario().equals(adm.getUsuario().getUsuario())) {
+                conflito = true;
+                conflito_str += "Já existe um administrador com este usuário.\n";
+            }
+        }
+
+        // Verifica se existe um instrutor com o mesmo usuario
+        for (Instrutor i : instrutores) {
+            if (adm.getUsuario().getUsuario() != null && !adm.getUsuario().getUsuario().isBlank() &&
+                i.getUsuario() != null && i.getUsuario().getUsuario().equals(adm.getUsuario().getUsuario())) {
+                conflito = true;
+                conflito_str += "Já existe um instrutor com este usuário.\n";
+            }
+        }
+
+        if (conflito) {
+            return ResponseEntity.badRequest().body(Map.of("error", conflito_str));
         }
 
         //

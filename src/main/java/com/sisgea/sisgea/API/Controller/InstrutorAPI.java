@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.sisgea.BancoDados.Controllers.InstrutorController;
+import com.sisgea.BancoDados.Controllers.AdministradorController;
 import com.sisgea.Entidades.Instrutor;
+import com.sisgea.Entidades.Administrador;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -33,11 +35,13 @@ public class InstrutorAPI {
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Instrutor i, @RequestParam(defaultValue = "false") boolean forcar) {
         List<Instrutor> instrutoresExistentes;
+        List<Administrador> administradoresExistentes;
         try {
             instrutoresExistentes = InstrutorController.listarInstrutores();
+            administradoresExistentes = AdministradorController.listarAdministradores();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Erro ao listar instrutores existentes para validação: " + e.getMessage()));
+                    .body(Map.of("error", "Erro ao listar usuários existentes para validação: " + e.getMessage()));
         }
 
         String conflito_str = "";
@@ -93,6 +97,16 @@ public class InstrutorAPI {
             }
         }
 
+        // Verifica se o usuário já existe entre administradores
+        for (Administrador adm : administradoresExistentes) {
+            if (adm.getUsuario() != null && i.getUsuario() != null &&
+                    adm.getUsuario().getUsuario().equals(i.getUsuario().getUsuario())) {
+                conflito = true;
+                conflito_str += "Já existe um administrador com este Usuário.\n";
+                break;
+            }
+        }
+
         //
         // WARNINGS
         //
@@ -125,11 +139,13 @@ public class InstrutorAPI {
         }
 
         List<Instrutor> instrutoresExistentes;
+        List<Administrador> administradoresExistentes;
         try {
             instrutoresExistentes = InstrutorController.listarInstrutores();
+            administradoresExistentes = AdministradorController.listarAdministradores();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Erro ao listar instrutores existentes para validação: " + e.getMessage()));
+                    .body(Map.of("error", "Erro ao listar usuários existentes para validação: " + e.getMessage()));
         }
 
         String conflito_str = "";
@@ -182,6 +198,16 @@ public class InstrutorAPI {
                     !outro.getCpf().equals(cpf)) {
                 conflito = true;
                 conflito_str += "Já existe um instrutor com este Usuário.\n";
+                break;
+            }
+        }
+
+        // Verifica se o usuário já existe entre administradores
+        for (Administrador adm : administradoresExistentes) {
+            if (adm.getUsuario() != null && i.getUsuario() != null &&
+                    adm.getUsuario().getUsuario().equals(i.getUsuario().getUsuario())) {
+                conflito = true;
+                conflito_str += "Já existe um administrador com este Usuário.\n";
                 break;
             }
         }
