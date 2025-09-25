@@ -2,6 +2,8 @@ package com.sisgea.BancoDados.Controllers;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.sisgea.BancoDados.Models.UsuarioModel;
 import com.sisgea.Entidades.Usuario;
 
@@ -10,7 +12,6 @@ public class UsuarioController {
     public static void salvarUsuario(String nome, String senha, Integer permissao) {
         Usuario usuario = new Usuario();
         usuario.setUsuario(nome);
-        usuario.setSenha(senha);
         usuario.setPermissao(permissao);
         UsuarioModel.salvarUsuario(usuario);
     }

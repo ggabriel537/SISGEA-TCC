@@ -1,5 +1,7 @@
 package com.sisgea.Entidades;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -16,8 +18,9 @@ public class Usuario {
     }
 
     public Usuario(String usuario, String senha, Integer permissao) {
+        PasswordEncoder senhahash = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+        this.senha = senhahash.encode(senha);
         this.usuario = usuario;
-        this.senha = senha;
         this.permissao = permissao;
     }
 
@@ -34,7 +37,8 @@ public class Usuario {
     }
 
     public void setSenha(String senha) {
-        this.senha = senha;
+        PasswordEncoder senhahash = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+        this.senha = senhahash.encode(senha);
     }
 
     public Integer getPermissao() {

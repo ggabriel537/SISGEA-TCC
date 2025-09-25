@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Administrador</title>
+  <link rel="stylesheet" href="css/adicionar.css">
+  <link rel="stylesheet" href="css/sweetalert.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+
+  <div class="sidebar">
+    <a href="inicio.html" id="inicial">
+      <h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1>
+    </a>
+    <a href="agendamento.html">Agendamento</a>
+    <a href="aeronave.html">Aeronave</a>
+    <a href="aluno.html">Aluno</a>
+    <a href="instrutor.html">Instrutor</a>
+    <a href="manutencao.html">Manutenção</a>
+    <a href="diario.html">Diário</a>
+  </div>
+
+  <div class="main">
+    <h1>Cadastro de Administrador</h1>
+    <div class="container" id="administrador">
+
+      <label>Nome</label>
+      <input type="text" id="nome" placeholder="Nome completo" maxlength="64">
+
+      <label>Usuário</label>
+      <input type="text" id="usuario" placeholder="Login no sistema" maxlength="16">
+
+      <label>Senha</label>
+      <input type="password" id="senha" placeholder="Senha de acesso" maxlength="16">
+
+      <button onclick="cadastrarAdministrador()">Cadastrar Administrador</button>
+    </div>
+  </div>
+
+  <script>
+    // Cadastrar Administrador
+    async function cadastrarAdministrador() {
+      const nome = document.getElementById("nome").value.trim();
+      const usuario = document.getElementById("usuario").value.trim();
+      const senha = document.getElementById("senha").value.trim();
+
+      // Validação básica
+      if (!nome || !usuario || !senha) {
+        Swal.fire("Atenção", "Preencha todos os campos obrigatórios!", "warning");
+        return;
+      }
+
+      const administrador = {
+        nome,
+        usuario: {
+          usuario,
+          senha,
+          permissao: 1
+        }
+      };
+
+      try {
+        const response = await fetch("http://localhost:8080/api/administradores", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(administrador)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          Swal.fire("Erro", data.error || "Falha ao cadastrar administrador.", "error");
+          return;
+        }
+
+        if (data.status === "sucesso") {
+          Swal.fire("Sucesso", "Administrador cadastrado com sucesso!", "success")
+            .then(() => window.location.href = "inicio.html");
+        }
+
+      } catch (error) {
+        Swal.fire("Erro", "Não foi possível conectar à API.", "error");
+        console.error(error);
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Aeronaves</title>
+  <link rel="stylesheet" href="css/adicionar.css">
+  <link rel="stylesheet" href="css/sweetalert.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <div class="sidebar">
+    <a href="inicio.html" id="inicial">
+      <h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1>
+    </a>
+    <a href="agendamento.html">Agendamento</a>
+    <a href="aeronave.html">Aeronave</a>
+    <a href="aluno.html">Aluno</a>
+    <a href="instrutor.html">Instrutor</a>
+    <a href="manutencao.html">Manutenção</a>
+    <a href="diario.html">Diário</a>
+  </div>
+
+  <div class="main">
+    <h1>Lista de Aeronaves</h1>
+    <div class="container" id="lista-aeronaves">
+      <ul id="aeronaves-list"></ul>
+      <a href="adicionaraeronave.html" class="add-button">+</a>
+    </div>
+  </div>
+
+  <script>
+    // Formata horas de voo
+    function formatarHoras(horas) {
+      return horas ? `${horas}h` : "0h";
+    }
+
+    // Carregar lista de aeronaves
+    async function carregarAeronaves() {
+      try {
+        const response = await fetch("http://localhost:8080/api/aeronaves");
+        if (!response.ok) throw new Error("Erro ao buscar aeronaves");
+
+        let aeronaves = await response.json();
+
+        // Ordena por matrícula
+        aeronaves.sort((a, b) => a.matricula.localeCompare(b.matricula));
+
+        const lista = document.getElementById("aeronaves-list");
+        lista.innerHTML = ""; // limpa lista
+
+        if (aeronaves.length === 0) {
+          lista.innerHTML = "<li>Nenhuma aeronave encontrada.</li>";
+          return;
+        }
+
+        // Renderiza cada aeronave
+        aeronaves.forEach(aer => {
+          const item = document.createElement("li");
+          item.innerHTML = `
+            <span>
+              ${aer.matricula || "Sem matrícula"} - ${aer.fabricante || "Sem Fabricante"} - ${aer.modelo || "Sem modelo"} - ${formatarHoras(aer.horas_de_voo)}
+            </span>
+            <div class="list-buttons">
+              <button onclick="editarAeronave('${aer.matricula}')">Editar</button>
+              <button onclick="deletarAeronave('${aer.matricula}')">Excluir</button>
+            </div>
+          `;
+          lista.appendChild(item);
+        });
+
+      } catch (error) {
+        console.error(error);
+        document.getElementById("aeronaves-list").innerHTML = "<li>Erro ao carregar aeronaves.</li>";
+      }
+    }
+
+    // Redireciona para edição
+    function editarAeronave(matricula) {
+      window.location.href = `editaraeronave.html?matricula=${matricula}`;
+    }
+
+    // Deleta aeronave com confirmação
+    async function deletarAeronave(matricula) {
+      Swal.fire({
+        title: 'Tem certeza?',
+        text: "A aeronave será excluída e você não poderá reverter esta ação!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#c00',
+        cancelButtonColor: '#555',
+        confirmButtonText: 'Sim, excluir',
+        cancelButtonText: 'Cancelar'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch(`http://localhost:8080/api/aeronaves/${matricula}`, { method: "DELETE" });
+            if (response.ok) {
+              Swal.fire({
+                title: 'Excluída!',
+                text: 'A aeronave foi removida com sucesso.',
+                icon: 'success',
+                confirmButtonColor: '#c00'
+              });
+              carregarAeronaves();
+            } else {
+              Swal.fire('Erro', 'Não foi possível excluir a aeronave.', 'error');
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire('Erro', 'Falha de conexão com o servidor.', 'error');
+          }
+        }
+      });
+    }
+
+    // Carrega lista ao abrir a página
+    carregarAeronaves();
+  </script>
+</body>
+</html>

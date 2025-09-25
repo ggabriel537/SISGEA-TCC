@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD Manutenções</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f8ff; color: #003366; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #004080; }
+        h2 { color: #00264d; margin-bottom: 10px; }
+        .card { background: #f0f8ff; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,51,102,0.2); }
+        label { display: block; margin: 10px 0 5px; font-weight: bold; }
+        input, textarea, select, button { padding: 8px; width: 100%; box-sizing: border-box; border-radius: 5px; border: 1px solid #004080; }
+        button { background-color: #004080; color: white; border: none; margin-top: 10px; cursor: pointer; transition: background 0.3s; }
+        button:hover { background-color: #00264d; }
+        .detalhes { display: none; margin-top: 10px; padding: 10px; background: #e6f0ff; border-radius: 5px; }
+        .item-title { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .seta { font-weight: bold; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <h1>CRUD Manutenções</h1>
+
+    <!-- Criar -->
+    <div class="card">
+        <h2>Criar Manutenção</h2>
+        <label>ID: <input type="text" id="id"></label>
+        <label>Matrícula da Aeronave: <input type="text" id="matricula"></label>
+        <label>Data: <input type="date" id="data"></label>
+        <label>Descrição: <textarea id="descricao"></textarea></label>
+        <button onclick="criarManutencao()">Criar</button>
+    </div>
+
+    <!-- Buscar -->
+    <div class="card">
+        <h2>Buscar Manutenção por ID</h2>
+        <input type="text" id="buscarId" placeholder="Digite o ID">
+        <button onclick="buscarManutencao()">Buscar</button>
+        <pre id="resultadoBusca"></pre>
+    </div>
+
+    <!-- Atualizar -->
+    <div class="card">
+        <h2>Atualizar Manutenção</h2>
+        <label>ID: <input type="text" id="updateId"></label>
+        <label>Matrícula da Aeronave: <input type="text" id="updateMatricula"></label>
+        <label>Data: <input type="date" id="updateData"></label>
+        <label>Descrição: <textarea id="updateDescricao"></textarea></label>
+        <button onclick="atualizarManutencao()">Atualizar</button>
+    </div>
+
+    <!-- Deletar -->
+    <div class="card">
+        <h2>Deletar Manutenção</h2>
+        <input type="text" id="deleteId" placeholder="Digite o ID">
+        <button onclick="deletarManutencao()">Deletar</button>
+    </div>
+
+    <!-- Listar -->
+    <div class="card">
+        <h2>Listar Todas</h2>
+        <button onclick="listarManutencoes()">Listar</button>
+        <div id="listaManutencoes"></div>
+    </div>
+
+<script>
+const apiManutencao = 'http://localhost:8080/api/manutencoes';
+
+function tratarResposta(res) {
+    return res.json().then(data => {
+        if (!res.ok) {
+            if (data.error) throw new Error(data.error);
+            else throw new Error("Erro desconhecido: " + res.status);
+        }
+        if (data.warn) {
+            if (confirm("Aviso: " + data.warn + "\nDeseja forçar a operação?")) {
+                return { forcar: true };
+            } else {
+                throw new Error("Operação cancelada pelo usuário devido a warning.");
+            }
+        }
+        return data;
+    });
+}
+
+function criarManutencao(forcar = false) {
+    const m = {
+        id: document.getElementById('id').value,
+        matricula: document.getElementById('matricula').value,
+        data: document.getElementById('data').value,
+        descricao: document.getElementById('descricao').value
+    };
+
+    fetch(apiManutencao + (forcar ? "?forcar=true" : ""), {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(m)
+    })
+    .then(tratarResposta)
+    .then(data => {
+        if (data.forcar) criarManutencao(true);
+        else alert("Manutenção criada com sucesso! ID: " + data.id);
+    })
+    .catch(err => alert(err.message));
+}
+
+function atualizarManutencao(forcar = false) {
+    const id = document.getElementById('updateId').value;
+    if (!id) return alert('Informe um ID válido para atualização!');
+
+    const m = {
+        matricula: document.getElementById('updateMatricula').value,
+        data: document.getElementById('updateData').value,
+        descricao: document.getElementById('updateDescricao').value
+    };
+
+    fetch(`${apiManutencao}/${id}` + (forcar ? "?forcar=true" : ""), {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(m)
+    })
+    .then(tratarResposta)
+    .then(data => {
+        if (data.forcar) atualizarManutencao(true);
+        else alert("Manutenção atualizada com sucesso! ID: " + data.id);
+    })
+    .catch(err => alert(err.message));
+}
+
+function deletarManutencao() {
+    const id = document.getElementById('deleteId').value;
+    if (!id) return alert('Informe um ID válido para deletar!');
+    fetch(`${apiManutencao}/${id}`, { method: 'DELETE' })
+        .then(res => {
+            if (!res.ok) return res.json().then(data => { throw new Error(data.error || "Erro ao deletar"); });
+            alert('Manutenção deletada com sucesso!');
+        })
+        .catch(err => alert(err.message));
+}
+
+function buscarManutencao() {
+    const id = document.getElementById('buscarId').value;
+    if (!id) return alert('Informe um ID válido!');
+    fetch(`${apiManutencao}/${id}`)
+        .then(res => res.json())
+        .then(data => document.getElementById('resultadoBusca').textContent = JSON.stringify(data, null, 2))
+        .catch(err => alert(err.message));
+}
+
+function listarManutencoes() {
+    fetch(apiManutencao)
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('listaManutencoes');
+            container.innerHTML = '';
+            data.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                const titulo = document.createElement('div');
+                titulo.className = 'item-title';
+                titulo.innerHTML = `<span>ID: ${m.id} - Aeronave: ${m.matricula}</span><span class="seta">➤</span>`;
+                const detalhes = document.createElement('div');
+                detalhes.className = 'detalhes';
+                detalhes.innerHTML = `
+                    <p><strong>Data:</strong> ${m.data}</p>
+                    <p><strong>Descrição:</strong> ${m.descricao}</p>
+                `;
+                titulo.addEventListener('click', () => {
+                    if (detalhes.style.display === 'none') {
+                        detalhes.style.display = 'block';
+                        titulo.querySelector('.seta').textContent = '▼';
+                    } else {
+                        detalhes.style.display = 'none';
+                        titulo.querySelector('.seta').textContent = '➤';
+                    }
+                });
+                card.appendChild(titulo);
+                card.appendChild(detalhes);
+                container.appendChild(card);
+            });
+        })
+        .catch(err => alert("Erro ao listar manutenções: " + err));
+}
+</script>
+</body>
+</html>

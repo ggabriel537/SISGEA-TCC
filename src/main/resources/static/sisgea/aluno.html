@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Alunos</title>
+  <link rel="stylesheet" href="css/adicionar.css">
+  <link rel="stylesheet" href="css/sweetalert.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+
+  <div class="sidebar">
+    <a href="inicio.html" id="inicial">
+      <h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1>
+    </a>
+    <a href="agendamento.html">Agendamento</a>
+    <a href="aeronave.html">Aeronave</a>
+    <a href="aluno.html">Aluno</a>
+    <a href="instrutor.html">Instrutor</a>
+    <a href="manutencao.html">Manutenção</a>
+    <a href="diario.html">Diário</a>
+  </div>
+
+  <div class="main">
+    <a class="add-button" href="adicionaraluno.html">+</a>
+
+    <h1>Lista de Alunos</h1>
+
+    <div class="container" id="lista-alunos">
+      <ul id="alunos-lista"></ul>
+    </div>
+  </div>
+
+  <script>
+    async function carregarAlunos() {
+      try {
+        const response = await fetch("http://localhost:8080/api/alunos");
+        if (!response.ok) throw new Error("Erro ao buscar alunos");
+
+        const alunos = await response.json();
+        const lista = document.getElementById("alunos-lista");
+        lista.innerHTML = "";
+
+        if (alunos.length === 0) {
+          lista.innerHTML = "<li>Nenhum aluno encontrado.</li>";
+          return;
+        }
+
+        alunos.forEach(aluno => {
+          const item = document.createElement("li");
+          item.innerHTML = `
+            <span>${aluno.nome} - CANAC: ${aluno.canac} - ${aluno.horas_compradas || 0}h</span>
+            <div class="list-buttons">
+              <button onclick="editarAluno('${aluno.cpf}')">Editar</button>
+              <button onclick="deletarAluno('${aluno.cpf}')">Excluir</button>
+            </div>
+          `;
+          lista.appendChild(item);
+        });
+
+      } catch (error) {
+        console.error(error);
+        document.getElementById("alunos-lista").innerHTML = "<li>Erro ao carregar alunos.</li>";
+      }
+    }
+
+    function editarAluno(cpf) {
+      window.location.href = `adicionaraluno.html?cpf=${cpf}`;
+    }
+
+    async function deletarAluno(cpf) {
+      Swal.fire({
+        title: 'Tem certeza?',
+        text: "O aluno será removido e você não poderá reverter esta ação!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#c00',
+        cancelButtonColor: '#555',
+        confirmButtonText: 'Sim, excluir',
+        cancelButtonText: 'Cancelar'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch(`http://localhost:8080/api/alunos/${cpf}`, { method: "DELETE" });
+            if (response.ok) {
+              Swal.fire({
+                title: 'Excluído!',
+                text: 'O aluno foi removido com sucesso.',
+                icon: 'success',
+                confirmButtonColor: '#c00'
+              });
+              carregarAlunos();
+            } else {
+              Swal.fire('Erro', 'Não foi possível excluir o aluno.', 'error');
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire('Erro', 'Falha de conexão com o servidor.', 'error');
+          }
+        }
+      });
+    }
+
+    carregarAlunos();
+  </script>
+</body>
+
+</html>

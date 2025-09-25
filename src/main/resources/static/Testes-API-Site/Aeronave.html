@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD Aeronaves</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f8ff; color: #003366; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #004080; }
+        h2 { color: #00264d; margin-bottom: 10px; }
+        .card { background: #f0f8ff; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,51,102,0.2); }
+        label { display: block; margin: 10px 0 5px; font-weight: bold; }
+        input, textarea, select, button { padding: 8px; width: 100%; box-sizing: border-box; border-radius: 5px; border: 1px solid #004080; }
+        button { background-color: #004080; color: white; border: none; margin-top: 10px; cursor: pointer; transition: background 0.3s; }
+        button:hover { background-color: #00264d; }
+        .detalhes { display: none; margin-top: 10px; padding: 10px; background: #e6f0ff; border-radius: 5px; }
+        .item-title { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .seta { font-weight: bold; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <h1>CRUD Aeronaves</h1>
+
+    <!-- Criar -->
+    <div class="card">
+        <h2>Criar Aeronave</h2>
+        <label>Matrícula: <input type="text" id="matricula"></label>
+        <label>Modelo: <input type="text" id="modelo"></label>
+        <label>Fabricante: <input type="text" id="fabricante"></label>
+        <button onclick="criarAeronave()">Criar</button>
+    </div>
+
+    <!-- Buscar -->
+    <div class="card">
+        <h2>Buscar Aeronave por Matrícula</h2>
+        <input type="text" id="buscarMatricula" placeholder="Digite a matrícula">
+        <button onclick="buscarAeronave()">Buscar</button>
+        <pre id="resultadoBusca"></pre>
+    </div>
+
+    <!-- Atualizar -->
+    <div class="card">
+        <h2>Atualizar Aeronave</h2>
+        <label>Matrícula: <input type="text" id="updateMatricula"></label>
+        <label>Modelo: <input type="text" id="updateModelo"></label>
+        <label>Fabricante: <input type="text" id="updateFabricante"></label>
+        <button onclick="atualizarAeronave()">Atualizar</button>
+    </div>
+
+    <!-- Deletar -->
+    <div class="card">
+        <h2>Deletar Aeronave</h2>
+        <input type="text" id="deleteMatricula" placeholder="Digite a matrícula">
+        <button onclick="deletarAeronave()">Deletar</button>
+    </div>
+
+    <!-- Listar -->
+    <div class="card">
+        <h2>Listar Todas</h2>
+        <button onclick="listarAeronaves()">Listar</button>
+        <div id="listaAeronaves"></div>
+    </div>
+
+<script>
+const apiAeronave = 'http://localhost:8080/api/aeronaves';
+
+function tratarResposta(res) {
+    return res.json().then(data => {
+        if (!res.ok) {
+            if (data.error) throw new Error(data.error);
+            else throw new Error("Erro desconhecido: " + res.status);
+        }
+        if (data.warn) {
+            if (confirm("Aviso: " + data.warn + "\nDeseja forçar a operação?")) {
+                return { forcar: true };
+            } else {
+                throw new Error("Operação cancelada pelo usuário devido a warning.");
+            }
+        }
+        return data;
+    });
+}
+
+function criarAeronave(forcar = false) {
+    const a = {
+        matricula: document.getElementById('matricula').value,
+        modelo: document.getElementById('modelo').value,
+        fabricante: document.getElementById('fabricante').value
+    };
+
+    fetch(apiAeronave + (forcar ? "?forcar=true" : ""), {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(a)
+    })
+    .then(tratarResposta)
+    .then(data => {
+        if (data.forcar) criarAeronave(true);
+        else alert("Aeronave criada com sucesso! Matrícula: " + data.matricula);
+    })
+    .catch(err => alert(err.message));
+}
+
+function atualizarAeronave(forcar = false) {
+    const matricula = document.getElementById('updateMatricula').value;
+    if (!matricula) return alert('Informe uma matrícula válida para atualização!');
+
+    const a = {
+        modelo: document.getElementById('updateModelo').value,
+        fabricante: document.getElementById('updateFabricante').value
+    };
+
+    fetch(`${apiAeronave}/${matricula}` + (forcar ? "?forcar=true" : ""), {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(a)
+    })
+    .then(tratarResposta)
+    .then(data => {
+        if (data.forcar) atualizarAeronave(true);
+        else alert("Aeronave atualizada com sucesso! Matrícula: " + data.matricula);
+    })
+    .catch(err => alert(err.message));
+}
+
+function deletarAeronave() {
+    const matricula = document.getElementById('deleteMatricula').value;
+    if (!matricula) return alert('Informe uma matrícula válida para deletar!');
+    fetch(`${apiAeronave}/${matricula}`, { method: 'DELETE' })
+        .then(res => {
+            if (!res.ok) return res.json().then(data => { throw new Error(data.error || "Erro ao deletar"); });
+            alert('Aeronave deletada com sucesso!');
+        })
+        .catch(err => alert(err.message));
+}
+
+function buscarAeronave() {
+    const matricula = document.getElementById('buscarMatricula').value;
+    if (!matricula) return alert('Informe uma matrícula válida!');
+    fetch(`${apiAeronave}/${matricula}`)
+        .then(res => res.json())
+        .then(data => document.getElementById('resultadoBusca').textContent = JSON.stringify(data, null, 2))
+        .catch(err => alert(err.message));
+}
+
+function listarAeronaves() {
+    fetch(apiAeronave)
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('listaAeronaves');
+            container.innerHTML = '';
+            data.forEach(a => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                const titulo = document.createElement('div');
+                titulo.className = 'item-title';
+                titulo.innerHTML = `<span>Matrícula: ${a.matricula} - ${a.modelo}</span><span class="seta">➤</span>`;
+                const detalhes = document.createElement('div');
+                detalhes.className = 'detalhes';
+                detalhes.innerHTML = `
+                    <p><strong>Fabricante:</strong> ${a.fabricante}</p>
+                `;
+                titulo.addEventListener('click', () => {
+                    if (detalhes.style.display === 'none') {
+                        detalhes.style.display = 'block';
+                        titulo.querySelector('.seta').textContent = '▼';
+                    } else {
+                        detalhes.style.display = 'none';
+                        titulo.querySelector('.seta').textContent = '➤';
+                    }
+                });
+                card.appendChild(titulo);
+                card.appendChild(detalhes);
+                container.appendChild(card);
+            });
+        })
+        .catch(err => alert("Erro ao listar aeronaves: " + err));
+}
+</script>
+</body>
+</html>

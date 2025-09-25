@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.sisgea.BancoDados.Controllers.UsuarioController;
@@ -32,6 +33,7 @@ public class UsuarioAPI {
 
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Usuario u, @RequestParam(defaultValue = "false") boolean forcar) {
+
         // Limitações de Cadastro dos usuários
         List<Usuario> usuariosExistentes = null;
         try {
@@ -98,6 +100,7 @@ public class UsuarioAPI {
         //
         // CADASTRO DO USUÁRIO
         //
+
         UsuarioController.salvarUsuario(u);
         return ResponseEntity.ok(Map.of("status", "sucesso", "usuario", u.getUsuario()));
     }

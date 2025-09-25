@@ -24,7 +24,8 @@ public class Instrutor {
     @Column(name = "habilitacao")
     private String habilitacao;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "endereco_id", unique = true, nullable = false)
     private Endereco endereco;
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

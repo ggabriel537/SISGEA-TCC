@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Voos Programados</title>
+  <link rel="stylesheet" href="css/adicionar.css">
+  <link rel="stylesheet" href="css/sweetalert.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+
+  <div class="sidebar">
+    <a href="inicio.html" id="inicial">
+      <h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1>
+    </a>
+    <a href="agendamento.html">Agendamento</a>
+    <a href="aeronave.html">Aeronave</a>
+    <a href="aluno.html">Aluno</a>
+    <a href="instrutor.html">Instrutor</a>
+    <a href="manutencao.html">Manutenção</a>
+    <a href="diario.html">Diário</a>
+  </div>
+
+  <div class="main">
+    <a class="add-button" href="adicionaragendamento.html">+</a>
+
+    <h1>Lista de Agendamentos de Voo</h1>
+
+    <div class="container" id="lista-agendamentos">
+      <ul id="agendamentos-list"></ul>
+    </div>
+  </div>
+
+  <script>
+    async function carregarAgendamentos() {
+      try {
+        // Chamada à API para buscar agendamentos
+        const response = await fetch("http://localhost:8080/api/agendamentos");
+        if (!response.ok) throw new Error("Erro ao buscar agendamentos");
+
+        let agendamentos = await response.json();
+
+        // Ordena pelo horário de partida (mais próximo primeiro)
+        agendamentos.sort((a, b) => new Date(a.horario_partida) - new Date(b.horario_partida));
+
+        const lista = document.getElementById("agendamentos-list");
+        lista.innerHTML = ""; // limpa lista
+
+        if (agendamentos.length === 0) {
+          lista.innerHTML = "<li>Nenhum agendamento encontrado.</li>";
+          return;
+        }
+
+        // Renderiza cada agendamento na lista
+        agendamentos.forEach(ag => {
+          const data = new Date(ag.horario_partida);
+          const dataFormatada = data.toLocaleDateString("pt-BR");
+          const horaFormatada = data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+          const item = document.createElement("li");
+          item.innerHTML = `
+            <span>${dataFormatada} - ${horaFormatada} - ${ag.aluno?.nome || "Aluno"} - ${ag.aeronave?.modelo || "Aeronave"} - ${ag.tipo_voo || "Tipo não definido"} - ${ag.status || "Status"}</span>
+            <div class="list-buttons">
+              <button onclick="editarAgendamento('${ag.id}')">Editar</button>
+              <button onclick="deletarAgendamento('${ag.id}')">Deletar</button>
+            </div>
+          `;
+          lista.appendChild(item);
+        });
+
+      } catch (error) {
+        console.error(error);
+        document.getElementById("agendamentos-list").innerHTML = "<li>Erro ao carregar agendamentos.</li>";
+      }
+    }
+
+    // Redireciona para página de edição
+    function editarAgendamento(id) {
+      window.location.href = `editaragendamento.html?id=${id}`;
+    }
+
+    // Deleta agendamento com confirmação via SweetAlert
+    async function deletarAgendamento(id) {
+      Swal.fire({
+        title: 'Tem certeza?',
+        text: "O agendamento será deletado e você não poderá reverter esta ação!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#c00',
+        cancelButtonColor: '#555',
+        confirmButtonText: 'Sim, deletar',
+        cancelButtonText: 'Cancelar'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch(`http://localhost:8080/api/agendamentos/${id}`, { method: "DELETE" });
+            if (response.ok) {
+              Swal.fire({
+                title: 'Deletado!',
+                text: 'O agendamento foi removido com sucesso.',
+                icon: 'success',
+                confirmButtonColor: '#c00'
+              });
+              carregarAgendamentos(); // recarrega lista
+            } else {
+              Swal.fire('Erro', 'Não foi possível excluir o agendamento.', 'error');
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire('Erro', 'Falha de conexão com o servidor.', 'error');
+          }
+        }
+      });
+    }
+
+    // Carrega a lista ao abrir a página
+    carregarAgendamentos();
+  </script>
+</body>
+
+</html>

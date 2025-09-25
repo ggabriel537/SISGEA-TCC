@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Instrutores</title>
+  <link rel="stylesheet" href="css/adicionar.css">
+  <link rel="stylesheet" href="css/sweetalert.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <div class="sidebar">
+    <a href="inicio.html" id="inicial">
+      <h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1>
+    </a>
+    <a href="agendamento.html">Agendamento</a>
+    <a href="aeronave.html">Aeronave</a>
+    <a href="aluno.html">Aluno</a>
+    <a href="instrutor.html">Instrutor</a>
+    <a href="manutencao.html">Manutenção</a>
+    <a href="diario.html">Diário</a>
+  </div>
+
+  <div class="main">
+    <h1>Lista de Instrutores</h1>
+    <div class="container" id="lista-instrutores">
+      <ul id="instrutores-list"></ul>
+      <a href="adicionarinstrutor.html" class="add-button">+</a>
+    </div>
+  </div>
+
+  <script>
+    function formatarCPF(cpf) {
+      if (!cpf) return "N/A";
+      return cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
+    }
+
+    async function carregarInstrutores() {
+      try {
+        // Chamada à API para buscar instrutores
+        const response = await fetch("http://localhost:8080/api/instrutores");
+        if (!response.ok) throw new Error("Erro ao buscar instrutores");
+
+        let instrutores = await response.json();
+
+        // Ordena por nome
+        instrutores.sort((a, b) => a.nome.localeCompare(b.nome));
+
+        const lista = document.getElementById("instrutores-list");
+        lista.innerHTML = ""; // limpa lista
+
+        if (instrutores.length === 0) {
+          lista.innerHTML = "<li>Nenhum instrutor encontrado.</li>";
+          return;
+        }
+
+        // Renderiza cada instrutor
+        instrutores.forEach(inst => {
+          const item = document.createElement("li");
+          item.innerHTML = `
+            <span>
+              ${inst.nome || "Sem nome"} - CPF: ${formatarCPF(inst.cpf) || "N/A"} - CANAC: ${inst.canac || "Sem CANAC"}
+            </span>
+            <div class="list-buttons">
+              <button onclick="editarInstrutor('${inst.cpf}')">Editar</button>
+              <button onclick="deletarInstrutor('${inst.cpf}')">Excluir</button>
+            </div>
+          `;
+          lista.appendChild(item);
+        });
+
+      } catch (error) {
+        console.error(error);
+        document.getElementById("instrutores-list").innerHTML = "<li>Erro ao carregar instrutores.</li>";
+      }
+    }
+
+    // Redireciona para edição usando CPF
+    function editarInstrutor(cpf) {
+      window.location.href = `editarinstrutor.html?cpf=${cpf}`;
+    }
+
+    // Deleta instrutor com confirmação
+    async function deletarInstrutor(cpf) {
+      Swal.fire({
+        title: 'Tem certeza?',
+        text: "O instrutor será excluído e você não poderá reverter esta ação!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#c00',
+        cancelButtonColor: '#555',
+        confirmButtonText: 'Sim, excluir',
+        cancelButtonText: 'Cancelar'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch(`http://localhost:8080/api/instrutores/${cpf}`, { method: "DELETE" });
+            if (response.ok) {
+              Swal.fire({
+                title: 'Excluído!',
+                text: 'O instrutor foi removido com sucesso.',
+                icon: 'success',
+                confirmButtonColor: '#c00'
+              });
+              carregarInstrutores(); // recarrega lista
+            } else {
+              Swal.fire('Erro', 'Não foi possível excluir o instrutor.', 'error');
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire('Erro', 'Falha de conexão com o servidor.', 'error');
+          }
+        }
+      });
+    }
+
+    // Carrega lista ao abrir a página
+    carregarInstrutores();
+  </script>
+</body>
+</html>

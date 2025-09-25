@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Aeronave</title>
+    <link rel="stylesheet" href="css/adicionar.css">
+    <link rel="stylesheet" href="css/sweetalert.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <a href="inicio.html" id="inicial">
+            <h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1>
+        </a>
+        <a href="agendamento.html">Agendamento</a>
+        <a href="aeronave.html">Aeronave</a>
+        <a href="aluno.html">Aluno</a>
+        <a href="instrutor.html">Instrutor</a>
+        <a href="manutencao.html">Manutenção</a>
+        <a href="diario.html">Diário</a>
+    </div>
+
+    <div class="main">
+        <h1>Cadastro de Aeronave</h1>
+        <div class="container" id="aeronave">
+
+            <label>Matrícula</label>
+            <input type="text" id="matricula" placeholder="PT-ABC" maxlength="6" oninput="formatarMatricula(this)">
+
+            <label>Modelo</label>
+            <input type="text" id="modelo" placeholder="Modelo da aeronave" maxlength="32">
+
+            <label>Fabricante</label>
+            <input type="text" id="fabricante" placeholder="Fabricante da aeronave" maxlength="32">
+
+            <label>Habilitação</label>
+            <select id="habilitacao">
+                <option value="">Selecione...</option>
+                <option>Mono Motor</option>
+                <option>Multi Motor</option>
+                <option>Asa Rotativa</option>
+                <option>Turbo Hélice</option>
+                <option>Jato</option>
+            </select>
+
+            <label>Tipo de Voo</label>
+            <select id="tipo_de_voo">
+                <option value="">Selecione...</option>
+                <option>VFR-D</option>
+                <option>VFR-N</option>
+                <option>IFR</option>
+            </select>
+
+            <label>Horas de Voo</label>
+            <input type="number" id="horas_de_voo" placeholder="Ex: 1200" min="0" step="0.1">
+
+            <button onclick="cadastrarAeronave()">Cadastrar Aeronave</button>
+        </div>
+    </div>
+
+    <script>
+        function formatarMatricula(input) {
+            let valor = input.value.toUpperCase().replace(/[^A-Z]/g, "");
+
+            if (valor.length > 2) {
+                valor = valor.slice(0, 2) + "-" + valor.slice(2, 5);
+            }
+
+            input.value = valor;
+        }
+
+        // Verifica se matrícula atende ao padrão
+        function matriculaValida(matricula) {
+            const regex = /^(PP|PT|PR|PS|PU)-[A-Z]{3}$/;
+            return regex.test(matricula);
+        }
+
+        // Cadastrar aeronave
+        async function cadastrarAeronave() {
+            const matricula = document.getElementById("matricula").value.trim().toUpperCase();
+            const modelo = document.getElementById("modelo").value.trim();
+            const fabricante = document.getElementById("fabricante").value.trim();
+            const habilitacao = document.getElementById("habilitacao").value.trim();
+            const tipo_de_voo = document.getElementById("tipo_de_voo").value.trim();
+            const horas_de_voo = parseFloat(document.getElementById("horas_de_voo").value) || 0;
+
+            // Validação
+            if (!matricula || !modelo || !fabricante || !habilitacao || !tipo_de_voo) {
+                Swal.fire("Atenção", "Preencha todos os campos obrigatórios!", "warning");
+                return;
+            }
+            if (!matriculaValida(matricula)) {
+                Swal.fire("Erro", "Matrícula inválida. Formato: XX-XXX e prefixo deve ser PP, PT, PR, PS ou PU.", "error");
+                return;
+            }
+
+            const aeronave = {
+                matricula,
+                modelo,
+                fabricante,
+                habilitacao,
+                tipo_de_voo,
+                horas_de_voo,
+                manutencoes: [],
+                diarioBordos: []
+            };
+
+            try {
+                const response = await fetch("http://localhost:8080/api/aeronaves", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(aeronave)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    Swal.fire("Erro", data.error || "Falha ao cadastrar aeronave.", "error");
+                    return;
+                }
+
+                if (data.status === "sucesso") {
+                    Swal.fire("Sucesso", "Aeronave cadastrada com sucesso!", "success")
+                        .then(() => window.location.href = "aeronave.html");
+                }
+
+            } catch (error) {
+                Swal.fire("Erro", "Não foi possível conectar à API.", "error");
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+
+</html>

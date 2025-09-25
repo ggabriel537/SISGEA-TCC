@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD Agendamento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fdf2f2;
+            color: #4d1a1a;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 { text-align: center; color: #b71c1c; }
+        h2 { color: #8b0000; margin-bottom: 10px; }
+        .card { background: #fff0f0; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(179,28,28,0.2); }
+        label { display: block; margin: 10px 0 5px; font-weight: bold; }
+        input, select, button { padding: 8px; width: 100%; box-sizing: border-box; border-radius: 5px; border: 1px solid #b71c1c; }
+        button { background-color: #b71c1c; color: white; border: none; margin-top: 10px; cursor: pointer; transition: background 0.3s; }
+        button:hover { background-color: #8b0000; }
+        .flex-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .flex-row > div { flex: 1 1 200px; }
+        .detalhes { display: none; margin-top: 10px; padding: 10px; background: #ffe5e5; border-radius: 5px; }
+        .agendamento-title { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .seta { font-weight: bold; margin-left: 10px; }
+    </style>
+</head>
+<body>
+<h1>CRUD Agendamento</h1>
+
+<!-- Criar Agendamento -->
+<div class="card">
+    <h2>Criar Agendamento</h2>
+    <div class="flex-row">
+        <div><label>Aeronave:</label><select id="aeronaveSelect"></select></div>
+        <div><label>Aluno:</label><select id="alunoSelect"></select></div>
+        <div><label>Instrutor:</label><select id="instrutorSelect"></select></div>
+    </div>
+    <label>Partida: <input type="datetime-local" id="partida"></label>
+    <label>Destino: <input type="text" id="destino"></label>
+    <label>Tipo Voo: <input type="text" id="tipo_voo"></label>
+    <label>Status: <input type="text" id="status"></label>
+    <label>Data Agendamento: <input type="datetime-local" id="data_agendamento"></label>
+    <button onclick="criarAgendamento()">Criar</button>
+</div>
+
+<!-- Buscar Agendamento -->
+<div class="card">
+    <h2>Buscar Agendamento por ID</h2>
+    <input type="text" id="buscarId" placeholder="Digite o ID">
+    <button onclick="buscarAgendamento()">Buscar</button>
+    <pre id="resultadoBusca"></pre>
+</div>
+
+<!-- Atualizar Agendamento -->
+<div class="card">
+    <h2>Atualizar Agendamento</h2>
+    <label>ID: <input type="text" id="updateId"></label>
+    <div class="flex-row">
+        <div><label>Aeronave:</label><select id="updateAeronaveSelect"></select></div>
+        <div><label>Aluno:</label><select id="updateAlunoSelect"></select></div>
+        <div><label>Instrutor:</label><select id="updateInstrutorSelect"></select></div>
+    </div>
+    <label>Partida: <input type="datetime-local" id="updatePartida"></label>
+    <label>Destino: <input type="text" id="updateDestino"></label>
+    <label>Tipo Voo: <input type="text" id="updateTipo_voo"></label>
+    <label>Status: <input type="text" id="updateStatus"></label>
+    <label>Data Agendamento: <input type="datetime-local" id="updateData_agendamento"></label>
+    <button onclick="atualizarAgendamento()">Atualizar</button>
+</div>
+
+<!-- Deletar Agendamento -->
+<div class="card">
+    <h2>Deletar Agendamento</h2>
+    <input type="text" id="deleteId" placeholder="Digite o ID">
+    <button onclick="deletarAgendamento()">Deletar</button>
+</div>
+
+<!-- Listar Todos -->
+<div class="card">
+    <h2>Listar Todos</h2>
+    <button onclick="listarAgendamentos()">Listar</button>
+    <div id="listaAgendamentos"></div>
+</div>
+
+<script>
+const apiAgendamento = 'http://localhost:8080/api/agendamentos';
+const apiAeronave = 'http://localhost:8080/api/aeronaves';
+const apiAluno = 'http://localhost:8080/api/alunos';
+const apiInstrutor = 'http://localhost:8080/api/instrutores';
+
+function carregarSelects() {
+    fetch(apiAeronave).then(res => res.json()).then(data => {
+        const sel = document.getElementById('aeronaveSelect');
+        const selUpdate = document.getElementById('updateAeronaveSelect');
+        sel.innerHTML=''; selUpdate.innerHTML='';
+        data.forEach(a => { sel.add(new Option(a.matricula + " - " + a.modelo, a.matricula)); selUpdate.add(new Option(a.matricula + " - " + a.modelo, a.matricula)); });
+    });
+    fetch(apiAluno).then(res => res.json()).then(data => {
+        const sel = document.getElementById('alunoSelect');
+        const selUpdate = document.getElementById('updateAlunoSelect');
+        sel.innerHTML=''; selUpdate.innerHTML='';
+        data.forEach(a => { sel.add(new Option(a.nome + " - " + a.cpf, a.cpf)); selUpdate.add(new Option(a.nome + " - " + a.cpf, a.cpf)); });
+    });
+    fetch(apiInstrutor).then(res => res.json()).then(data => {
+        const sel = document.getElementById('instrutorSelect');
+        const selUpdate = document.getElementById('updateInstrutorSelect');
+        sel.innerHTML=''; selUpdate.innerHTML='';
+        data.forEach(i => { sel.add(new Option(i.nome + " - " + i.cpf, i.cpf)); selUpdate.add(new Option(i.nome + " - " + i.cpf, i.cpf)); });
+    });
+}
+
+function tratarResposta(res) {
+    if (!res.ok) return res.json().then(data => { throw new Error(data.error || data.warn || 'Erro desconhecido'); });
+    return res.json();
+}
+
+function criarAgendamento() {
+    const ag = {
+        aeronave:{matricula:document.getElementById('aeronaveSelect').value},
+        aluno:{cpf:document.getElementById('alunoSelect').value},
+        instrutor:{cpf:document.getElementById('instrutorSelect').value},
+        partida:document.getElementById('partida').value,
+        destino:document.getElementById('destino').value,
+        tipo_voo:document.getElementById('tipo_voo').value,
+        status:document.getElementById('status').value,
+        data_agendamento:new Date(document.getElementById('data_agendamento').value).toISOString()
+    };
+    fetch(apiAgendamento,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(ag)})
+        .then(tratarResposta)
+        .then(data => alert(data.status ? 'Agendamento criado com sucesso!' : data.warn))
+        .catch(err => alert(err.message));
+}
+
+function atualizarAgendamento() {
+    const id = document.getElementById('updateId').value;
+    if(!id) return alert('Informe o ID para atualizar!');
+    const ag = {
+        aeronave:{matricula:document.getElementById('updateAeronaveSelect').value},
+        aluno:{cpf:document.getElementById('updateAlunoSelect').value},
+        instrutor:{cpf:document.getElementById('updateInstrutorSelect').value},
+        partida:document.getElementById('updatePartida').value,
+        destino:document.getElementById('updateDestino').value,
+        tipo_voo:document.getElementById('updateTipo_voo').value,
+        status:document.getElementById('updateStatus').value,
+        data_agendamento:new Date(document.getElementById('updateData_agendamento').value).toISOString()
+    };
+    fetch(`${apiAgendamento}/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(ag)})
+        .then(tratarResposta)
+        .then(data => alert(data.status ? 'Agendamento atualizado!' : data.warn))
+        .catch(err => alert(err.message));
+}
+
+function deletarAgendamento() {
+    const id = document.getElementById('deleteId').value;
+    if(!id) return alert('Informe o ID para deletar!');
+    fetch(`${apiAgendamento}/${id}`,{method:'DELETE'})
+        .then(res => { if(!res.ok) throw new Error('Erro ao deletar agendamento'); alert('Agendamento deletado!'); })
+        .catch(err => alert(err.message));
+}
+
+function buscarAgendamento() {
+    const id = document.getElementById('buscarId').value;
+    if(!id) return alert('Informe o ID!');
+    fetch(`${apiAgendamento}/${id}`)
+        .then(res => { if(!res.ok) throw new Error('Agendamento não encontrado'); return res.json(); })
+        .then(data => document.getElementById('resultadoBusca').textContent = JSON.stringify(data,null,2))
+        .catch(err => alert(err.message));
+}
+
+function listarAgendamentos() {
+    fetch(apiAgendamento)
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('listaAgendamentos');
+            container.innerHTML='';
+            data.forEach(ag => {
+                const card = document.createElement('div'); card.className='card';
+                const titulo = document.createElement('div'); titulo.className='agendamento-title';
+                titulo.innerHTML=`<span>ID: ${ag.id}</span><span class="seta">➤</span>`;
+                const detalhes = document.createElement('div'); detalhes.className='detalhes';
+                detalhes.innerHTML=`
+                    <p><strong>Aeronave:</strong> ${ag.aeronave?.matricula} - ${ag.aeronave?.modelo || ''}</p>
+                    <p><strong>Aluno:</strong> ${ag.aluno?.nome} - ${ag.aluno?.cpf}</p>
+                    <p><strong>Instrutor:</strong> ${ag.instrutor?.nome} - ${ag.instrutor?.cpf}</p>
+                    <p><strong>Partida:</strong> ${ag.partida}</p>
+                    <p><strong>Destino:</strong> ${ag.destino}</p>
+                    <p><strong>Tipo Voo:</strong> ${ag.tipo_voo}</p>
+                    <p><strong>Status:</strong> ${ag.status}</p>
+                    <p><strong>Data Agendamento:</strong> ${new Date(ag.data_agendamento).toLocaleString()}</p>
+                `;
+                titulo.addEventListener('click',()=>{detalhes.style.display=(detalhes.style.display==='none')?'block':'none'; titulo.querySelector('.seta').textContent=(detalhes.style.display==='none')?'➤':'▼';});
+                card.appendChild(titulo); card.appendChild(detalhes); container.appendChild(card);
+            });
+        })
+        .catch(err => alert('Erro ao listar agendamentos: '+err.message));
+}
+
+window.onload = carregarSelects;
+</script>
+</body>
+</html>

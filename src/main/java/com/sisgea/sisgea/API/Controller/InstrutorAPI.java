@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.sisgea.BancoDados.Controllers.InstrutorController;
+import com.sisgea.BancoDados.Controllers.AdministradorController;
 import com.sisgea.Entidades.Instrutor;
+import com.sisgea.Entidades.Administrador;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -32,17 +34,16 @@ public class InstrutorAPI {
 
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Instrutor i, @RequestParam(defaultValue = "false") boolean forcar) {
-        // Limitações de Cadastro dos instrutores
-        List<Instrutor> instrutoresExistentes = null;
+        List<Instrutor> instrutoresExistentes;
+        List<Administrador> administradoresExistentes;
         try {
             instrutoresExistentes = InstrutorController.listarInstrutores();
+            administradoresExistentes = AdministradorController.listarAdministradores();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Erro ao listar instrutores existentes para validação: " + e.getMessage()));
+                    .body(Map.of("error", "Erro ao listar usuários existentes para validação: " + e.getMessage()));
         }
 
-        // Conflito -> Bloqueia o cadastro
-        // Warn -> Apenas avisa o usuário, mas permite o cadastro
         String conflito_str = "";
         String warn_str = "";
         boolean warn = false;
@@ -63,9 +64,14 @@ public class InstrutorAPI {
             conflito = true;
             conflito_str += "Email é obrigatório.\n";
         }
-        if (i.getUsuario() == null) {
+        if (i.getUsuario() == null || i.getUsuario().getUsuario() == null || i.getUsuario().getUsuario().isBlank()) {
             conflito = true;
             conflito_str += "Usuário é obrigatório.\n";
+        }
+
+        // Força sempre permissao = 0
+        if (i.getUsuario() != null) {
+            i.getUsuario().setPermissao(0);
         }
 
         //
@@ -77,6 +83,28 @@ public class InstrutorAPI {
                 conflito_str += "Já existe um instrutor com este CPF.\n";
                 break;
             }
+            if (existente.getCanac() != null && i.getCanac() != null &&
+                    existente.getCanac().equals(i.getCanac())) {
+                conflito = true;
+                conflito_str += "Já existe um instrutor com este CANAC.\n";
+                break;
+            }
+            if (existente.getUsuario() != null && i.getUsuario() != null &&
+                    existente.getUsuario().getUsuario().equals(i.getUsuario().getUsuario())) {
+                conflito = true;
+                conflito_str += "Já existe um instrutor com este Usuário.\n";
+                break;
+            }
+        }
+
+        // Verifica se o usuário já existe entre administradores
+        for (Administrador adm : administradoresExistentes) {
+            if (adm.getUsuario() != null && i.getUsuario() != null &&
+                    adm.getUsuario().getUsuario().equals(i.getUsuario().getUsuario())) {
+                conflito = true;
+                conflito_str += "Já existe um administrador com este Usuário.\n";
+                break;
+            }
         }
 
         //
@@ -89,19 +117,14 @@ public class InstrutorAPI {
             }
         }
 
-        // Se houver conflito, bloqueia o cadastro
         if (conflito) {
             return ResponseEntity.badRequest().body(Map.of("error", conflito_str));
         }
 
-        // Se houver apenas warn, avisa o usuário, mas permite o cadastro
         if (warn && !forcar) {
             return ResponseEntity.ok(Map.of("warn", warn_str));
         }
 
-        //
-        // CADASTRO DO INSTRUTOR
-        //
         InstrutorController.salvarInstrutor(i);
         return ResponseEntity.ok(Map.of("status", "sucesso", "cpf", i.getCpf()));
     }
@@ -109,23 +132,22 @@ public class InstrutorAPI {
     @PutMapping("/{cpf}")
     public ResponseEntity<?> atualizar(@PathVariable String cpf, @RequestBody Instrutor i,
                                        @RequestParam(defaultValue = "false") boolean forcar) {
-        // Busca instrutor existente
         Instrutor existente = InstrutorController.buscarId(cpf);
         if (existente == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "Instrutor não encontrado"));
         }
 
-        // Lista todos os instrutores para validação
-        List<Instrutor> instrutoresExistentes = null;
+        List<Instrutor> instrutoresExistentes;
+        List<Administrador> administradoresExistentes;
         try {
             instrutoresExistentes = InstrutorController.listarInstrutores();
+            administradoresExistentes = AdministradorController.listarAdministradores();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Erro ao listar instrutores existentes para validação: " + e.getMessage()));
+                    .body(Map.of("error", "Erro ao listar usuários existentes para validação: " + e.getMessage()));
         }
 
-        // Inicializa variáveis de conflito e warning
         String conflito_str = "";
         String warn_str = "";
         boolean warn = false;
@@ -146,9 +168,14 @@ public class InstrutorAPI {
             conflito = true;
             conflito_str += "Email é obrigatório.\n";
         }
-        if (i.getUsuario() == null) {
+        if (i.getUsuario() == null || i.getUsuario().getUsuario() == null || i.getUsuario().getUsuario().isBlank()) {
             conflito = true;
             conflito_str += "Usuário é obrigatório.\n";
+        }
+
+        // Força sempre permissao = 0
+        if (i.getUsuario() != null) {
+            i.getUsuario().setPermissao(0);
         }
 
         //
@@ -160,11 +187,31 @@ public class InstrutorAPI {
                 conflito_str += "Já existe um instrutor com este CPF.\n";
                 break;
             }
+            if (outro.getCanac() != null && i.getCanac() != null &&
+                    outro.getCanac().equals(i.getCanac()) && !outro.getCpf().equals(cpf)) {
+                conflito = true;
+                conflito_str += "Já existe um instrutor com este CANAC.\n";
+                break;
+            }
+            if (outro.getUsuario() != null && i.getUsuario() != null &&
+                    outro.getUsuario().getUsuario().equals(i.getUsuario().getUsuario()) &&
+                    !outro.getCpf().equals(cpf)) {
+                conflito = true;
+                conflito_str += "Já existe um instrutor com este Usuário.\n";
+                break;
+            }
         }
 
-        //
-        // WARNINGS
-        //
+        // Verifica se o usuário já existe entre administradores
+        for (Administrador adm : administradoresExistentes) {
+            if (adm.getUsuario() != null && i.getUsuario() != null &&
+                    adm.getUsuario().getUsuario().equals(i.getUsuario().getUsuario())) {
+                conflito = true;
+                conflito_str += "Já existe um administrador com este Usuário.\n";
+                break;
+            }
+        }
+
         if (!conflito) {
             if (i.getEmail() != null && !i.getEmail().contains("@")) {
                 warn = true;
@@ -172,23 +219,14 @@ public class InstrutorAPI {
             }
         }
 
-        //
-        // BLOQUEIA ATUALIZAÇÃO SE HOUVER CONFLITO
-        //
         if (conflito) {
             return ResponseEntity.badRequest().body(Map.of("error", conflito_str));
         }
 
-        //
-        // AVISA USUÁRIO SE HOUVER WARNING
-        //
         if (warn && !forcar) {
             return ResponseEntity.ok(Map.of("warn", warn_str));
         }
 
-        //
-        // ATUALIZAÇÃO DO INSTRUTOR
-        //
         i.setCpf(cpf);
         InstrutorController.atualizarInstrutor(i);
         return ResponseEntity.ok(Map.of("status", "sucesso", "cpf", i.getCpf()));
