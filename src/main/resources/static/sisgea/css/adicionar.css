@@ -177,4 +177,11 @@
     border: 1px solid #c00;
   }
 
+  input[readonly], textarea[readonly], select[readonly] {
+  background-color: #f0f0f0;
+  color: #555;
+  border: 1px solid #ccc;
+  cursor: not-allowed;
+}
+
   
