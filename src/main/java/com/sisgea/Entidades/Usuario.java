@@ -1,6 +1,6 @@
 package com.sisgea.Entidades;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import jakarta.persistence.*;
 
@@ -22,10 +22,9 @@ public class Usuario {
     }
 
     public Usuario(String usuario, String senha, Integer permissao) {
-        PasswordEncoder senhahash = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
-        this.senha = senhahash.encode(senha);
         this.usuario = usuario;
         this.permissao = permissao;
+        setSenha(senha);
     }
 
     public String getUsuario() {
@@ -41,8 +40,12 @@ public class Usuario {
     }
 
     public void setSenha(String senha) {
-        PasswordEncoder senhahash = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
-        this.senha = senhahash.encode(senha);
+        if (senha != null && !senha.startsWith("$2a$")) {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            this.senha = encoder.encode(senha);
+        } else {
+            this.senha = senha;
+        }
     }
 
     public Integer getPermissao() {

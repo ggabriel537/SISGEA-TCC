@@ -113,71 +113,38 @@ public class InstrutorAPI {
 
     @PutMapping("/{cpf}")
     public ResponseEntity<?> atualizar(@PathVariable String cpf, @RequestBody Instrutor i) {
-        String conflito_str = "";
-        boolean conflito = false;
-
         Instrutor existente = InstrutorController.buscarId(cpf);
         if (existente == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "Instrutor não encontrado"));
         }
 
-        conflito_str += validarInstrutor(i);
+        // Validação dos dados básicos (exceto usuário)
+        String conflito_str = validarInstrutor(i);
         if (!conflito_str.isEmpty()) {
-            conflito = true;
-        }
-
-        List<Instrutor> instrutores = InstrutorController.listarInstrutores();
-        List<Administrador> administradores = AdministradorController.listarAdministradores();
-
-        if (i.getUsuario() != null) {
-            for (Instrutor outro : instrutores) {
-                if (!outro.getCpf().equals(cpf) && i.getUsuario().getUsuario() != null && outro.getUsuario() != null
-                        && i.getUsuario().getUsuario().equals(outro.getUsuario().getUsuario())) {
-                    conflito = true;
-                    conflito_str += "Já existe um instrutor com este usuário.\n";
-                }
-            }
-
-            for (Administrador adm : administradores) {
-                if (i.getUsuario() != null && adm.getUsuario() != null
-                        && i.getUsuario().getUsuario() != null
-                        && i.getUsuario().getUsuario().equals(adm.getUsuario().getUsuario())) {
-                    conflito = true;
-                    conflito_str += "Já existe um administrador com este usuário.\n";
-                }
-            }
-        }
-
-        if (conflito) {
             return ResponseEntity.badRequest().body(Map.of("error", conflito_str));
         }
 
-        i.setCpf(cpf);
+        // Atualiza apenas os dados editáveis
+        existente.setNome(i.getNome());
+        existente.setTelefone(i.getTelefone());
+        existente.setEmail(i.getEmail());
+        existente.setHabilitacao(i.getHabilitacao());
+        existente.setCanac(i.getCanac());
+        existente.setEndereco(i.getEndereco());
 
-        if (i.getUsuario() != null && !i.getUsuario().getUsuario().equals(existente.getUsuario().getUsuario())) {
-            Usuario novoUsuario = new Usuario();
-            novoUsuario.setUsuario(i.getUsuario().getUsuario());
-            novoUsuario.setSenha(i.getUsuario().getSenha());
-            novoUsuario.setPermissao(0);
-
-            UsuarioController.salvarUsuario(novoUsuario); // cria novo usuário
-            UsuarioController.deletarUsuario(existente.getUsuario()); // deleta antigo
-
-            i.setUsuario(novoUsuario); // vincula o novo usuário ao instrutor
-        } else {
-            // apenas atualiza senha se fornecida
-            if (i.getUsuario() != null && i.getUsuario().getSenha() != null && !i.getUsuario().getSenha().isBlank()) {
-                existente.getUsuario().setSenha(i.getUsuario().getSenha());
-                UsuarioController.atualizarUsuario(existente.getUsuario());
-            }
-            i.setUsuario(existente.getUsuario());
+        // Mantém o mesmo usuário (login) e só atualiza a senha
+        Usuario user = existente.getUsuario();
+        if (i.getUsuario() != null && i.getUsuario().getSenha() != null && !i.getUsuario().getSenha().isBlank()) {
+            user.setSenha(i.getUsuario().getSenha());
         }
+        user.setPermissao(0); // mantém permissão 0 para instrutor
+        existente.setUsuario(user);
 
-        i.getUsuario().setPermissao(0);
+        UsuarioController.atualizarUsuario(user);
+        InstrutorController.atualizarInstrutor(existente);
 
-        InstrutorController.atualizarInstrutor(i);
-        return ResponseEntity.ok(Map.of("status", "sucesso", "cpf", i.getCpf()));
+        return ResponseEntity.ok(Map.of("status", "sucesso", "cpf", existente.getCpf()));
     }
 
     @DeleteMapping("/{cpf}")

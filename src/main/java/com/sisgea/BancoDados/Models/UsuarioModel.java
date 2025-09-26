@@ -36,7 +36,9 @@ public class UsuarioModel {
         EntityManager em = JPAUtil.getEntityManager();
         Usuario usuario = em.createQuery("SELECT u FROM Usuario u WHERE u.usuario = :username", Usuario.class)
                 .setParameter("username", username)
-                .getSingleResult();
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
         em.close();
         return usuario;
     }

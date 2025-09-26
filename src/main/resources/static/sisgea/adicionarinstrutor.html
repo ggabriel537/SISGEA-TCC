@@ -188,14 +188,8 @@
           permissao: 0
         };
       } else {
-        // Atualização: se o usuário mudou, deletar o antigo
-        if (usuarioInput !== usuarioAnterior && usuarioAnterior) {
-          await fetch(`http://localhost:8080/api/usuarios/${usuarioAnterior}`, {
-            method: "DELETE"
-          });
-        }
         instrutor.usuario = {
-          usuario: usuarioInput,
+          usuario: usuarioAnterior,
           senha: senhaInput,
           permissao: 0
         };
@@ -277,6 +271,7 @@
         if (instrutor.usuario) {
           usuarioAnterior = instrutor.usuario.usuario || "";
           document.getElementById("usuario").value = usuarioAnterior;
+          document.getElementById("usuario").readOnly = true;
           document.getElementById("senha").value = "";
         }
 
