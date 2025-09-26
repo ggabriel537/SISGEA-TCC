@@ -9,6 +9,10 @@ import jakarta.persistence.*;
 public class Usuario {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
+    @Column(unique = true, nullable = false)
     private String usuario;
 
     private String senha;

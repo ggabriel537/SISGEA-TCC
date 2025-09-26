@@ -12,8 +12,8 @@ public class Administrador {
     @Column(name = "nome")
     private String nome;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "usuario_id", unique = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+@JoinColumn(name = "usuario_id", unique = true)
     private Usuario usuario;
 
     public Administrador() {
