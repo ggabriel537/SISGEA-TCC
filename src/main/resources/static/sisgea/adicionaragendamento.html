@@ -206,6 +206,7 @@
         Swal.fire("Sucesso", "Agendamento criado com sucesso. ID: " + (body.agendamento || ""), "success").then(() => {
           window.location.href = "agendamento.html";
         });
+
       } catch (err) {
         console.error(err);
         Swal.fire("Erro", "Erro ao comunicar com a API: " + err.message, "error");

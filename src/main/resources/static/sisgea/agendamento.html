@@ -183,7 +183,7 @@
           <span>${dataFormatada} - ${horaFormatada} - ${ag.aluno?.nome || "Aluno"} - ${ag.instrutor?.nome || "Instrutor"} - ${ag.aeronave?.modelo || "Aeronave"} - ${ag.tipo_voo || "Tipo não definido"} - ${ag.status || "Status"}</span>
           <div class="list-buttons">
             <button onclick="editarAgendamento('${ag.id}')">Editar</button>
-            <button onclick="deletarAgendamento('${ag.id}')">Deletar</button>
+            <button onclick="deletarAgendamento('${ag.id}')">Excluir</button>
           </div>
         `;
         lista.appendChild(item);

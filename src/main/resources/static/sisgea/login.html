@@ -7,10 +7,7 @@
   <title>SISGEA - Login</title>
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -20,7 +17,6 @@
       justify-content: center;
       align-items: center;
     }
-
     .login-container {
       background: #fff;
       padding: 40px 30px;
@@ -29,7 +25,6 @@
       width: 100%;
       max-width: 400px;
     }
-
     .login-container h1 {
       text-align: center;
       color: #000;
@@ -38,49 +33,20 @@
       justify-content: center;
       align-items: center;
     }
-
-    .login-container img {
-      width: 40px;
-      margin-left: 10px;
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      color: #333;
-      font-weight: bold;
-    }
-
+    .login-container img { width: 40px; margin-left: 10px; }
+    label { display: block; margin-top: 15px; color: #333; font-weight: bold; }
     input {
-      width: 100%;
-      padding: 12px 15px;
-      margin-top: 8px;
-      border-radius: 5px;
-      border: 1px solid #ddd;
+      width: 100%; padding: 12px 15px; margin-top: 8px;
+      border-radius: 5px; border: 1px solid #ddd;
     }
-
     button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 20px;
-      border: none;
-      border-radius: 5px;
-      background-color: #c00;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
+      width: 100%; padding: 12px; margin-top: 20px; border: none;
+      border-radius: 5px; background-color: #c00; color: #000;
+      font-weight: bold; cursor: pointer; transition: background 0.3s;
     }
-
-    button:hover {
-      background-color: #900;
-    }
-
+    button:hover { background-color: #900; }
     .footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 0.9em;
-      color: #777;
+      text-align: center; margin-top: 20px; font-size: 0.9em; color: #777;
     }
   </style>
 </head>
@@ -101,38 +67,50 @@
       José Carlos Gabriel e Luca Just
     </div>
   </div>
+  <script src="/sisgea/js/auth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script>
-
-    // Função para lidar com o envio do formulário de login
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       const username = document.getElementById('usuario').value;
       const password = document.getElementById('senha').value;
+
       try {
-        // Envia os dados para o backend
         const response = await fetch('/login/logar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ username, password })
         });
-        // Verifica a resposta do servidor
+
         if (response.status === 200) {
           const data = await response.json();
-          // Armazena o token e o nome no sessionStorage
           sessionStorage.setItem('jwt', data.token);
           sessionStorage.setItem('nome', data.nome);
           window.location.href = 'inicio.html';
         } else if (response.status === 401) {
-          Toastify({ text: "Usuário ou senha incorretos", duration: 3000, close: true, gravity: "top", position: "right", backgroundColor: "rgb(221,0,0)" }).showToast();
+          Toastify({ text: "Usuário ou senha incorretos", duration: 3000, close: true,
+            gravity: "top", position: "right", backgroundColor: "rgb(221,0,0)" }).showToast();
         } else {
-          Toastify({ text: "Erro no login. Tente novamente.", duration: 3000, close: true, gravity: "top", position: "right", backgroundColor: "rgb(221,0,0)" }).showToast();
+          Toastify({ text: "Erro no login. Tente novamente.", duration: 3000, close: true,
+            gravity: "top", position: "right", backgroundColor: "rgb(221,0,0)" }).showToast();
         }
       } catch (err) {
-        Toastify({ text: "Erro de conexão. Tente novamente.", duration: 3000, close: true, gravity: "top", position: "right", backgroundColor: "rgb(221,0,0)" }).showToast();
+        Toastify({ text: "Erro de conexão. Tente novamente.", duration: 3000, close: true,
+          gravity: "top", position: "right", backgroundColor: "rgb(221,0,0)" }).showToast();
       }
     });
+
+    async function usarToken(url, options = {}) {
+      const token = sessionStorage.getItem('jwt');
+      return fetch(url, {
+        ...options,
+        headers: {
+          ...options.headers,
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        }
+      });
+    }
   </script>
 </body>
-
 </html>
