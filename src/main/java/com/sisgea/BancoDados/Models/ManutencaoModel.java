@@ -9,7 +9,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 
 public class ManutencaoModel {
-    
+
     public static void salvarManutencao(Manutencao manutencao) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -27,8 +27,9 @@ public class ManutencaoModel {
     }
 
     public static Manutencao buscarId(String id) {
+        UUID uuid = UUID.fromString(id);
         EntityManager em = JPAUtil.getEntityManager();
-        Manutencao manutencao = em.find(Manutencao.class, id);
+        Manutencao manutencao = em.find(Manutencao.class, uuid);
         em.close();
         return manutencao;
     }
@@ -54,4 +55,5 @@ public class ManutencaoModel {
         tx.commit();
         em.close();
     }
+
 }

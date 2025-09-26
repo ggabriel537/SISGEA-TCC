@@ -29,48 +29,107 @@
 
     <h1>Lista de Alunos</h1>
 
+    <div class="filtros">
+      <label>Filtrar por nome:</label>
+      <input type="text" id="filtro-nome" placeholder="Digite o nome" oninput="aplicarFiltros()">
+
+      <label>Filtrar por CPF:</label>
+      <input type="text" id="filtro-cpf" placeholder="Digite o CPF" oninput="aplicarFiltros()">
+
+      <label>Filtrar por CANAC:</label>
+      <input type="text" id="filtro-canac" placeholder="Digite o CANAC" oninput="aplicarFiltros()">
+
+      <label>Curso:</label>
+      <select id="filtro-curso" onchange="aplicarFiltros()">
+        <option value="">Todos</option>
+        <option>Piloto Privado</option>
+        <option>Piloto Comercial</option>
+        <option>Piloto Comercial / IFR</option>
+        <option>Instrutor de Voo</option>
+        <option>IFR</option>
+      </select>
+    </div>
+    <br><br>
+
     <div class="container" id="lista-alunos">
       <ul id="alunos-lista"></ul>
     </div>
   </div>
 
   <script>
+    // Lista alunos
+    let alunosCarregados = [];
+
+
+    // Formata CPF no padrão xxx.xxx.xxx-xx
+    function formatarCPF(cpf) {
+      if (!cpf) return "N/A";
+      return cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
+    }
+
+    // Carrega alunos do backend
     async function carregarAlunos() {
       try {
         const response = await fetch("http://localhost:8080/api/alunos");
         if (!response.ok) throw new Error("Erro ao buscar alunos");
 
-        const alunos = await response.json();
-        const lista = document.getElementById("alunos-lista");
-        lista.innerHTML = "";
-
-        if (alunos.length === 0) {
-          lista.innerHTML = "<li>Nenhum aluno encontrado.</li>";
-          return;
-        }
-
-        alunos.forEach(aluno => {
-          const item = document.createElement("li");
-          item.innerHTML = `
-            <span>${aluno.nome} - CANAC: ${aluno.canac} - ${aluno.horas_compradas || 0}h</span>
-            <div class="list-buttons">
-              <button onclick="editarAluno('${aluno.cpf}')">Editar</button>
-              <button onclick="deletarAluno('${aluno.cpf}')">Excluir</button>
-            </div>
-          `;
-          lista.appendChild(item);
-        });
-
+        alunosCarregados = await response.json();
+        aplicarFiltros();
       } catch (error) {
         console.error(error);
         document.getElementById("alunos-lista").innerHTML = "<li>Erro ao carregar alunos.</li>";
       }
     }
 
+    // Aplica filtros aos alunos carregados
+    function aplicarFiltros() {
+      const filtroNome = document.getElementById("filtro-nome").value.toLowerCase();
+      const filtroCPF = document.getElementById("filtro-cpf").value.replace(/\D/g, "");
+      const filtroCANAC = document.getElementById("filtro-canac").value.toLowerCase();
+      const filtroCurso = document.getElementById("filtro-curso").value.toLowerCase();
+
+      const lista = document.getElementById("alunos-lista");
+      lista.innerHTML = "";
+
+      let filtrados = alunosCarregados.filter(aluno => {
+        const nome = aluno.nome?.toLowerCase() || "";
+        const cpf = aluno.cpf?.replace(/\D/g, "") || "";
+        const canac = aluno.canac ? aluno.canac.toString().toLowerCase() : "";
+        const curso = aluno.curso ? aluno.curso.toString().toLowerCase() : "";
+
+        if (filtroNome && !nome.includes(filtroNome)) return false;
+        if (filtroCPF && !cpf.includes(filtroCPF)) return false;
+        if (filtroCANAC && !canac.includes(filtroCANAC)) return false;
+        if (filtroCurso && !curso.includes(filtroCurso)) return false;
+
+        return true;
+      });
+
+      if (filtrados.length === 0) {
+        lista.innerHTML = "<li>Nenhum aluno encontrado.</li>";
+        return;
+      }
+
+      // Cria os itens da lista para cada aluno filtrado
+      filtrados.forEach(aluno => {
+        const item = document.createElement("li");
+        item.innerHTML = `
+          <span>${aluno.nome || "Sem nome"} - CPF: ${formatarCPF(aluno.cpf) || "N/A"} - CANAC: ${aluno.canac || "Sem CANAC"} - Curso: ${aluno.curso || "Sem curso"} - ${aluno.horas_compradas || 0}h</span>
+          <div class="list-buttons">
+            <button onclick="editarAluno('${aluno.cpf}')">Editar</button>
+            <button onclick="deletarAluno('${aluno.cpf}')">Excluir</button>
+          </div>
+        `;
+        lista.appendChild(item);
+      });
+    }
+
+    // Redireciona para a página de edição do aluno
     function editarAluno(cpf) {
       window.location.href = `adicionaraluno.html?cpf=${cpf}`;
     }
 
+    // Deleta um aluno com confirmação
     async function deletarAluno(cpf) {
       Swal.fire({
         title: 'Tem certeza?',
@@ -104,6 +163,7 @@
       });
     }
 
+    // Inicializa a página carregando os alunos
     carregarAlunos();
   </script>
 </body>

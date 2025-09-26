@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="stylesheet" href="css/sweetalert.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
 
   <div class="sidebar">
@@ -24,6 +26,19 @@
 
   <div class="main">
     <h1>Lista de Instrutores</h1>
+
+    <div class="filtros">
+      <label>Filtrar por nome:</label>
+      <input type="text" id="filtro-nome" placeholder="Digite o nome" oninput="aplicarFiltros()">
+
+      <label>Filtrar por CPF:</label>
+      <input type="text" id="filtro-cpf" placeholder="Digite o CPF" oninput="aplicarFiltros()">
+
+      <label>Filtrar por CANAC:</label>
+      <input type="text" id="filtro-canac" placeholder="Digite o CANAC" oninput="aplicarFiltros()">
+      <br><br>
+    </div>
+
     <div class="container" id="lista-instrutores">
       <ul id="instrutores-list"></ul>
       <a href="adicionarinstrutor.html" class="add-button">+</a>
@@ -31,57 +46,78 @@
   </div>
 
   <script>
+    // Lista instrutores
+    let instrutoresCarregados = [];
+
+    // Formata CPF no padrão xxx.xxx.xxx-xx
     function formatarCPF(cpf) {
       if (!cpf) return "N/A";
       return cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
     }
 
+    // Carrega instrutores do backend
     async function carregarInstrutores() {
       try {
-        // Chamada à API para buscar instrutores
         const response = await fetch("http://localhost:8080/api/instrutores");
         if (!response.ok) throw new Error("Erro ao buscar instrutores");
 
-        let instrutores = await response.json();
-
-        // Ordena por nome
-        instrutores.sort((a, b) => a.nome.localeCompare(b.nome));
-
-        const lista = document.getElementById("instrutores-list");
-        lista.innerHTML = ""; // limpa lista
-
-        if (instrutores.length === 0) {
-          lista.innerHTML = "<li>Nenhum instrutor encontrado.</li>";
-          return;
-        }
-
-        // Renderiza cada instrutor
-        instrutores.forEach(inst => {
-          const item = document.createElement("li");
-          item.innerHTML = `
-            <span>
-              ${inst.nome || "Sem nome"} - CPF: ${formatarCPF(inst.cpf) || "N/A"} - CANAC: ${inst.canac || "Sem CANAC"}
-            </span>
-            <div class="list-buttons">
-              <button onclick="editarInstrutor('${inst.cpf}')">Editar</button>
-              <button onclick="deletarInstrutor('${inst.cpf}')">Excluir</button>
-            </div>
-          `;
-          lista.appendChild(item);
-        });
-
+        instrutoresCarregados = await response.json();
+        aplicarFiltros();
       } catch (error) {
         console.error(error);
         document.getElementById("instrutores-list").innerHTML = "<li>Erro ao carregar instrutores.</li>";
       }
     }
 
-    // Redireciona para edição usando CPF
+    // Aplica filtros aos instrutores carregados
+    function aplicarFiltros() {
+      const filtroNome = document.getElementById("filtro-nome").value.toLowerCase();
+      const filtroCPF = document.getElementById("filtro-cpf").value.replace(/\D/g, "");
+      const filtroCANAC = document.getElementById("filtro-canac").value.toLowerCase();
+
+      const lista = document.getElementById("instrutores-list");
+      lista.innerHTML = "";
+
+      let filtrados = instrutoresCarregados.filter(inst => {
+        const nome = inst.nome?.toLowerCase() || "";
+        const cpf = inst.cpf?.replace(/\D/g, "") || "";
+        const canac = inst.canac ? inst.canac.toString().toLowerCase() : "";
+
+        if (filtroNome && !nome.includes(filtroNome)) return false;
+        if (filtroCPF && !cpf.includes(filtroCPF)) return false;
+        if (filtroCANAC && !canac.includes(filtroCANAC)) return false;
+
+        return true;
+      });
+
+      if (filtrados.length === 0) {
+        lista.innerHTML = "<li>Nenhum instrutor encontrado.</li>";
+        return;
+      }
+
+      // Cria os itens da lista para cada instrutor filtrado
+      filtrados.forEach(inst => {
+        const item = document.createElement("li");
+        item.innerHTML = `
+          <span>
+            ${inst.nome || "Sem nome"} - CPF: ${formatarCPF(inst.cpf) || "N/A"} - CANAC: ${inst.canac || "Sem CANAC"}
+          </span>
+          <div class="list-buttons">
+            <button onclick="editarInstrutor('${inst.cpf}')">Editar</button>
+            <button onclick="deletarInstrutor('${inst.cpf}')">Excluir</button>
+          </div>
+        `;
+        lista.appendChild(item);
+      });
+    }
+
+    // Redireciona para a página de edição do instrutor
     function editarInstrutor(cpf) {
       window.location.href = `editarinstrutor.html?cpf=${cpf}`;
     }
 
-    // Deleta instrutor com confirmação
+
+    // Deleta um instrutor com confirmação
     async function deletarInstrutor(cpf) {
       Swal.fire({
         title: 'Tem certeza?',
@@ -103,7 +139,7 @@
                 icon: 'success',
                 confirmButtonColor: '#c00'
               });
-              carregarInstrutores(); // recarrega lista
+              carregarInstrutores();
             } else {
               Swal.fire('Erro', 'Não foi possível excluir o instrutor.', 'error');
             }
@@ -115,8 +151,9 @@
       });
     }
 
-    // Carrega lista ao abrir a página
+    // Inicializa a página carregando os instrutores
     carregarInstrutores();
   </script>
 </body>
+
 </html>

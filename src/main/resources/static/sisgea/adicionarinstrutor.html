@@ -202,6 +202,7 @@
         }
       };
 
+      // Envia a requisição para a API
       try {
         const response = await fetch(`http://localhost:8080/api/instrutores?forcar=${forcar}`, {
           method: "POST",
@@ -211,11 +212,13 @@
 
         const data = await response.json();
 
+        // Verifica se houve erro na resposta
         if (!response.ok) {
           Swal.fire("Erro", data.error || "Falha ao cadastrar instrutor.", "error");
           return;
         }
 
+        // Verifica se há aviso na resposta
         if (data.warn) {
           Swal.fire({
             title: "Atenção",
@@ -232,6 +235,7 @@
           return;
         }
 
+        // Sucesso
         if (data.status === "sucesso") {
           Swal.fire("Sucesso", "Instrutor cadastrado com sucesso!", "success")
             .then(() => window.location.href = "instrutor.html");

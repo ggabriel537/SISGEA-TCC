@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 @Entity
 public class Agendamento {
 

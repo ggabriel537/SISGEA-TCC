@@ -61,6 +61,7 @@
     </div>
 
     <script>
+        // Formata matrícula enquanto digita
         function formatarMatricula(input) {
             let valor = input.value.toUpperCase().replace(/[^A-Z]/g, "");
 
@@ -107,6 +108,7 @@
                 diarioBordos: []
             };
 
+            // Envia para a API
             try {
                 const response = await fetch("http://localhost:8080/api/aeronaves", {
                     method: "POST",

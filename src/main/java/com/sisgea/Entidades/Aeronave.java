@@ -3,6 +3,8 @@ package com.sisgea.Entidades;
 import jakarta.persistence.*;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class Aeronave {
 
@@ -25,7 +27,8 @@ public class Aeronave {
     @Column(name = "horas_de_voo")
     private Float horas_de_voo;
 
-    @OneToMany(mappedBy = "aeronave", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "aeronave", fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<Manutencao> manutencoes;
 
     @OneToMany(mappedBy = "aeronaveId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

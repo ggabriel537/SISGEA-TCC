@@ -2,8 +2,6 @@ package com.sisgea.BancoDados.Controllers;
 
 import java.util.List;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.sisgea.BancoDados.Models.UsuarioModel;
 import com.sisgea.Entidades.Usuario;
 

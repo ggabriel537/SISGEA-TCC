@@ -70,4 +70,12 @@ public class Manutencao {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public Aeronave getAeronave() {
+        return aeronave;
+    }
+    
+    public void setAeronave(Aeronave aeronave) {
+        this.aeronave = aeronave;
+    }
 }

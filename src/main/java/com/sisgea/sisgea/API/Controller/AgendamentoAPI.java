@@ -39,24 +39,27 @@ public class AgendamentoAPI {
 
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Agendamento ag, @RequestParam(defaultValue = "false") boolean forcar) {
-        if (ag.getStatus() == null) ag.setStatus("Agendado");
+        if (ag.getStatus() == null)
+            ag.setStatus("Agendado");
         ag.setData_agendamento(new Date());
+
+        String conflito_str = "";
+        String warn_str = "";
+        boolean conflito = false;
+        boolean warn = false;
 
         //
         // DADOS OBRIGATÓRIOS
         //
-        String erroObrigatorio = validarCamposObrigatorios(ag);
-        if (!erroObrigatorio.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", erroObrigatorio, "status", "CONFLITO"));
+        conflito_str += validarCamposObrigatorios(ag);
+        if (!conflito_str.isEmpty()) {
+            conflito = true;
         }
 
         //
         // CONFLITOS
         //
-        String conflito_str = "";
-        String warn_str = "";
-        boolean conflito = false;
-        boolean warn = false;
+        
 
         if (ag.getHorario_partida().before(new Date())) {
             conflito = true;
@@ -66,7 +69,8 @@ public class AgendamentoAPI {
         List<Agendamento> agendamentosExistentes = AgendamentoController.listarAgendamentos();
         for (Agendamento existente : agendamentosExistentes) {
             Date existenteInicio = existente.getHorario_partida();
-            Date existenteFim = existente.getHorario_retorno() != null ? existente.getHorario_retorno() : existenteInicio;
+            Date existenteFim = existente.getHorario_retorno() != null ? existente.getHorario_retorno()
+                    : existenteInicio;
             Date novoInicio = ag.getHorario_partida();
             Date novoFim = ag.getHorario_retorno();
 
@@ -94,7 +98,8 @@ public class AgendamentoAPI {
                 }
             }
 
-            if (conflito) break;
+            if (conflito)
+                break;
         }
 
         Aluno aluno = AlunoController.buscarId(ag.getAluno().getCpf());
@@ -112,8 +117,10 @@ public class AgendamentoAPI {
             }
         }
 
-        if (conflito) return ResponseEntity.badRequest().body(Map.of("error", conflito_str, "status", "CONFLITO"));
-        if (warn && !forcar) return ResponseEntity.ok(Map.of("warn", warn_str));
+        if (conflito)
+            return ResponseEntity.badRequest().body(Map.of("error", conflito_str, "status", "CONFLITO"));
+        if (warn && !forcar)
+            return ResponseEntity.ok(Map.of("warn", warn_str));
 
         ag.setInstrutor(InstrutorController.buscarId(ag.getInstrutor().getCpf()));
         AgendamentoController.salvarAgendamento(ag);
@@ -123,13 +130,14 @@ public class AgendamentoAPI {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable String id, @RequestBody Agendamento ag,
-                                       @RequestParam(defaultValue = "false") boolean forcar) {
+            @RequestParam(defaultValue = "false") boolean forcar) {
         Agendamento existenteAtual = AgendamentoController.buscarId(id);
         if (existenteAtual == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Agendamento não encontrado"));
         }
 
-        if (ag.getStatus() == null) ag.setStatus(existenteAtual.getStatus() != null ? existenteAtual.getStatus() : "Agendado");
+        if (ag.getStatus() == null)
+            ag.setStatus(existenteAtual.getStatus() != null ? existenteAtual.getStatus() : "Agendado");
 
         String erroObrigatorio = validarCamposObrigatorios(ag);
         if (!erroObrigatorio.isEmpty()) {
@@ -148,7 +156,8 @@ public class AgendamentoAPI {
 
         List<Agendamento> agendamentosExistentes = AgendamentoController.listarAgendamentos();
         for (Agendamento outro : agendamentosExistentes) {
-            if (outro.getId().equals(ag.getId())) continue;
+            if (outro.getId().equals(ag.getId()))
+                continue;
 
             Date existenteInicio = outro.getHorario_partida();
             Date existenteFim = outro.getHorario_retorno() != null ? outro.getHorario_retorno() : existenteInicio;
@@ -179,7 +188,8 @@ public class AgendamentoAPI {
                 }
             }
 
-            if (conflito) break;
+            if (conflito)
+                break;
         }
 
         Aluno aluno = AlunoController.buscarId(ag.getAluno().getCpf());
@@ -197,8 +207,10 @@ public class AgendamentoAPI {
             }
         }
 
-        if (conflito) return ResponseEntity.badRequest().body(Map.of("error", conflito_str, "status", "CONFLITO"));
-        if (warn && !forcar) return ResponseEntity.ok(Map.of("warn", warn_str));
+        if (conflito)
+            return ResponseEntity.badRequest().body(Map.of("error", conflito_str, "status", "CONFLITO"));
+        if (warn && !forcar)
+            return ResponseEntity.ok(Map.of("warn", warn_str));
 
         ag.setId(UUID.fromString(id));
         AgendamentoController.atualizarAgendamento(ag);
@@ -218,14 +230,20 @@ public class AgendamentoAPI {
     private String validarCamposObrigatorios(Agendamento ag) {
         String msg = "";
         if (ag.getHorario_partida() == null || ag.getHorario_retorno() == null)
-            msg += "Campos 'horario_partida' e 'horario_retorno' são obrigatórios. ";
+            msg += "Campos 'Horario Partida' e 'Horario Retorno' são obrigatórios. ";
         if (ag.getHorario_retorno() != null && ag.getHorario_partida() != null
                 && ag.getHorario_retorno().before(ag.getHorario_partida()))
-            msg += "'horario_retorno' deve ser posterior ou igual ao 'horario_partida'. ";
-        if (ag.getAluno() == null || ag.getInstrutor() == null || ag.getAeronave() == null)
+            msg += "'Horario Retorno' deve ser posterior ou igual ao 'Horario Partida'. ";
+        if (ag.getAluno() == null || ag.getInstrutor() == null || ag.getAeronave() == null || ag.getAluno().getCpf() == null
+                || ag.getAluno().getCpf().isBlank() || ag.getInstrutor().getCpf() == null
+                || ag.getInstrutor().getCpf().isBlank() || ag.getAeronave().getMatricula() == null
+                || ag.getAeronave().getMatricula().isBlank())
             msg += "Aluno, instrutor e aeronave são obrigatórios. ";
-        if (ag.getPartida() == null || ag.getPartida().isBlank() || ag.getDestino() == null || ag.getDestino().isBlank())
+        if (ag.getPartida() == null || ag.getPartida().isBlank() || ag.getDestino() == null
+                || ag.getDestino().isBlank())
             msg += "Campos 'Origem' e 'Destino' são obrigatórios. ";
+        if (ag.getTipo_voo() == null || ag.getTipo_voo().isBlank())
+            msg += "Tipo de voo é obrigatório. ";
         return msg.trim();
     }
 }

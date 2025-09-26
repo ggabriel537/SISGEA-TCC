@@ -1,52 +1,130 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISGEA - Cadastro de Manutenção</title>
-    <link rel="stylesheet" href="css/adicionar.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SISGEA - Cadastro de Manutenção</title>
+  <link rel="stylesheet" href="css/adicionar.css">
+  <link rel="stylesheet" href="css/sweetalert.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
-    <div class="sidebar">
-        <a href="inicio.html" id="inicial"><h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1></a>
-        <a href="agendamento.html">Agendamento</a>
-        <a href="aeronave.html">Aeronave</a>
-        <a href="aluno.html">Aluno</a>
-        <a href="instrutor.html">Instrutor</a>
-        <a href="manutencao.html">Manutenção</a>
-        <a href="diario.html">Diário</a>
-      </div>
+  <div class="sidebar">
+    <a href="inicio.html" id="inicial">
+      <h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1>
+    </a>
+    <a href="agendamento.html">Agendamento</a>
+    <a href="aeronave.html">Aeronave</a>
+    <a href="aluno.html">Aluno</a>
+    <a href="instrutor.html">Instrutor</a>
+    <a href="manutencao.html">Manutenção</a>
+    <a href="diario.html">Diário</a>
+  </div>
 
-    <div class="main">
-        <h1>Cadastro de Manutenção</h1>
-        <div class="container" id="manutencao">
-            
-            <label>Matrícula</label>
-            <select>
-                <option value="PT-KLM">PT-KLM - Cessna 150</option>
-                <option value="PR-ABC">PR-ABC - Piper PA-28</option>
-                <option value="PT-ZYX">PT-ZYX - Beechcraft Bonanza</option>
-            </select>
-            
-            <label>Fabricante e Modelo</label>
-            <input type="text" value="Cessna 150">
-            
-            <label>Última Manutenção</label>
-            <input type="date" value="2025-04-15">
-            
-            <label>Horas Totais</label>
-            <input type="number" value="1530">
-            
-            <label>Status de Manutenção</label>
-            <select>
-                <option>Concluída</option>
-                <option>Pendente</option>
-                <option>Em andamento</option>
-            </select>
-            
-            <button>Salvar</button>
-        </div>
+  <div class="main">
+    <h1>Cadastro de Manutenção</h1>
+    <div class="container" id="manutencao">
+
+      <label>Aeronave</label>
+      <select id="aeronave">
+        <option value="">Selecione...</option>
+      </select>
+
+      <label>Descrição</label>
+      <input type="text" id="descricao" placeholder="Descrição da manutenção" maxlength="128">
+
+      <label>Data Estimada</label>
+      <input type="date" id="dataEstimada">
+
+      <label>Status</label>
+      <select id="status">
+        <option value="">Selecione...</option>
+        <option>Concluída</option>
+        <option>Em andamento</option>
+        <option>Pendente</option>
+      </select>
+
+      <button onclick="cadastrarManutencao()">Cadastrar Manutenção</button>
     </div>
+  </div>
+
+  <script>
+    // Carrega aeronaves do backend para o select
+    async function carregarAeronaves() {
+      try {
+        const res = await fetch("http://localhost:8080/api/aeronaves");
+        if (!res.ok) throw new Error("Erro ao buscar aeronaves");
+        const aeronaves = await res.json();
+        const select = document.getElementById("aeronave");
+        aeronaves.forEach(a => {
+          const option = document.createElement("option");
+          option.value = a.matricula;
+          option.textContent = `${a.matricula} - ${a.modelo}`;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        Swal.fire("Erro", "Não foi possível carregar as aeronaves.", "error");
+        console.error(error);
+      }
+    }
+
+    // Cadastrar Manutenção
+    async function cadastrarManutencao(forcar = false) {
+      const manutencao = {
+        descricao: document.getElementById("descricao").value.trim(),
+        data_est_man: document.getElementById("dataEstimada").value,
+        status: document.getElementById("status").value.trim(),
+        aeronave: { matricula: document.getElementById("aeronave").value }
+      };
+
+      // Validação básica
+      if (!manutencao.descricao || !manutencao.data_est_man || !manutencao.status || !manutencao.aeronave.matricula) {
+        Swal.fire("Atenção", "Preencha todos os campos obrigatórios!", "warning");
+        return;
+      }
+
+      // Envia a requisição para a API
+      try {
+        const res = await fetch(`http://localhost:8080/api/manutencoes?forcar=${forcar}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(manutencao)
+        });
+        const data = await res.text();
+
+        if (!res.ok) {
+          Swal.fire("Erro", data, "error");
+          return;
+        }
+
+        // Verifica se a resposta contém um aviso
+        if (data.startsWith("AVISO") && !forcar) {
+          Swal.fire({
+            title: "Atenção",
+            text: data.replace("AVISO:\n", ""),
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Confirmar mesmo assim",
+            cancelButtonText: "Cancelar"
+          }).then(result => {
+            if (result.isConfirmed) cadastrarManutencao(true);
+          });
+          return;
+        }
+
+        // Sucesso
+        Swal.fire("Sucesso", "Manutenção cadastrada com sucesso!", "success")
+          .then(() => window.location.href = "manutencao.html");
+
+      } catch (error) {
+        Swal.fire("Erro", "Não foi possível conectar à API.", "error");
+        console.error(error);
+      }
+    }
+
+    // Inicializa a página carregando as aeronaves
+    carregarAeronaves();
+  </script>
 </body>
 </html>

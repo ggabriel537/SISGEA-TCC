@@ -1,52 +1,187 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SISGEA - Manutenções</title>
   <link rel="stylesheet" href="css/adicionar.css">
+  <link rel="stylesheet" href="css/sweetalert.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
 
-    <div class="sidebar">
-        <a href="inicio.html" id="inicial"><h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1></a>
-        <a href="agendamento.html">Agendamento</a>
-        <a href="aeronave.html">Aeronave</a>
-        <a href="aluno.html">Aluno</a>
-        <a href="instrutor.html">Instrutor</a>
-        <a href="manutencao.html">Manutenção</a>
-        <a href="diario.html">Diário</a>
-      </div>
+  <div class="sidebar">
+    <a href="inicio.html" id="inicial">
+      <h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1>
+    </a>
+    <a href="agendamento.html">Agendamento</a>
+    <a href="aeronave.html">Aeronave</a>
+    <a href="aluno.html">Aluno</a>
+    <a href="instrutor.html">Instrutor</a>
+    <a href="manutencao.html">Manutenção</a>
+    <a href="diario.html">Diário</a>
+  </div>
 
   <div class="main">
-    <h1>Lista de Manutenção</h1>
+    <a class="add-button" href="adicionarmanutencao.html">+</a>
+
+    <h1>Lista de Manutenções</h1>
+
+    <div class="filtros">
+      <label>Filtrar por matrícula:</label>
+      <input type="text" id="filtro-matricula" placeholder="Digite a matrícula" oninput="aplicarFiltros()">
+
+      <label>Filtrar por status:</label>
+      <select id="filtro-status" onchange="aplicarFiltros()">
+        <option value="">Todos</option>
+        <option>Concluída</option>
+        <option>Em andamento</option>
+        <option>Pendente</option>
+      </select>
+
+      <label>Data início:</label>
+      <input type="date" id="filtro-data-inicio" onchange="aplicarFiltros()">
+
+      <label>Data fim:</label>
+      <input type="date" id="filtro-data-fim" onchange="aplicarFiltros()">
+      <br><br>
+    </div>
+
     <div class="container" id="lista-manutencoes">
-      <ul>
-        <li>
-          PR-ABC - Última: 01/04/2025 - Concluída
-          <div class="list-buttons">
-            <button>Editar</button>
-            <button>Excluir</button>
-          </div>
-        </li>
-        <li>
-          PT-KLM - Última: 15/04/2025 - Em andamento
-          <div class="list-buttons">
-            <button>Editar</button>
-            <button>Excluir</button>
-          </div>
-        </li>
-        <li>
-          PT-ZYX - Última: 10/03/2025 - Pendente
-          <div class="list-buttons">
-            <button>Editar</button>
-            <button>Excluir</button>
-          </div>
-        </li>
-      </ul>
-      <a href="adicionarmanutencao.html" class="add-button">+</a>
+      <ul id="manutencoes-lista"></ul>
     </div>
   </div>
 
+  <script>
+    // Lista manutencoes
+    let manutencoesCarregadas = [];
+
+    // Formata matrícula para o padrão XX-XXX
+    function formatarMatricula(input) {
+            let valor = input.value.toUpperCase().replace(/[^A-Z]/g, "");
+
+            if (valor.length > 2) {
+                valor = valor.slice(0, 2) + "-" + valor.slice(2, 5);
+            }
+
+            input.value = valor;
+        }
+
+        // Carrega as manutencoes do banco de dados
+    async function carregarManutencoes() {
+      try {
+        const response = await fetch("http://localhost:8080/api/manutencoes");
+        if (!response.ok) throw new Error("Erro ao buscar manutenções");
+
+        manutencoesCarregadas = await response.json();
+        aplicarFiltros();
+      } catch (error) {
+        console.error(error);
+        document.getElementById("manutencoes-lista").innerHTML = "<li>Erro ao carregar manutenções.</li>";
+      }
+    }
+
+    // Aplica os filtros na lista de manutenções
+
+    function aplicarFiltros() {
+      formatarMatricula(document.getElementById("filtro-matricula"));
+      const filtroMatricula = document.getElementById("filtro-matricula").value.toLowerCase();
+      const filtroStatus = document.getElementById("filtro-status").value;
+      const filtroDataInicio = document.getElementById("filtro-data-inicio").value;
+      const filtroDataFim = document.getElementById("filtro-data-fim").value;
+
+      const lista = document.getElementById("manutencoes-lista");
+      lista.innerHTML = "";
+
+      let filtradas = manutencoesCarregadas.filter(m => {
+        const matricula = m.aeronave?.matricula?.toLowerCase() || "";
+        if (filtroMatricula && !matricula.includes(filtroMatricula)) return false;
+
+        if (filtroStatus && m.status !== filtroStatus) return false;
+
+        if (m.data_est_man) {
+          const d = new Date(m.data_est_man);
+          d.setDate(d.getDate() + 1);
+          if (filtroDataInicio && d < new Date(filtroDataInicio)) return false;
+          if (filtroDataFim && d > new Date(filtroDataFim)) return false;
+        }
+
+        return true;
+      });
+
+      if (filtradas.length === 0) {
+        lista.innerHTML = "<li>Nenhuma manutenção encontrada.</li>";
+        return;
+      }
+
+      filtradas.forEach(m => {
+        let data = "Não informada";
+        if (m.data_est_man) {
+          const d = new Date(m.data_est_man);
+          d.setDate(d.getDate() + 1);
+          data = d.toLocaleDateString();
+        }
+
+        // Cria o item da lista
+
+        const item = document.createElement("li");
+        item.innerHTML = `
+          <span>${m.aeronave?.matricula || "N/A"} - Data estimada: ${data} - ${m.status}</span>
+          <div class="list-buttons">
+            <button onclick="editarManutencao('${m.id}')">Editar</button>
+            <button onclick="deletarManutencao('${m.id}')">Excluir</button>
+          </div>
+        `;
+        lista.appendChild(item);
+      });
+    }
+
+    // Redireciona para a página de edição de manutenção
+
+    function editarManutencao(id) {
+      window.location.href = `adicionarmanutencao.html?id=${id}`;
+    }
+
+
+    // Deleta uma manutenção com confirmação
+    async function deletarManutencao(id) {
+      Swal.fire({
+        title: 'Tem certeza?',
+        text: "A manutenção será removida e não poderá ser recuperada!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#c00',
+        cancelButtonColor: '#555',
+        confirmButtonText: 'Sim, excluir',
+        cancelButtonText: 'Cancelar'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch(`http://localhost:8080/api/manutencoes/${id}`, { method: "DELETE" });
+            if (response.ok) {
+              Swal.fire({
+                title: 'Excluído!',
+                text: 'A manutenção foi removida com sucesso.',
+                icon: 'success',
+                confirmButtonColor: '#c00'
+              });
+              carregarManutencoes();
+            } else {
+              Swal.fire('Erro', 'Não foi possível excluir a manutenção.', 'error');
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire('Erro', 'Falha de conexão com o servidor.', 'error');
+          }
+        }
+      });
+    }
+
+    // Inicializa a página carregando as manutenções
+    carregarManutencoes();
+  </script>
 </body>
+
 </html>

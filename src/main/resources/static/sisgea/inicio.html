@@ -97,6 +97,7 @@
   </div>
 
   <script>
+    // Exibe mensagem de boas-vindas com saudação baseada na hora do dia
     const welcomeElement = document.getElementById('welcome-message');
     const now = new Date();
     const hour = now.getHours();
@@ -109,6 +110,7 @@
     } else {
       greeting = 'Boa noite';
     }
+    // Pega o nome do usuário do sessionStorage
     let usuario = sessionStorage.getItem('nome');
 
     welcomeElement.textContent = `${greeting}, ${usuario}! Seja bem-vindo ao SISGEA.`;

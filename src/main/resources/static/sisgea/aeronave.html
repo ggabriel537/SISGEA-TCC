@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="stylesheet" href="css/sweetalert.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
 
   <div class="sidebar">
@@ -24,6 +26,35 @@
 
   <div class="main">
     <h1>Lista de Aeronaves</h1>
+
+    <div class="filtros">
+      <label>Matrícula</label>
+      <input type="text" id="filtro-matricula" placeholder="Digite a matrícula" oninput="aplicarFiltros()">
+
+      <label>Modelo</label>
+      <input type="text" id="filtro-modelo" placeholder="Digite o modelo" oninput="aplicarFiltros()">
+
+      <label>Fabricante</label>
+      <input type="text" id="filtro-fabricante" placeholder="Digite o fabricante" oninput="aplicarFiltros()">
+
+      <label>Habilitação</label>
+      <select id="filtro-habilitacao" onchange="aplicarFiltros()">
+        <option value="">Selecione...</option>
+        <option>MNTE</option>
+        <option>MLTE</option>
+        <option>MNAF</option>
+      </select>
+
+      <label>Tipo de Voo</label>
+      <select id="filtro-tipo" onchange="aplicarFiltros()">
+        <option value="">Selecione...</option>
+        <option>VFR-D</option>
+        <option>VFR-N</option>
+        <option>IFR</option>
+      </select>
+    </div>
+    <br><br>
+
     <div class="container" id="lista-aeronaves">
       <ul id="aeronaves-list"></ul>
       <a href="adicionaraeronave.html" class="add-button">+</a>
@@ -31,57 +62,94 @@
   </div>
 
   <script>
-    // Formata horas de voo
+    // Lista aeronaves
+    let aeronavesCarregadas = [];
+
+    // Formata matrícula para o padrão XX-XXX
+    function formatarMatricula(input) {
+            let valor = input.value.toUpperCase().replace(/[^A-Z]/g, "");
+
+            if (valor.length > 2) {
+                valor = valor.slice(0, 2) + "-" + valor.slice(2, 5);
+            }
+
+            input.value = valor;
+        }
+
+        // Formata horas de voo
     function formatarHoras(horas) {
       return horas ? `${horas}h` : "0h";
     }
 
-    // Carregar lista de aeronaves
+    // Carrega aeronaves do backend
     async function carregarAeronaves() {
       try {
         const response = await fetch("http://localhost:8080/api/aeronaves");
         if (!response.ok) throw new Error("Erro ao buscar aeronaves");
 
-        let aeronaves = await response.json();
-
-        // Ordena por matrícula
-        aeronaves.sort((a, b) => a.matricula.localeCompare(b.matricula));
-
-        const lista = document.getElementById("aeronaves-list");
-        lista.innerHTML = ""; // limpa lista
-
-        if (aeronaves.length === 0) {
-          lista.innerHTML = "<li>Nenhuma aeronave encontrada.</li>";
-          return;
-        }
-
-        // Renderiza cada aeronave
-        aeronaves.forEach(aer => {
-          const item = document.createElement("li");
-          item.innerHTML = `
-            <span>
-              ${aer.matricula || "Sem matrícula"} - ${aer.fabricante || "Sem Fabricante"} - ${aer.modelo || "Sem modelo"} - ${formatarHoras(aer.horas_de_voo)}
-            </span>
-            <div class="list-buttons">
-              <button onclick="editarAeronave('${aer.matricula}')">Editar</button>
-              <button onclick="deletarAeronave('${aer.matricula}')">Excluir</button>
-            </div>
-          `;
-          lista.appendChild(item);
-        });
-
+        aeronavesCarregadas = await response.json();
+        aplicarFiltros();
       } catch (error) {
         console.error(error);
         document.getElementById("aeronaves-list").innerHTML = "<li>Erro ao carregar aeronaves.</li>";
       }
     }
 
-    // Redireciona para edição
+    // Aplica filtros às aeronaves carregadas
+    function aplicarFiltros() {
+      formatarMatricula(document.getElementById("filtro-matricula"));
+      const filtroMatricula = document.getElementById("filtro-matricula").value.toLowerCase();
+      const filtroModelo = document.getElementById("filtro-modelo").value.toLowerCase();
+      const filtroFabricante = document.getElementById("filtro-fabricante").value.toLowerCase();
+      const filtroHabilitacao = document.getElementById("filtro-habilitacao").value;
+      const filtroTipo = document.getElementById("filtro-tipo").value;
+
+      const lista = document.getElementById("aeronaves-list");
+      lista.innerHTML = "";
+
+      const filtradas = aeronavesCarregadas.filter(aer => {
+        const matricula = aer.matricula?.toLowerCase() || "";
+        const modelo = aer.modelo?.toLowerCase() || "";
+        const fabricante = aer.fabricante?.toLowerCase() || "";
+        const habilitacao = aer.habilitacao || "";
+        const tipo = aer.tipo_de_voo || "";
+
+        if (filtroMatricula && !matricula.includes(filtroMatricula)) return false;
+        if (filtroModelo && !modelo.includes(filtroModelo)) return false;
+        if (filtroFabricante && !fabricante.includes(filtroFabricante)) return false;
+        if (filtroHabilitacao && habilitacao !== filtroHabilitacao) return false;
+        if (filtroTipo && tipo !== filtroTipo) return false;
+
+        return true;
+      });
+
+      if (filtradas.length === 0) {
+        lista.innerHTML = "<li>Nenhuma aeronave encontrada.</li>";
+        return;
+      }
+
+      // Cria os itens da lista para cada aeronave filtrada
+      filtradas.forEach(aer => {
+        const item = document.createElement("li");
+        item.innerHTML = `
+          <span>
+            ${aer.matricula || "Sem matrícula"} - ${aer.fabricante || "Sem Fabricante"} - ${aer.modelo || "Sem modelo"} - ${formatarHoras(aer.horas_de_voo)}
+          </span>
+          <div class="list-buttons">
+            <button onclick="editarAeronave('${aer.matricula}')">Editar</button>
+            <button onclick="deletarAeronave('${aer.matricula}')">Excluir</button>
+          </div>
+        `;
+        lista.appendChild(item);
+      });
+    }
+
+    // Redireciona para a página de edição da aeronave
     function editarAeronave(matricula) {
       window.location.href = `editaraeronave.html?matricula=${matricula}`;
     }
 
-    // Deleta aeronave com confirmação
+    // Deleta uma aeronave com confirmação
     async function deletarAeronave(matricula) {
       Swal.fire({
         title: 'Tem certeza?',
@@ -102,8 +170,7 @@
                 text: 'A aeronave foi removida com sucesso.',
                 icon: 'success',
                 confirmButtonColor: '#c00'
-              });
-              carregarAeronaves();
+              }).then(() => carregarAeronaves());
             } else {
               Swal.fire('Erro', 'Não foi possível excluir a aeronave.', 'error');
             }
@@ -115,7 +182,7 @@
       });
     }
 
-    // Carrega lista ao abrir a página
+    // Inicializa a página carregando as aeronaves
     carregarAeronaves();
   </script>
 </body>

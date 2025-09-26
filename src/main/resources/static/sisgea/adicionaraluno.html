@@ -173,6 +173,7 @@
         return;
       }
 
+      // Envia a requisição para a API
       try {
         const res = await fetch(`http://localhost:8080/api/alunos?forcar=${forcar}`, {
           method: "POST",
@@ -181,11 +182,13 @@
         });
         const data = await res.json();
 
+        // Verifica se houve erro na resposta
         if (!res.ok) {
           Swal.fire("Erro", data.error || "Falha ao cadastrar aluno.", "error");
           return;
         }
 
+        // Verifica se há aviso na resposta
         if (data.warn) {
           Swal.fire({
             title: "Atenção",
@@ -200,6 +203,7 @@
           return;
         }
 
+        // Sucesso
         if (data.status === "sucesso") {
           Swal.fire("Sucesso", "Aluno cadastrado com sucesso!", "success")
             .then(() => window.location.href = "aluno.html");

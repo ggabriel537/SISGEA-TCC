@@ -50,6 +50,7 @@ public class EnderecoAPI {
         if (existente == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado");
         }
+        
         endereco.setId(UUID.fromString(id));
         EnderecoController.atualizarEndereco(endereco);
         return endereco;

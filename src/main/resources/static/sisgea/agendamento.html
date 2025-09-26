@@ -29,60 +29,173 @@
 
     <h1>Lista de Agendamentos de Voo</h1>
 
+    <div class="filtros">
+      <label>Data Início:</label>
+      <input type="date" id="filtro-data-inicio" onchange="aplicarFiltros()">
+
+      <label>Data Fim:</label>
+      <input type="date" id="filtro-data-fim" onchange="aplicarFiltros()">
+
+      <label>Aluno:</label>
+      <select id="filtro-aluno" onchange="aplicarFiltros()">
+        <option value="">Todos</option>
+      </select>
+
+      <label>Instrutor:</label>
+      <select id="filtro-instrutor" onchange="aplicarFiltros()">
+        <option value="">Todos</option>
+      </select>
+
+      <label>Aeronave:</label>
+      <select id="filtro-aeronave" onchange="aplicarFiltros()">
+        <option value="">Todas</option>
+      </select>
+
+      <label>Tipo de Voo:</label>
+      <select id="filtro-tipo-voo" onchange="aplicarFiltros()">
+        <option value="">Todos</option>
+        <option value="VFR-D">VFR-D</option>
+        <option value="VFR-N">VFR-N</option>
+        <option value="IFR">IFR</option>
+        <option value="SIM">SIM</option>
+      </select>
+    </div>
+    <br><br>
+
     <div class="container" id="lista-agendamentos">
       <ul id="agendamentos-list"></ul>
     </div>
   </div>
 
   <script>
+    // Lista agendamentos, alunos, instrutores e aeronaves
+    let agendamentosCarregados = [];
+    let alunosCarregados = [];
+    let instrutoresCarregados = [];
+    let aeronavesCarregadas = [];
+
+    // Carrega agendamentos do backend
     async function carregarAgendamentos() {
       try {
-        // Chamada à API para buscar agendamentos
         const response = await fetch("http://localhost:8080/api/agendamentos");
         if (!response.ok) throw new Error("Erro ao buscar agendamentos");
-
-        let agendamentos = await response.json();
-
-        // Ordena pelo horário de partida (mais próximo primeiro)
-        agendamentos.sort((a, b) => new Date(a.horario_partida) - new Date(b.horario_partida));
-
-        const lista = document.getElementById("agendamentos-list");
-        lista.innerHTML = ""; // limpa lista
-
-        if (agendamentos.length === 0) {
-          lista.innerHTML = "<li>Nenhum agendamento encontrado.</li>";
-          return;
-        }
-
-        // Renderiza cada agendamento na lista
-        agendamentos.forEach(ag => {
-          const data = new Date(ag.horario_partida);
-          const dataFormatada = data.toLocaleDateString("pt-BR");
-          const horaFormatada = data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-
-          const item = document.createElement("li");
-          item.innerHTML = `
-            <span>${dataFormatada} - ${horaFormatada} - ${ag.aluno?.nome || "Aluno"} - ${ag.aeronave?.modelo || "Aeronave"} - ${ag.tipo_voo || "Tipo não definido"} - ${ag.status || "Status"}</span>
-            <div class="list-buttons">
-              <button onclick="editarAgendamento('${ag.id}')">Editar</button>
-              <button onclick="deletarAgendamento('${ag.id}')">Deletar</button>
-            </div>
-          `;
-          lista.appendChild(item);
-        });
-
+        agendamentosCarregados = await response.json();
+        aplicarFiltros();
       } catch (error) {
         console.error(error);
         document.getElementById("agendamentos-list").innerHTML = "<li>Erro ao carregar agendamentos.</li>";
       }
     }
 
-    // Redireciona para página de edição
+    // Carrega alunos do backend
+    async function carregarAlunos() {
+      try {
+        const response = await fetch("http://localhost:8080/api/alunos");
+        if (!response.ok) throw new Error("Erro ao buscar alunos");
+        alunosCarregados = await response.json();
+        const selectAluno = document.getElementById("filtro-aluno");
+        alunosCarregados.forEach(a => {
+          const option = document.createElement("option");
+          option.value = a.cpf;
+          option.textContent = a.nome;
+          selectAluno.appendChild(option);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+
+    // Carrega instrutores do backend
+    async function carregarInstrutores() {
+      try {
+        const response = await fetch("http://localhost:8080/api/instrutores");
+        if (!response.ok) throw new Error("Erro ao buscar instrutores");
+        instrutoresCarregados = await response.json();
+        const selectInstrutor = document.getElementById("filtro-instrutor");
+        instrutoresCarregados.forEach(i => {
+          const option = document.createElement("option");
+          option.value = i.cpf;
+          option.textContent = i.nome;
+          selectInstrutor.appendChild(option);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // Carrega aeronaves do backend
+    async function carregarAeronaves() {
+      try {
+        const response = await fetch("http://localhost:8080/api/aeronaves");
+        if (!response.ok) throw new Error("Erro ao buscar aeronaves");
+        aeronavesCarregadas = await response.json();
+        const selectAeronave = document.getElementById("filtro-aeronave");
+        aeronavesCarregadas.forEach(a => {
+          const option = document.createElement("option");
+          option.value = a.matricula;
+          option.textContent = a.modelo + " (" + a.matricula + ")";
+          selectAeronave.appendChild(option);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // Aplica filtros aos agendamentos carregados
+    function aplicarFiltros() {
+      const filtroInicio = document.getElementById("filtro-data-inicio").value;
+      const filtroFim = document.getElementById("filtro-data-fim").value;
+      const filtroAluno = document.getElementById("filtro-aluno").value;
+      const filtroInstrutor = document.getElementById("filtro-instrutor").value;
+      const filtroAeronave = document.getElementById("filtro-aeronave").value;
+      const filtroTipo = document.getElementById("filtro-tipo-voo").value;
+
+      const lista = document.getElementById("agendamentos-list");
+      lista.innerHTML = "";
+
+      let filtrados = agendamentosCarregados.filter(ag => {
+        const dataAg = new Date(ag.horario_partida);
+
+        if (filtroInicio && dataAg < new Date(filtroInicio)) return false;
+        if (filtroFim && dataAg > new Date(filtroFim)) return false;
+        if (filtroAluno && ag.aluno?.cpf !== filtroAluno) return false;
+        if (filtroInstrutor && ag.instrutor?.cpf !== filtroInstrutor) return false;
+        if (filtroAeronave && ag.aeronave?.matricula !== filtroAeronave) return false;
+        if (filtroTipo && ag.tipo_voo !== filtroTipo) return false;
+
+        return true;
+      });
+
+      if (filtrados.length === 0) {
+        lista.innerHTML = "<li>Nenhum agendamento encontrado.</li>";
+        return;
+      }
+
+      // Cria os itens da lista para cada agendamento filtrado
+      filtrados.forEach(ag => {
+        const data = new Date(ag.horario_partida);
+        const dataFormatada = data.toLocaleDateString("pt-BR");
+        const horaFormatada = data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+        const item = document.createElement("li");
+        item.innerHTML = `
+          <span>${dataFormatada} - ${horaFormatada} - ${ag.aluno?.nome || "Aluno"} - ${ag.instrutor?.nome || "Instrutor"} - ${ag.aeronave?.modelo || "Aeronave"} - ${ag.tipo_voo || "Tipo não definido"} - ${ag.status || "Status"}</span>
+          <div class="list-buttons">
+            <button onclick="editarAgendamento('${ag.id}')">Editar</button>
+            <button onclick="deletarAgendamento('${ag.id}')">Deletar</button>
+          </div>
+        `;
+        lista.appendChild(item);
+      });
+    }
+
+    // Redireciona para a página de edição do agendamento
     function editarAgendamento(id) {
       window.location.href = `editaragendamento.html?id=${id}`;
     }
 
-    // Deleta agendamento com confirmação via SweetAlert
+    // Deleta um agendamento com confirmação
     async function deletarAgendamento(id) {
       Swal.fire({
         title: 'Tem certeza?',
@@ -98,13 +211,8 @@
           try {
             const response = await fetch(`http://localhost:8080/api/agendamentos/${id}`, { method: "DELETE" });
             if (response.ok) {
-              Swal.fire({
-                title: 'Deletado!',
-                text: 'O agendamento foi removido com sucesso.',
-                icon: 'success',
-                confirmButtonColor: '#c00'
-              });
-              carregarAgendamentos(); // recarrega lista
+              Swal.fire({ title: 'Deletado!', text: 'O agendamento foi removido com sucesso.', icon: 'success', confirmButtonColor: '#c00' });
+              carregarAgendamentos();
             } else {
               Swal.fire('Erro', 'Não foi possível excluir o agendamento.', 'error');
             }
@@ -116,9 +224,13 @@
       });
     }
 
-    // Carrega a lista ao abrir a página
-    carregarAgendamentos();
+    // Inicializa a página carregando alunos, instrutores, aeronaves e agendamentos
+    async function inicializar() {
+      await Promise.all([carregarAlunos(), carregarInstrutores(), carregarAeronaves()]);
+      carregarAgendamentos();
+    }
+
+    inicializar();
   </script>
 </body>
-
 </html>

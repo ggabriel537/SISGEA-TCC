@@ -54,6 +54,7 @@
         return;
       }
 
+      // Monta o objeto do administrador
       const administrador = {
         nome,
         usuario: {
@@ -63,6 +64,7 @@
         }
       };
 
+      // Envia para a API
       try {
         const response = await fetch("http://localhost:8080/api/administradores", {
           method: "POST",
@@ -72,11 +74,13 @@
 
         const data = await response.json();
 
+        // Verifica se houve erro na resposta
         if (!response.ok) {
           Swal.fire("Erro", data.error || "Falha ao cadastrar administrador.", "error");
           return;
         }
 
+        // Verifica se há aviso na resposta
         if (data.status === "sucesso") {
           Swal.fire("Sucesso", "Administrador cadastrado com sucesso!", "success")
             .then(() => window.location.href = "inicio.html");
