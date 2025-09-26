@@ -26,6 +26,10 @@ public class UsuarioController {
         return UsuarioModel.buscarUsuario(id);
     }
 
+    public static Usuario buscarUsuarioUsername(String id) {
+        return UsuarioModel.buscarUsuarioUsername(id);
+    }
+
     public static void deletarUsuario(Usuario usuario) {
         UsuarioModel.excluirUsuario(usuario);
     }

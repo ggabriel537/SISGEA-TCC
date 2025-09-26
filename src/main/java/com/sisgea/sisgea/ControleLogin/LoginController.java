@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class LoginController {
 
     public static boolean validarLogin(String usuario, String senha) {
-        Usuario u = UsuarioController.buscarUsuario(usuario);
+        Usuario u = UsuarioController.buscarUsuarioUsername(usuario);
         if (u != null) {
             BCryptPasswordEncoder senhahash = new BCryptPasswordEncoder();
             return senhahash.matches(senha, u.getSenha());
@@ -38,7 +38,7 @@ public class LoginController {
             JwtUtil jwtUtil = new JwtUtil();
             String token = jwtUtil.generateToken(username);
 
-            Usuario user = UsuarioController.buscarUsuario(username);
+            Usuario user = UsuarioController.buscarUsuarioUsername(username);
             String nomeUsuario = "Usuário"; // valor padrão caso não encontre
 
             int perm = user.getPermissao();

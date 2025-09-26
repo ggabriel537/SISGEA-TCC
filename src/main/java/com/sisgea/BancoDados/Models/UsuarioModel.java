@@ -8,7 +8,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 
 public class UsuarioModel {
-    
+
     public static void salvarUsuario(Usuario usuario) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -28,6 +28,15 @@ public class UsuarioModel {
     public static Usuario buscarUsuario(String id) {
         EntityManager em = JPAUtil.getEntityManager();
         Usuario usuario = em.find(Usuario.class, id);
+        em.close();
+        return usuario;
+    }
+
+    public static Usuario buscarUsuarioUsername(String username) {
+        EntityManager em = JPAUtil.getEntityManager();
+        Usuario usuario = em.createQuery("SELECT u FROM Usuario u WHERE u.usuario = :username", Usuario.class)
+                .setParameter("username", username)
+                .getSingleResult();
         em.close();
         return usuario;
     }
