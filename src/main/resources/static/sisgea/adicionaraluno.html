@@ -23,7 +23,7 @@
   </div>
 
   <div class="main">
-    <h1>Cadastro de Aluno</h1>
+    <h1 id="titulo">Cadastro de Aluno</h1>
     <div class="container" id="aluno">
 
       <label>Nome</label>
@@ -79,11 +79,15 @@
       <label>Bairro</label>
       <input type="text" id="bairro" placeholder="Bairro" maxlength="64">
 
-      <button onclick="cadastrarAluno()">Cadastrar Aluno</button>
+      <button id="botao" onclick="cadastrarAluno()">Cadastrar Aluno</button>
     </div>
   </div>
 
   <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const cpfEdit = urlParams.get('cpf');
+    if(cpfEdit) carregarAluno(cpfEdit);
+
     // Máscara CPF
     function mascaraCPF(input) {
       let v = input.value.replace(/\D/g, "").slice(0, 11);
@@ -93,12 +97,10 @@
       input.value = v;
     }
 
-    // Apenas números
     function apenasNumeros(input) {
       input.value = input.value.replace(/\D/g, "");
     }
 
-    // Máscara telefone
     function mascaraTelefone(input) {
       let v = input.value.replace(/\D/g, "").slice(0, 11);
       v = v.replace(/(\d{2})(\d)/, "($1) $2");
@@ -106,57 +108,48 @@
       input.value = v;
     }
 
-    // Máscara CEP
     function mascaraCEP(input) {
       let v = input.value.replace(/\D/g, "").slice(0, 8);
       v = v.replace(/(\d{5})(\d)/, "$1-$2");
       input.value = v;
-      if (v.length === 9) buscarCep();
+      if(v.length === 9) buscarCep();
     }
 
-    // Buscar CEP
     function buscarCep() {
-      const cep = document.getElementById("cep").value.replace(/\D/g, "");
-      if (cep.length === 8) {
+      const cep = document.getElementById("cep").value.replace(/\D/g,"");
+      if(cep.length === 8){
         fetch(`https://viacep.com.br/ws/${cep}/json/`)
           .then(r => r.json())
           .then(data => {
-            if (data.erro) {
-              Swal.fire("Erro", "CEP não encontrado!", "error");
-            } else {
-              document.getElementById("cidade").value = data.localidade || "";
-              document.getElementById("estado").value = data.uf || "";
-              document.getElementById("logradouro").value = data.logradouro || "";
-              document.getElementById("bairro").value = data.bairro || "";
+            if(data.erro){
+              Swal.fire("Erro","CEP não encontrado!","error");
+            }else{
+              document.getElementById("cidade").value = data.localidade||"";
+              document.getElementById("estado").value = data.uf||"";
+              document.getElementById("logradouro").value = data.logradouro||"";
+              document.getElementById("bairro").value = data.bairro||"";
             }
-          })
-          .catch(err => {
-            Swal.fire("Erro", "Não foi possível buscar o CEP.", "error");
+          }).catch(err=>{
+            Swal.fire("Erro","Não foi possível buscar o CEP.","error");
             console.error(err);
           });
       }
     }
 
-    // Remover máscara
-    function limparMascaraCPF(cpf) {
-      return cpf.replace(/\D/g, "");
-    }
-    function limparMascaraTelefone(tel) {
-      return tel.replace(/\D/g, "");
-    }
+    function limparMascaraCPF(cpf){ return cpf.replace(/\D/g,""); }
+    function limparMascaraTelefone(tel){ return tel.replace(/\D/g,""); }
 
-    // Cadastrar aluno
-    async function cadastrarAluno(forcar = false) {
+    async function cadastrarAluno(forcar=false){
       const aluno = {
         nome: document.getElementById("nome").value.trim(),
         cpf: limparMascaraCPF(document.getElementById("cpf").value).trim(),
         canac: document.getElementById("canac").value.trim(),
         email: document.getElementById("email").value.trim(),
         curso: document.getElementById("curso").value.trim(),
-        horas_compradas: parseFloat(document.getElementById("horasCompradas").value) || 0,
-        horas_voadas: parseFloat(document.getElementById("horasVoadas").value) || 0,
+        horas_compradas: parseFloat(document.getElementById("horasCompradas").value)||0,
+        horas_voadas: parseFloat(document.getElementById("horasVoadas").value)||0,
         telefone: limparMascaraTelefone(document.getElementById("telefone").value).trim(),
-        endereco: {
+        endereco:{
           cep: document.getElementById("cep").value.trim(),
           cidade: document.getElementById("cidade").value.trim(),
           estado: document.getElementById("estado").value.trim(),
@@ -167,53 +160,95 @@
         }
       };
 
-      // Validação básica
-      if (!aluno.nome || !aluno.cpf || !aluno.canac) {
-        Swal.fire("Atenção", "Preencha Nome, CPF e CANAC!", "warning");
+      if(!aluno.nome || !aluno.cpf || !aluno.canac){
+        Swal.fire("Atenção","Preencha Nome, CPF e CANAC!","warning");
         return;
       }
 
-      // Envia a requisição para a API
+      const method = cpfEdit ? "PUT" : "POST";
+      const endpoint = cpfEdit ? `http://localhost:8080/api/alunos/${cpfEdit}?forcar=${forcar}` 
+                               : `http://localhost:8080/api/alunos?forcar=${forcar}`;
+
       try {
-        const res = await fetch(`http://localhost:8080/api/alunos?forcar=${forcar}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const res = await fetch(endpoint,{
+          method,
+          headers:{"Content-Type":"application/json"},
           body: JSON.stringify(aluno)
         });
         const data = await res.json();
 
-        // Verifica se houve erro na resposta
-        if (!res.ok) {
-          Swal.fire("Erro", data.error || "Falha ao cadastrar aluno.", "error");
+        if(!res.ok){
+          Swal.fire("Erro", data.error || "Falha ao cadastrar aluno.","error");
           return;
         }
 
-        // Verifica se há aviso na resposta
-        if (data.warn) {
+        if(data.warn){
           Swal.fire({
-            title: "Atenção",
-            text: data.warn,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Confirmar mesmo assim",
-            cancelButtonText: "Cancelar"
-          }).then(result => {
-            if (result.isConfirmed) cadastrarAluno(true);
+            title:"Atenção",
+            text:data.warn,
+            icon:"warning",
+            showCancelButton:true,
+            confirmButtonText:"Confirmar mesmo assim",
+            cancelButtonText:"Cancelar"
+          }).then(result=>{
+            if(result.isConfirmed) cadastrarAluno(true);
           });
           return;
         }
 
-        // Sucesso
-        if (data.status === "sucesso") {
-          Swal.fire("Sucesso", "Aluno cadastrado com sucesso!", "success")
-            .then(() => window.location.href = "aluno.html");
+        if(data.status === "sucesso"){
+          Swal.fire("Sucesso",cpfEdit ? "Aluno atualizado com sucesso!" : "Aluno cadastrado com sucesso!","success")
+            .then(()=> window.location.href="aluno.html");
         }
 
-      } catch (error) {
-        Swal.fire("Erro", "Não foi possível conectar à API.", "error");
+      }catch(error){
+        Swal.fire("Erro","Não foi possível conectar à API.","error");
         console.error(error);
       }
     }
+
+    async function carregarAluno(cpf){
+  try{
+    const res = await fetch(`http://localhost:8080/api/alunos/${cpf}`);
+    if(!res.ok) throw new Error("Aluno não encontrado");
+    const aluno = await res.json();
+
+    document.getElementById("titulo").innerText = "Edição de Aluno";
+    document.getElementById("botao").innerText = "Atualizar Aluno";
+
+    document.getElementById("nome").value = aluno.nome || "";
+    document.getElementById("cpf").value = aluno.cpf || "";
+    document.getElementById("canac").value = aluno.canac || "";
+    document.getElementById("email").value = aluno.email || "";
+    document.getElementById("curso").value = aluno.curso || "";
+    document.getElementById("horasCompradas").value = aluno.horas_compradas || 0;
+    document.getElementById("horasVoadas").value = aluno.horas_voadas || 0;
+    document.getElementById("telefone").value = aluno.telefone || "";
+    if(aluno.endereco){
+      document.getElementById("cep").value = aluno.endereco.cep || "";
+      document.getElementById("cidade").value = aluno.endereco.cidade || "";
+      document.getElementById("estado").value = aluno.endereco.estado || "";
+      document.getElementById("logradouro").value = aluno.endereco.logradouro || "";
+      document.getElementById("numero").value = aluno.endereco.numero || "";
+      document.getElementById("complemento").value = aluno.endereco.complemento || "";
+      document.getElementById("bairro").value = aluno.endereco.bairro || "";
+    }
+
+    // Tornar campos CPF e CANAC readonly
+    document.getElementById("cpf").readOnly = true;
+    document.getElementById("canac").readOnly = true;
+
+    // Aplicar máscaras nos campos carregados
+    mascaraCPF(document.getElementById("cpf"));
+    mascaraTelefone(document.getElementById("telefone"));
+    mascaraCEP(document.getElementById("cep"));
+
+  }catch(error){
+    Swal.fire("Erro","Não foi possível carregar os dados do aluno.","error");
+    console.error(error);
+  }
+}
+
   </script>
 </body>
 </html>

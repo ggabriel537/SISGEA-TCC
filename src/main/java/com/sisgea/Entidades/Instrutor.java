@@ -28,7 +28,7 @@ public class Instrutor {
     @JoinColumn(name = "endereco_id", unique = true, nullable = false)
     private Endereco endereco;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     @JoinColumn(name = "usuario_id", unique = true, nullable = false)
     private Usuario usuario;
 

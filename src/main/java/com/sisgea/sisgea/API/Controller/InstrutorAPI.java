@@ -8,8 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.sisgea.BancoDados.Controllers.InstrutorController;
+import com.sisgea.BancoDados.Controllers.UsuarioController;
 import com.sisgea.BancoDados.Controllers.AdministradorController;
 import com.sisgea.Entidades.Instrutor;
+import com.sisgea.Entidades.Usuario;
 import com.sisgea.Entidades.Administrador;
 
 @CrossOrigin(origins = "*")
@@ -129,37 +131,20 @@ public class InstrutorAPI {
         List<Administrador> administradores = AdministradorController.listarAdministradores();
 
         if (i.getUsuario() != null) {
-            if (instrutores != null && !instrutores.isEmpty()) {
-                for (Instrutor outro : instrutores) {
-                    if (outro.getCpf() != null && !outro.getCpf().equals(cpf)
-                            && i.getCpf() != null && i.getCpf().equals(outro.getCpf())) {
-                        conflito = true;
-                        conflito_str += "Já existe um instrutor com este CPF.\n";
-                    }
-                    if (i.getCanac() != null && outro.getCanac() != null
-                            && i.getCanac().equals(outro.getCanac())
-                            && !outro.getCpf().equals(cpf)) {
-                        conflito = true;
-                        conflito_str += "Já existe um instrutor com este CANAC.\n";
-                    }
-                    if (i.getUsuario().getUsuario() != null && !i.getUsuario().getUsuario().isBlank()
-                            && outro.getUsuario() != null
-                            && outro.getUsuario().getUsuario().equals(i.getUsuario().getUsuario())
-                            && !outro.getCpf().equals(cpf)) {
-                        conflito = true;
-                        conflito_str += "Já existe um instrutor com este usuário.\n";
-                    }
+            for (Instrutor outro : instrutores) {
+                if (!outro.getCpf().equals(cpf) && i.getUsuario().getUsuario() != null && outro.getUsuario() != null
+                        && i.getUsuario().getUsuario().equals(outro.getUsuario().getUsuario())) {
+                    conflito = true;
+                    conflito_str += "Já existe um instrutor com este usuário.\n";
                 }
             }
 
-            if (administradores != null && !administradores.isEmpty()) {
-                for (Administrador adm : administradores) {
-                    if (i.getUsuario().getUsuario() != null && !i.getUsuario().getUsuario().isBlank()
-                            && adm.getUsuario() != null
-                            && adm.getUsuario().getUsuario().equals(i.getUsuario().getUsuario())) {
-                        conflito = true;
-                        conflito_str += "Já existe um administrador com este usuário.\n";
-                    }
+            for (Administrador adm : administradores) {
+                if (i.getUsuario() != null && adm.getUsuario() != null
+                        && i.getUsuario().getUsuario() != null
+                        && i.getUsuario().getUsuario().equals(adm.getUsuario().getUsuario())) {
+                    conflito = true;
+                    conflito_str += "Já existe um administrador com este usuário.\n";
                 }
             }
         }
@@ -169,9 +154,23 @@ public class InstrutorAPI {
         }
 
         i.setCpf(cpf);
-        if (i.getUsuario() == null
-                || i.getUsuario().getUsuario() == null || i.getUsuario().getUsuario().isBlank()
-                || i.getUsuario().getSenha() == null || i.getUsuario().getSenha().isBlank()) {
+
+        if (i.getUsuario() != null && !i.getUsuario().getUsuario().equals(existente.getUsuario().getUsuario())) {
+            Usuario novoUsuario = new Usuario();
+            novoUsuario.setUsuario(i.getUsuario().getUsuario());
+            novoUsuario.setSenha(i.getUsuario().getSenha());
+            novoUsuario.setPermissao(0);
+
+            UsuarioController.salvarUsuario(novoUsuario); // cria novo usuário
+            UsuarioController.deletarUsuario(existente.getUsuario()); // deleta antigo
+
+            i.setUsuario(novoUsuario); // vincula o novo usuário ao instrutor
+        } else {
+            // apenas atualiza senha se fornecida
+            if (i.getUsuario() != null && i.getUsuario().getSenha() != null && !i.getUsuario().getSenha().isBlank()) {
+                existente.getUsuario().setSenha(i.getUsuario().getSenha());
+                UsuarioController.atualizarUsuario(existente.getUsuario());
+            }
             i.setUsuario(existente.getUsuario());
         }
 

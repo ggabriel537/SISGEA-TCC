@@ -3,11 +3,13 @@ package com.sisgea.BancoDados.Models;
 import java.util.List;
 
 import com.sisgea.Entidades.Instrutor;
+import com.sisgea.Entidades.Usuario;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 
 public class InstrutorModel {
-    
+
     public static void salvarInstrutor(Instrutor instrutor) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -35,6 +37,17 @@ public class InstrutorModel {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
         tx.begin();
+
+        if (instrutor.getUsuario() != null && instrutor.getUsuario().getUsuario() != null) {
+            Usuario usuarioExistente = em
+                    .createQuery("SELECT u FROM Usuario u WHERE u.usuario = :usuario", Usuario.class)
+                    .setParameter("usuario", instrutor.getUsuario().getUsuario())
+                    .getResultStream().findFirst().orElse(null);
+            if (usuarioExistente != null) {
+                instrutor.setUsuario(usuarioExistente);
+            }
+        }
+
         em.merge(instrutor);
         tx.commit();
         em.close();
