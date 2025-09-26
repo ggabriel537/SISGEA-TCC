@@ -89,8 +89,6 @@ public class AlunoAPI {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Aluno não encontrado"));
         }
 
-        List<Aluno> alunosExistentes = AlunoController.listarAlunos();
-
         String conflito_str = "";
         String warn_str = "";
         boolean warn = false;
@@ -99,20 +97,6 @@ public class AlunoAPI {
         String erro = validarAluno(aluno);
         if (!erro.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", erro));
-        }
-
-        for (Aluno outro : alunosExistentes) {
-            if (outro.getCpf().equals(aluno.getCpf()) && !outro.getCpf().equals(cpf)) {
-                conflito = true;
-                conflito_str += "Já existe um aluno com este CPF.\n";
-                break;
-            }
-            if (outro.getCanac() != null && aluno.getCanac() != null &&
-                outro.getCanac().equals(aluno.getCanac()) && !outro.getCpf().equals(cpf)) {
-                conflito = true;
-                conflito_str += "Já existe um aluno com este CANAC.\n";
-                break;
-            }
         }
 
         if (!conflito) {
@@ -146,15 +130,25 @@ public class AlunoAPI {
     }
 
     private String validarAluno(Aluno aluno) {
+        String msg = "";
         if (aluno.getNome() == null || aluno.getNome().isBlank()) {
-            return "Nome é obrigatório.";
+            msg += "Nome é obrigatório.\n";
         }
         if (aluno.getCpf() == null || aluno.getCpf().isBlank()) {
-            return "CPF é obrigatório.";
+            msg += "CPF é obrigatório.\n";
         }
         if (aluno.getCanac() == null || aluno.getCanac().toString().isBlank()) {
-            return "CANAC é obrigatório.";
+            msg += "CANAC é obrigatório.\n";
         }
-        return "";
+        if (aluno.getCurso() == null || aluno.getCurso() == "Selecione..." || aluno.getCurso().isBlank()) {
+            msg += "Curso é obrigatório.\n";
+        }
+        if (aluno.getEmail() == null || aluno.getEmail().isBlank()) {
+            msg += "Email é obrigatório.\n";
+        }
+        if (aluno.getTelefone() == null || aluno.getTelefone().isBlank()) {
+            msg += "Telefone é obrigatório.\n";
+        }
+        return msg;
     }
 }

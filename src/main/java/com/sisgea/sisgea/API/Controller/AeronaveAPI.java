@@ -54,8 +54,14 @@ public class AeronaveAPI {
             conflito_str += "Já existe uma aeronave com esta matrícula.\n";
         }
 
+        // Verificação de formato da matrícula
+        if (!aer.getMatricula().matches("^(PP|PT|PR|PS|PU)-[A-Z]{3}$")) {
+            conflito = true;
+            conflito_str += "Matrícula inválida. O formato correto é XX-XXX com prefixo válido (PP, PT, PR, PS, PU).\n";
+        }
+
         if (conflito) {
-            return ResponseEntity.badRequest().body(Map.of("error", conflito_str));
+            return ResponseEntity.badRequest().body(Map.of("error", conflito_str, "status", "CONFLITO"));
         }
 
         //
@@ -102,6 +108,8 @@ public class AeronaveAPI {
         if (aer.getMatricula() == null || aer.getMatricula().isBlank()) msg += "Matrícula é obrigatória. ";
         if (aer.getModelo() == null || aer.getModelo().isBlank()) msg += "Modelo é obrigatório. ";
         if (aer.getFabricante() == null || aer.getFabricante().isBlank()) msg += "Fabricante é obrigatório.";
+        if (aer.getHoras_de_voo() == null || aer.getHoras_de_voo() < 0) msg += "Horas de voo inválidas.";
+        if (aer.getTipo_de_voo() == null || aer.getTipo_de_voo().isBlank()) msg += "Tipo de voo é obrigatório.";
         return msg;
     }
 }

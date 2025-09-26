@@ -44,9 +44,9 @@ public class AdministradorAPI {
         //
         // DADOS OBRIGATÓRIOS
         //
-        String erro = validarAdministrador(adm);
-        if (!erro.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", erro));
+        conflito_str += validarAdministrador(adm);
+        if(conflito_str != "") {
+            conflito = true;
         }
 
         //
@@ -70,6 +70,15 @@ public class AdministradorAPI {
             }
         }
 
+        if (adm.getUsuario() == null || adm.getUsuario().getUsuario() == null || adm.getUsuario().getUsuario().isBlank()) {
+            conflito = true;
+            conflito_str += "Usuário é obrigatório.\n";
+        }
+        if (adm.getUsuario() == null || adm.getUsuario().getSenha() == null || adm.getUsuario().getSenha().isBlank()) {
+            conflito = true;
+            conflito_str += "Senha é obrigatória.\n";
+        }
+
         if (conflito) {
             return ResponseEntity.badRequest().body(Map.of("error", conflito_str));
         }
@@ -83,6 +92,8 @@ public class AdministradorAPI {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable String id, @RequestBody Administrador adm) {
+        String conflito_str = "";
+        boolean conflito = false;
         // Busca administrador existente
         Administrador existente = AdministradorController.buscarId(id);
         if (existente == null) {
@@ -91,9 +102,9 @@ public class AdministradorAPI {
         }
 
         // DADOS OBRIGATÓRIOS
-        String erro = validarAdministrador(adm);
-        if (!erro.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", erro));
+        conflito_str += validarAdministrador(adm);
+        if(conflito_str != "") {
+            conflito = true;
         }
 
         List<Administrador> admins = AdministradorController.listarAdministradores();
@@ -102,8 +113,6 @@ public class AdministradorAPI {
         //
         // CONFLITOS
         //
-        String conflito_str = "";
-        boolean conflito = false;
 
         // Verifica se existe um administrador com o mesmo usuario (exceto ele mesmo)
         for (Administrador a : admins) {
@@ -132,6 +141,9 @@ public class AdministradorAPI {
         // ATUALIZAÇÃO DO ADMINISTRADOR
         //
         adm.setId(id);
+        if (adm.getUsuario().getSenha() == null || adm.getUsuario().getSenha().isBlank() || adm.getUsuario().getUsuario() == null || adm.getUsuario().getUsuario().isBlank()) {
+            adm.setUsuario(existente.getUsuario());
+        }
         AdministradorController.atualizarAdministrador(adm);
         return ResponseEntity.ok(Map.of("status", "sucesso", "id", adm.getId()));
     }

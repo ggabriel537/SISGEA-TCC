@@ -52,21 +52,17 @@ public class InstrutorAPI {
         //
         // DADOS OBRIGATÓRIOS
         //
-        if (i.getNome() == null || i.getNome().isBlank()) {
+        conflito_str += validarInstrutor(i);
+        if(conflito_str != "") {
             conflito = true;
-            conflito_str += "Nome é obrigatório.\n";
-        }
-        if (i.getCpf() == null || i.getCpf().isBlank()) {
-            conflito = true;
-            conflito_str += "CPF é obrigatório.\n";
-        }
-        if (i.getEmail() == null || i.getEmail().isBlank()) {
-            conflito = true;
-            conflito_str += "Email é obrigatório.\n";
         }
         if (i.getUsuario() == null || i.getUsuario().getUsuario() == null || i.getUsuario().getUsuario().isBlank()) {
             conflito = true;
             conflito_str += "Usuário é obrigatório.\n";
+        }
+        if (i.getUsuario() == null || i.getUsuario().getSenha() == null || i.getUsuario().getSenha().isBlank()) {
+            conflito = true;
+            conflito_str += "Senha é obrigatória.\n";
         }
 
         // Força sempre permissao = 0
@@ -156,22 +152,11 @@ public class InstrutorAPI {
         //
         // DADOS OBRIGATÓRIOS
         //
-        if (i.getNome() == null || i.getNome().isBlank()) {
+        conflito_str += validarInstrutor(i);
+        if(conflito_str != "") {
             conflito = true;
-            conflito_str += "Nome é obrigatório.\n";
         }
-        if (i.getCpf() == null || i.getCpf().isBlank()) {
-            conflito = true;
-            conflito_str += "CPF é obrigatório.\n";
-        }
-        if (i.getEmail() == null || i.getEmail().isBlank()) {
-            conflito = true;
-            conflito_str += "Email é obrigatório.\n";
-        }
-        if (i.getUsuario() == null || i.getUsuario().getUsuario() == null || i.getUsuario().getUsuario().isBlank()) {
-            conflito = true;
-            conflito_str += "Usuário é obrigatório.\n";
-        }
+        
 
         // Força sempre permissao = 0
         if (i.getUsuario() != null) {
@@ -228,6 +213,10 @@ public class InstrutorAPI {
         }
 
         i.setCpf(cpf);
+        if (i.getUsuario().getSenha() == null || i.getUsuario().getSenha().isBlank() || i.getUsuario().getUsuario() == null
+                || i.getUsuario().getUsuario().isBlank()) {
+            i.setUsuario(existente.getUsuario());
+        }
         InstrutorController.atualizarInstrutor(i);
         return ResponseEntity.ok(Map.of("status", "sucesso", "cpf", i.getCpf()));
     }
@@ -241,5 +230,22 @@ public class InstrutorAPI {
         }
         InstrutorController.deletarInstrutor(cpf);
         return ResponseEntity.ok(Map.of("status", "deletado", "cpf", cpf));
+    }
+
+    private String validarInstrutor(Instrutor i) {
+        String msg = "";
+        if (i.getNome() == null || i.getNome().isBlank()) {
+            msg += "Nome é obrigatório.\n";
+        }
+        if (i.getCpf() == null || i.getCpf().isBlank()) {
+            msg += "CPF é obrigatório.\n";
+        }
+        if (i.getCanac() == null || i.getCanac().toString().isBlank()) {
+            msg += "CANAC é obrigatório.\n";
+        }
+        if (i.getEmail() == null || i.getEmail().isBlank()) {
+            msg += "Email é obrigatório.\n";
+        }
+        return msg;
     }
 }
