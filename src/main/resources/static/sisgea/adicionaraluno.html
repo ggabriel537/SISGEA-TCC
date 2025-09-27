@@ -97,10 +97,12 @@
       input.value = v;
     }
 
+    // Permite apenas números
     function apenasNumeros(input) {
       input.value = input.value.replace(/\D/g, "");
     }
 
+    // Máscara Telefone
     function mascaraTelefone(input) {
       let v = input.value.replace(/\D/g, "").slice(0, 11);
       v = v.replace(/(\d{2})(\d)/, "($1) $2");
@@ -108,6 +110,7 @@
       input.value = v;
     }
 
+    // Máscara CEP e busca endereço
     function mascaraCEP(input) {
       let v = input.value.replace(/\D/g, "").slice(0, 8);
       v = v.replace(/(\d{5})(\d)/, "$1-$2");
@@ -115,6 +118,7 @@
       if(v.length === 9) buscarCep();
     }
 
+    // Busca endereço via API do ViaCEP
     function buscarCep() {
       const cep = document.getElementById("cep").value.replace(/\D/g,"");
       if(cep.length === 8){
@@ -136,6 +140,7 @@
       }
     }
 
+    // Limpa máscaras para enviar ao DB
     function limparMascaraCPF(cpf){ return cpf.replace(/\D/g,""); }
     function limparMascaraTelefone(tel){ return tel.replace(/\D/g,""); }
 
@@ -160,6 +165,7 @@
         }
       };
 
+      // Validações
       if(!aluno.nome || !aluno.cpf || !aluno.canac){
         Swal.fire("Atenção","Preencha Nome, CPF e CANAC!","warning");
         return;
@@ -207,6 +213,7 @@
       }
     }
 
+    // Carrega dados do aluno para edição
     async function carregarAluno(cpf){
   try{
     const res = await fetch(`http://localhost:8080/api/alunos/${cpf}`);

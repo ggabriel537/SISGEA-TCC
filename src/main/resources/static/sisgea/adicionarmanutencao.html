@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="stylesheet" href="css/sweetalert.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
 
   <div class="sidebar">
@@ -23,12 +25,12 @@
   </div>
 
   <div class="main">
-    <h1>Cadastro de Manutenção</h1>
+    <h1 id="titulo">Cadastro de Manutenção</h1>
     <div class="container" id="manutencao">
 
       <label>Aeronave</label>
       <select id="aeronave">
-        <option value="">Selecione...</option>
+        <option value="">Carregando aeronaves...</option>
       </select>
 
       <label>Descrição</label>
@@ -45,52 +47,65 @@
         <option>Pendente</option>
       </select>
 
-      <button onclick="cadastrarManutencao()">Cadastrar Manutenção</button>
+      <button id="botao" onclick="cadastrarManutencao()">Cadastrar Manutenção</button>
     </div>
   </div>
 
   <script>
-    // Carrega aeronaves do backend para o select
-    async function carregarAeronaves() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const manutencaoId = urlParams.get('id');
+    const aeronaveSelect = document.getElementById("aeronave");
+
+    if (manutencaoId) carregarManutencao(manutencaoId);
+
+    // Carrega aeronaves disponíveis
+    async function carregarAeronaves(selecionar = "") {
       try {
         const res = await fetch("http://localhost:8080/api/aeronaves");
         if (!res.ok) throw new Error("Erro ao buscar aeronaves");
         const aeronaves = await res.json();
-        const select = document.getElementById("aeronave");
+        aeronaveSelect.innerHTML = "<option value=''>Selecione...</option>";
         aeronaves.forEach(a => {
-          const option = document.createElement("option");
-          option.value = a.matricula;
-          option.textContent = `${a.matricula} - ${a.modelo}`;
-          select.appendChild(option);
+          const opt = document.createElement("option");
+          opt.value = a.matricula;
+          opt.textContent = `${a.matricula} - ${a.modelo}`;
+          if (a.matricula === selecionar) opt.selected = true;
+          aeronaveSelect.appendChild(opt);
         });
-      } catch (error) {
-        Swal.fire("Erro", "Não foi possível carregar as aeronaves.", "error");
-        console.error(error);
+        // Bloqueia select apenas se estiver editando
+        if (manutencaoId) aeronaveSelect.disabled = true;
+      } catch (err) {
+        aeronaveSelect.innerHTML = "<option value=''>Erro ao carregar aeronaves</option>";
+        console.error(err);
       }
     }
 
-    // Cadastrar Manutenção
+    // Cadastra ou atualiza uma manutenção
     async function cadastrarManutencao(forcar = false) {
       const manutencao = {
         descricao: document.getElementById("descricao").value.trim(),
         data_est_man: document.getElementById("dataEstimada").value,
         status: document.getElementById("status").value.trim(),
-        aeronave: { matricula: document.getElementById("aeronave").value }
+        aeronave: { matricula: aeronaveSelect.value }
       };
 
-      // Validação básica
       if (!manutencao.descricao || !manutencao.data_est_man || !manutencao.status || !manutencao.aeronave.matricula) {
         Swal.fire("Atenção", "Preencha todos os campos obrigatórios!", "warning");
         return;
       }
 
-      // Envia a requisição para a API
+      const method = manutencaoId ? "PUT" : "POST";
+      const endpoint = manutencaoId
+        ? `http://localhost:8080/api/manutencoes/${manutencaoId}?forcar=${forcar}`
+        : `http://localhost:8080/api/manutencoes?forcar=${forcar}`;
+
       try {
-        const res = await fetch(`http://localhost:8080/api/manutencoes?forcar=${forcar}`, {
-          method: "POST",
+        const res = await fetch(endpoint, {
+          method,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(manutencao)
         });
+
         const data = await res.text();
 
         if (!res.ok) {
@@ -98,7 +113,6 @@
           return;
         }
 
-        // Verifica se a resposta contém um aviso
         if (data.startsWith("AVISO") && !forcar) {
           Swal.fire({
             title: "Atenção",
@@ -113,8 +127,7 @@
           return;
         }
 
-        // Sucesso
-        Swal.fire("Sucesso", "Manutenção cadastrada com sucesso!", "success")
+        Swal.fire("Sucesso", manutencaoId ? "Manutenção atualizada com sucesso!" : "Manutenção cadastrada com sucesso!", "success")
           .then(() => window.location.href = "manutencao.html");
 
       } catch (error) {
@@ -123,7 +136,28 @@
       }
     }
 
-    // Inicializa a página carregando as aeronaves
+    // Carrega dados da manutenção para edição
+    async function carregarManutencao(id) {
+      try {
+        const res = await fetch(`http://localhost:8080/api/manutencoes/${id}`);
+        if (!res.ok) throw new Error("Manutenção não encontrada");
+        const m = await res.json();
+
+        document.getElementById("titulo").innerText = "Edição de Manutenção";
+        document.getElementById("botao").innerText = "Atualizar Manutenção";
+
+        document.getElementById("descricao").value = m.descricao || "";
+        document.getElementById("dataEstimada").value = m.data_est_man || "";
+        document.getElementById("status").value = m.status || "";
+
+        await carregarAeronaves(m.aeronave?.matricula || "");
+
+      } catch (error) {
+        Swal.fire("Erro", "Não foi possível carregar os dados da manutenção.", "error");
+        console.error(error);
+      }
+    }
+
     carregarAeronaves();
   </script>
 </body>

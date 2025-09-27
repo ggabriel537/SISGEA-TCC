@@ -40,13 +40,17 @@ public class AdministradorAPI {
         String conflito_str = "";
         boolean conflito = false;
 
+        //
         // DADOS OBRIGATÓRIOS
+        //
         conflito_str += validarAdministrador(adm);
         if (!conflito_str.isEmpty()) {
             conflito = true;
         }
 
+        //
         // CONFLITOS
+        //
         if (adm.getUsuario() != null) {
             if (admins != null && !admins.isEmpty()) {
                 for (Administrador a : admins) {

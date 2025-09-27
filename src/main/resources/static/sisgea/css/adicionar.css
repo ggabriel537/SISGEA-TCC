@@ -121,7 +121,6 @@
 
   h2 {
     color: black;
-    border-bottom: 2px solid #c00;
     padding-bottom: 5px;
     margin-bottom: 15px;
   }
@@ -177,7 +176,7 @@
     border: 1px solid #c00;
   }
 
-  input[readonly], textarea[readonly], select[readonly] {
+  input[readonly], textarea[readonly], select[readonly], input[disabled], textarea[disabled], select[disabled] {
   background-color: #f0f0f0;
   color: #555;
   border: 1px solid #ccc;

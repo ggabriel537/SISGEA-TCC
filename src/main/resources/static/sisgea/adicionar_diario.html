@@ -1,81 +1,323 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISGEA - Cadstro de Diário de Bordo</title>
+    <title>SISGEA - Cadastro de Diário de Bordo</title>
     <link rel="stylesheet" href="css/adicionar.css">
+    <link rel="stylesheet" href="css/sweetalert.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body>
 
+<body>
     <div class="sidebar">
-        <a href="inicio.html" id="inicial"><h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1></a>
+        <a href="inicio.html" id="inicial">
+            <h1><img src="css/aviao.png" alt="Logo do Avião">SISGEA</h1>
+        </a>
         <a href="agendamento.html">Agendamento</a>
         <a href="aeronave.html">Aeronave</a>
         <a href="aluno.html">Aluno</a>
         <a href="instrutor.html">Instrutor</a>
         <a href="manutencao.html">Manutenção</a>
         <a href="diario.html">Diário</a>
-      </div>
+    </div>
 
     <div class="main">
-        <h1>Cadastro de Diário de Bordo</h1>
-        <div class="container" id="diario">
-            
-            <label>Matrícula</label>
-            <select>
-                <option value="PT-KLM">PT-KLM - Cessna 172</option>
-                <option value="PR-ABC">PR-ABC - Piper PA-28</option>
-                <option value="PT-ZYX">PT-ZYX - Beechcraft Bonanza</option>
+        <h1 id="titulo">Cadastro de Diário de Bordo</h1>
+        <div class="container" id="diario-container">
+            <label>Aeronave</label>
+            <select id="aeronave">
+                <option value="" disabled selected>Selecione a Aeronave...</option>
             </select>
-            
-            <label>Data</label>
-            <input type="date" value="2025-05-22">
-            
-            <label>Aluno</label>
-            <select>
-                <option value="joao_silva">João Silva - CANAC: 987654</option>
-                <option value="mariana_costa">Mariana Costa - CANAC: 654321</option>
-                <option value="lucas_oliveira">Lucas Oliveira - CANAC: 123789</option>
-            </select>
-            
-            <label>Instrutor</label>
-            <select>
-                <option value="carlos_eduardo">Carlos Eduardo Lima - CANAC: 123987</option>
-                <option value="fernanda_souza">Fernanda Souza - CANAC: 987321</option>
-                <option value="rafael_almeida">Rafael Almeida - CANAC: 654789</option>
-            </select>
-            
-            <label>Origem</label>
-            <select>
-              <option value="SBBR">SBBR (Brasília)</option>
-              <option value="SBSP">SBSP (Congonhas)</option>
-              <option value="SBCT">SBCT (Curitiba)</option>
-            </select>
-            
-            <label>Destino</label>
-            <select>
-              <option value="SBSP">SBSP (Congonhas)</option>
-              <option value="SBRJ">SBRJ (Santos Dumont)</option>
-              <option value="SBPA">SBPA (Porto Alegre)</option>
-            </select>
-            
-            <label>Decolagem</label>
-            <input type="time" value="08:30">
-            
-            <label>Pouso</label>
-            <input type="time" value="10:00">
-            
-            <label>Tempo de Voo (DIU)</label>
-            <input type="text" value="01:30">
-            
-            <label>Ocorrências</label>
-            <textarea rows="3" placeholder="Preencher Discrepâncias"></textarea>
 
-            <button>Preencher Ocorrências</button>
-            
-            <button>Salvar Diário</button>
+            <label>Número do Diário</label>
+            <input type="number" id="nro-diario">
+
+            <label>Data</label>
+            <input type="date" id="data">
+
+            <label>Aluno</label>
+            <select id="aluno">
+                <option value="" selected>Selecione o Aluno...</option>
+            </select>
+
+            <label>Função do Aluno</label>
+            <input type="text" id="funcao-aluno" placeholder="Ex: Piloto em comando, Copiloto...">
+
+            <label>Instrutor</label>
+            <select id="instrutor">
+                <option value="" selected>Selecione o Instrutor...</option>
+            </select>
+
+            <label>Função do Instrutor</label>
+            <input type="text" id="funcao-instrutor" placeholder="Ex: Instrutor de voo, Observador...">
+
+            <label>Hora Aeronave</label>
+            <input type="number" step="0.1" id="hora-aeronave">
+
+            <label>Data de Decolagem</label>
+            <input type="datetime-local" id="data-decolagem">
+
+            <label>Data de Pouso</label>
+            <input type="datetime-local" id="data-pouso">
+
+            <label>Local de Decolagem</label>
+            <input type="text" id="local-decolagem">
+
+            <label>Local de Pouso</label>
+            <input type="text" id="local-pouso">
+
+            <label>Data de Corte</label>
+            <input type="datetime-local" id="data-corte">
+
+            <label>Horas Diurno</label>
+            <input type="number" step="0.1" id="horas-diu">
+
+            <label>Horas Noturno</label>
+            <input type="number" step="0.1" id="horas-not">
+
+            <label>Horas VFR</label>
+            <input type="number" step="0.1" id="horas-vfr">
+
+            <label>Horas IFR</label>
+            <input type="number" step="0.1" id="horas-ifr">
+
+            <label>Horas IFR C</label>
+            <input type="number" step="0.1" id="horas-ifr-c">
+
+            <label>Combustível Utilizado</label>
+            <input type="number" step="0.1" id="combustivel">
+
+            <label>Ciclos</label>
+            <input type="number" step="1" id="ciclos">
+
+            <label>POB</label>
+            <input type="number" step="1" id="pob">
+
+            <label>Carga</label>
+            <input type="number" step="0.1" id="carga">
+
+            <label>Natureza</label>
+            <input type="text" id="nat">
+
+            <label>Ocorrências</label>
+            <textarea id="ocorrencias" rows="4"></textarea>
+
+            <label>Discrepâncias</label>
+            <div id="discrepancias-container"></div>
+            <button type="button" id="btn-add-discrepancia">Adicionar Discrepância</button>
+
+            <button type="button" id="btn-salvar">Salvar Diário</button>
         </div>
     </div>
+
+    <script>
+        // Lista aeronaves, alunos e instrutores
+        let aeronavesCarregadas = [];
+        let alunosCarregados = [];
+        let instrutoresCarregados = [];
+        let diarioId = new URLSearchParams(window.location.search).get("id");
+        let editar = diarioId !== null;
+
+        // Carrega aeronaves, alunos e instrutores do backend
+        async function carregarAeronaves() {
+            const res = await fetch("http://localhost:8080/api/aeronaves");
+            aeronavesCarregadas = await res.json();
+            const select = document.getElementById("aeronave");
+            aeronavesCarregadas.forEach(a => {
+                const opt = document.createElement("option");
+                opt.value = a.matricula;
+                opt.textContent = `${a.modelo} (${a.matricula})`;
+                select.appendChild(opt);
+            });
+        }
+
+        // Carrega alunos do backend
+        async function carregarAlunos() {
+            const res = await fetch("http://localhost:8080/api/alunos");
+            alunosCarregados = await res.json();
+            const select = document.getElementById("aluno");
+            alunosCarregados.forEach(a => {
+                const opt = document.createElement("option");
+                opt.value = a.cpf;
+                opt.textContent = a.nome;
+                select.appendChild(opt);
+            });
+        }
+
+        // Carrega instrutores do backend
+        async function carregarInstrutores() {
+            const res = await fetch("http://localhost:8080/api/instrutores");
+            instrutoresCarregados = await res.json();
+            const select = document.getElementById("instrutor");
+            instrutoresCarregados.forEach(i => {
+                const opt = document.createElement("option");
+                opt.value = i.cpf;
+                opt.textContent = i.nome;
+                select.appendChild(opt);
+            });
+        }
+
+        // Adiciona um novo conjunto de campos para discrepância
+        function adicionarDiscrepancia(d = {}) {
+            const container = document.getElementById("discrepancias-container");
+            const div = document.createElement("div");
+            div.classList.add("discrepancia-item");
+            div.style.marginBottom = "15px";
+            div.innerHTML = `
+  <input type="datetime-local" value="${d.data ? d.data.substring(0, 16) : ""}" placeholder="Data e Hora">
+  <input type="text" value="${d.sistema || ""}" placeholder="Sistema">
+  <input type="text" value="${d.discrepancia || ""}" placeholder="Discrepância">
+  <input type="text" value="${d.correcao || ""}" placeholder="Correção">
+  <button type="button" onclick="removerDiscrepancia(this)" style="font-size: 0.8em; margin-left: 5px;">Excluir</button>
+  <br><br>
+`;
+            container.appendChild(div);
+
+        }
+
+        // Remove um conjunto de campos de discrepância
+        function removerDiscrepancia(btn) { btn.parentElement.remove(); }
+
+        // Carrega diário para edição
+        async function carregarDiario() {
+            if (!editar) return;
+            document.getElementById("titulo").textContent = "Edição de Diário de Bordo";
+            const res = await fetch(`http://localhost:8080/api/diarios-bordo/${diarioId}`);
+            const diario = await res.json();
+
+            document.getElementById("aeronave").value = diario.aeronaveId;
+            document.getElementById("nro-diario").value = diario.nroDiario;
+            document.getElementById("data").value = diario.data?.split("T")[0];
+            document.getElementById("aluno").value = diario.alunoId;
+            document.getElementById("instrutor").value = diario.instrutorId;
+            document.getElementById("hora-aeronave").value = diario.horaAeronave;
+            document.getElementById("data-decolagem").value = diario.dataDecolagem;
+            document.getElementById("data-pouso").value = diario.dataPouso;
+            document.getElementById("local-decolagem").value = diario.localDecolagem;
+            document.getElementById("local-pouso").value = diario.localPouso;
+            document.getElementById("data-corte").value = diario.dataCorte;
+            document.getElementById("horas-diu").value = diario.horasDiu;
+            document.getElementById("horas-not").value = diario.horasNot;
+            document.getElementById("horas-vfr").value = diario.horasVfr;
+            document.getElementById("horas-ifr").value = diario.horasIfr;
+            document.getElementById("horas-ifr-c").value = diario.horasIfrC;
+            document.getElementById("combustivel").value = diario.combustivelUtilizado;
+            document.getElementById("ciclos").value = diario.ciclos;
+            document.getElementById("pob").value = diario.pob;
+            document.getElementById("carga").value = diario.carga;
+            document.getElementById("nat").value = diario.nat;
+            document.getElementById("ocorrencias").value = diario.ocorrencias;
+            document.getElementById("funcao-aluno").value = diario.funcaoAluno || "";
+            document.getElementById("funcao-instrutor").value = diario.funcaoInstrutor || "";
+
+            diario.discrepancias?.forEach(d => adicionarDiscrepancia(d));
+        }
+
+        document.getElementById("btn-add-discrepancia").addEventListener("click", () => adicionarDiscrepancia());
+        document.getElementById("btn-salvar").addEventListener("click", salvarDiario);
+
+        async function salvarDiario() {
+            const discrepancias = Array.from(document.querySelectorAll("#discrepancias-container .discrepancia-item")).map(div => {
+                const inputs = div.querySelectorAll("input");
+                return {
+                    data: inputs[0].value || null,
+                    sistema: inputs[1].value,
+                    discrepancia: inputs[2].value,
+                    correcao: inputs[3].value
+                };
+            });
+
+            // Monta o payload para envio à API
+            const payload = {
+                aeronaveId: document.getElementById("aeronave").value,
+                nroDiario: document.getElementById("nro-diario").value,
+                data: document.getElementById("data").value,
+                alunoId: document.getElementById("aluno").value,
+                funcaoAluno: document.getElementById("funcao-aluno").value,
+                instrutorId: document.getElementById("instrutor").value,
+                funcaoInstrutor: document.getElementById("funcao-instrutor").value,
+                horaAeronave: document.getElementById("hora-aeronave").value,
+                dataDecolagem: document.getElementById("data-decolagem").value,
+                dataPouso: document.getElementById("data-pouso").value,
+                localDecolagem: document.getElementById("local-decolagem").value,
+                localPouso: document.getElementById("local-pouso").value,
+                dataCorte: document.getElementById("data-corte").value,
+                horasDiu: document.getElementById("horas-diu").value,
+                horasNot: document.getElementById("horas-not").value,
+                horasVfr: document.getElementById("horas-vfr").value,
+                horasIfr: document.getElementById("horas-ifr").value,
+                horasIfrC: document.getElementById("horas-ifr-c").value,
+                combustivelUtilizado: document.getElementById("combustivel").value,
+                ciclos: document.getElementById("ciclos").value,
+                pob: document.getElementById("pob").value,
+                carga: document.getElementById("carga").value,
+                nat: document.getElementById("nat").value,
+                ocorrencias: document.getElementById("ocorrencias").value,
+                discrepancias
+            };
+
+
+            let erros = [];
+
+            if (!payload.aeronaveId) erros.push("Aeronave é obrigatória.");
+            if (!payload.nroDiario) erros.push("Número do diário é obrigatório.");
+            if (!payload.data) erros.push("Data do diário é obrigatória.");
+            if (!payload.horaAeronave) erros.push("Hora da aeronave é obrigatória.");
+            if (!payload.dataDecolagem) erros.push("Data de decolagem é obrigatória.");
+            if (!payload.dataPouso) erros.push("Data de pouso é obrigatória.");
+            if (!payload.dataCorte) erros.push("Data de corte é obrigatória.");
+            if (!payload.combustivelUtilizado) erros.push("Combustível utilizado é obrigatório.");
+            if (!payload.ciclos) erros.push("Ciclos são obrigatórios.");
+            if (!payload.pob) erros.push("POB é obrigatório.");
+            if (!payload.carga) erros.push("Carga é obrigatória.");
+            if (!payload.nat) erros.push("Natureza é obrigatória.");
+
+            if (!payload.horasDiu && !payload.horasNot && !payload.horasVfr && !payload.horasIfr && !payload.horasIfrC) {
+                erros.push("Pelo menos uma hora deve ser preenchida.");
+            }
+
+            if (payload.dataDecolagem && payload.dataPouso && new Date(payload.dataPouso) < new Date(payload.dataDecolagem)) {
+                erros.push("Data de pouso não pode ser antes da decolagem.");
+            }
+            if (payload.dataCorte && payload.dataPouso && new Date(payload.dataCorte) < new Date(payload.dataPouso)) {
+                erros.push("Data de corte não pode ser anterior à data de pouso.");
+            }
+
+            if (erros.length > 0) {
+                Swal.fire("Erro de Validação", erros.join("<br>"), "error");
+                return;
+            }
+
+            const url = editar ? `http://localhost:8080/api/diarios-bordo/${diarioId}` : "http://localhost:8080/api/diarios-bordo";
+            const method = editar ? "PUT" : "POST";
+
+            const res = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                Swal.fire("Sucesso!", "Diário salvo com sucesso.", "success")
+                    .then(() => window.location.href = "diario.html");
+            } else {
+                const data = await res.json();
+                Swal.fire("Erro", data.error || "Ocorreu um erro.", "error");
+            }
+        }
+
+
+        async function init() {
+            await carregarAeronaves();
+            await carregarAlunos();
+            await carregarInstrutores();
+            await carregarDiario();
+        }
+
+        init();
+    </script>
 </body>
+
 </html>

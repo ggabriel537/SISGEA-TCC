@@ -18,6 +18,12 @@ public class DiarioBordo {
     @Column(name = "nro_diario", nullable = false)
     private Integer nroDiario;
 
+    @Column(name = "aluno_id", nullable = false)
+    private String alunoId;
+
+    @Column(name = "instrutor_id")
+    private String instrutorId;
+
     @Temporal(TemporalType.DATE)
     @Column(name = "data", nullable = false)
     private Date data;
@@ -278,5 +284,21 @@ public class DiarioBordo {
 
     public void setDiscrepancias(List<Discrepancia> discrepancias) {
         this.discrepancias = discrepancias;
+    }
+
+    public String getAlunoId() {
+        return alunoId;
+    }
+
+    public void setAlunoId(String alunoId) {
+        this.alunoId = alunoId;
+    }
+
+    public String getInstrutorId() {
+        return instrutorId;
+    }
+
+    public void setInstrutorId(String instrutorId) {
+        this.instrutorId = instrutorId;
     }
 }

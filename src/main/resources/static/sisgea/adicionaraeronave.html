@@ -25,7 +25,7 @@
     </div>
 
     <div class="main">
-        <h1>Cadastro de Aeronave</h1>
+        <h1 id="titulo">Cadastro de Aeronave</h1>
         <div class="container" id="aeronave">
 
             <label>Matrícula</label>
@@ -56,19 +56,29 @@
             <label>Horas de Voo</label>
             <input type="number" id="horas_de_voo" placeholder="Ex: 1200" min="0" step="0.1">
 
-            <button onclick="cadastrarAeronave()">Cadastrar Aeronave</button>
+            <button id="btnCadastrar">Cadastrar Aeronave</button>
         </div>
     </div>
 
     <script>
+        const baseUrl = 'http://localhost:8080/api';
+        const urlParams = new URLSearchParams(window.location.search);
+        const matriculaParam = urlParams.get('matricula'); // id para edição
+
+        const matriculaInput = document.getElementById("matricula");
+        const modeloInput = document.getElementById("modelo");
+        const fabricanteInput = document.getElementById("fabricante");
+        const habilitacaoSelect = document.getElementById("habilitacao");
+        const tipoVooSelect = document.getElementById("tipo_de_voo");
+        const horasInput = document.getElementById("horas_de_voo");
+        const btnCadastrar = document.getElementById("btnCadastrar");
+
         // Formata matrícula enquanto digita
         function formatarMatricula(input) {
             let valor = input.value.toUpperCase().replace(/[^A-Z]/g, "");
-
             if (valor.length > 2) {
                 valor = valor.slice(0, 2) + "-" + valor.slice(2, 5);
             }
-
             input.value = valor;
         }
 
@@ -78,61 +88,81 @@
             return regex.test(matricula);
         }
 
-        // Cadastrar aeronave
-        async function cadastrarAeronave() {
-            const matricula = document.getElementById("matricula").value.trim().toUpperCase();
-            const modelo = document.getElementById("modelo").value.trim();
-            const fabricante = document.getElementById("fabricante").value.trim();
-            const habilitacao = document.getElementById("habilitacao").value.trim();
-            const tipo_de_voo = document.getElementById("tipo_de_voo").value.trim();
-            const horas_de_voo = parseFloat(document.getElementById("horas_de_voo").value) || 0;
+        // Carrega aeronave para edição
+        async function carregarAeronave(matricula) {
+            try {
+                const res = await fetch(`${baseUrl}/aeronaves/${matricula}`);
+                if (!res.ok) throw new Error("Aeronave não encontrada");
+                const aer = await res.json();
 
-            // Validação
-            if (!matricula || !modelo || !fabricante || !habilitacao || !tipo_de_voo) {
-                Swal.fire("Atenção", "Preencha todos os campos obrigatórios!", "warning");
-                return;
-            }
-            if (!matriculaValida(matricula)) {
-                Swal.fire("Erro", "Matrícula inválida. Formato: XX-XXX e prefixo deve ser PP, PT, PR, PS ou PU.", "error");
-                return;
-            }
+                document.getElementById("titulo").innerText = "Editar Aeronave";
+                btnCadastrar.innerText = "Atualizar Aeronave";
 
+                matriculaInput.value = aer.matricula;
+                matriculaInput.disabled = true;
+                modeloInput.value = aer.modelo;
+                fabricanteInput.value = aer.fabricante;
+                habilitacaoSelect.value = aer.habilitacao;
+                tipoVooSelect.value = aer.tipo_de_voo;
+                horasInput.value = aer.horas_de_voo;
+            } catch (err) {
+                Swal.fire("Erro", "Não foi possível carregar a aeronave.\n" + err, "error");
+                console.error(err);
+            }
+        }
+
+        if (matriculaParam) carregarAeronave(matriculaParam);
+
+        // Cadastrar ou atualizar aeronave
+        async function salvarAeronave() {
             const aeronave = {
-                matricula,
-                modelo,
-                fabricante,
-                habilitacao,
-                tipo_de_voo,
-                horas_de_voo,
+                matricula: matriculaInput.value.trim().toUpperCase(),
+                modelo: modeloInput.value.trim(),
+                fabricante: fabricanteInput.value.trim(),
+                habilitacao: habilitacaoSelect.value.trim(),
+                tipo_de_voo: tipoVooSelect.value.trim(),
+                horas_de_voo: parseFloat(horasInput.value) || 0,
                 manutencoes: [],
                 diarioBordos: []
             };
 
-            // Envia para a API
+            // Validação
+            if (!aeronave.matricula || !aeronave.modelo || !aeronave.fabricante || !aeronave.habilitacao || !aeronave.tipo_de_voo) {
+                Swal.fire("Atenção", "Preencha todos os campos obrigatórios!", "warning");
+                return;
+            }
+            if (!matriculaValida(aeronave.matricula)) {
+                Swal.fire("Erro", "Matrícula inválida. Formato: XX-XXX e prefixo deve ser PP, PT, PR, PS ou PU.", "error");
+                return;
+            }
+
+            const method = matriculaParam ? "PUT" : "POST";
+            const url = matriculaParam ? `${baseUrl}/aeronaves/${matriculaParam}` : `${baseUrl}/aeronaves`;
+
             try {
-                const response = await fetch("http://localhost:8080/api/aeronaves", {
-                    method: "POST",
+                const res = await fetch(url, {
+                    method,
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(aeronave)
                 });
 
-                const data = await response.json();
+                const data = await res.json();
 
-                if (!response.ok) {
-                    Swal.fire("Erro", data.error || "Falha ao cadastrar aeronave.", "error");
+                if (!res.ok) {
+                    Swal.fire("Erro", data.error || "Falha ao salvar aeronave.", "error");
                     return;
                 }
 
-                if (data.status === "sucesso") {
-                    Swal.fire("Sucesso", "Aeronave cadastrada com sucesso!", "success")
-                        .then(() => window.location.href = "aeronave.html");
-                }
+                Swal.fire("Sucesso", matriculaParam ? "Aeronave atualizada com sucesso!" : "Aeronave cadastrada com sucesso!", "success")
+                    .then(() => window.location.href = "aeronave.html");
 
-            } catch (error) {
-                Swal.fire("Erro", "Não foi possível conectar à API.", "error");
-                console.error(error);
+            } catch (err) {
+                Swal.fire("Erro", "Não foi possível conectar à API.\n" + err, "error");
+                console.error(err);
             }
         }
+
+        btnCadastrar.addEventListener("click", salvarAeronave);
     </script>
 </body>
 

@@ -25,7 +25,7 @@
   </div>
 
   <div class="main">
-    <h1>Cadastro de Agendamento</h1>
+    <h1 id="titulo">Cadastro de Agendamento</h1>
 
     <div class="container" id="agendamento">
       <label>Instrutor</label>
@@ -71,8 +71,9 @@
   </div>
 
   <script>
-    const baseUrl = location.origin + '/api';
-
+    const baseUrl = 'http://localhost:8080/api';
+    const urlParams = new URLSearchParams(window.location.search);
+    const agendamentoId = urlParams.get('id'); // id para edição
     const instrutorSelect = document.getElementById('instrutorSelect');
     const alunoSelect = document.getElementById('alunoSelect');
     const aeronaveSelect = document.getElementById('aeronaveSelect');
@@ -84,7 +85,7 @@
     const statusInput = document.getElementById('status');
     const btnCadastrar = document.getElementById('btnCadastrar');
 
-    // Carrega lista de itens (aeronaves, alunos, instrutores)
+    // Carrega lista de itens
     async function carregarDados(url, selectElem, valueField, textFields, placeholder) {
       try {
         const res = await fetch(url);
@@ -104,115 +105,106 @@
       }
     }
 
-    // Carrega dados iniciais para os selects
+    // Carrega dados iniciais
     carregarDados(baseUrl + '/aeronaves', aeronaveSelect, 'matricula', ['matricula', 'fabricante', 'modelo'], 'Selecione a Aeronave');
     carregarDados(baseUrl + '/alunos', alunoSelect, 'cpf', ['canac', 'nome'], 'Selecione o Aluno');
     carregarDados(baseUrl + '/instrutores', instrutorSelect, 'cpf', ['canac', 'nome'], 'Selecione o Instrutor');
 
-    // Cadastrar Agendamento
-    btnCadastrar.addEventListener('click', async () => {
-      const instrutorCpf = instrutorSelect.value;
-      const alunoCpf = alunoSelect.value;
-      const aeronaveMatricula = aeronaveSelect.value;
-      const dataAgendamentoVal = dataAgendamentoInput.value;
-      const retornoVal = retornoInput.value;
-      const partida = partidaInput.value.trim();
-      const destino = destinoInput.value.trim();
-      const tipoVoo = tipoVooSelect.value;
-      const status = statusInput.value;
+    // Função para carregar agendamento para edição
+    async function carregarAgendamento(id) {
+      try {
+        const res = await fetch(`${baseUrl}/agendamentos/${id}`);
+        if (!res.ok) throw new Error("Agendamento não encontrado");
+        const ag = await res.json();
 
-      // Validações básicas
-      if (!instrutorCpf || !alunoCpf || !aeronaveMatricula) {
+        document.getElementById('titulo').innerText = "Editar Agendamento";
+        btnCadastrar.innerText = "Atualizar Agendamento";
+
+        instrutorSelect.value = ag.instrutor.cpf;
+        alunoSelect.value = ag.aluno.cpf;
+        aeronaveSelect.value = ag.aeronave.matricula;
+        dataAgendamentoInput.value = new Date(ag.horario_partida).toISOString().slice(0,16);
+        retornoInput.value = new Date(ag.horario_retorno).toISOString().slice(0,16);
+        partidaInput.value = ag.partida;
+        destinoInput.value = ag.destino;
+        tipoVooSelect.value = ag.tipo_voo;
+        statusInput.value = ag.status || "Agendado";
+      } catch (err) {
+        Swal.fire("Erro", "Não foi possível carregar o agendamento.\n" + err, "error");
+        console.error(err);
+      }
+    }
+
+    if (agendamentoId) carregarAgendamento(agendamentoId);
+
+    // Cadastrar ou atualizar agendamento
+    async function salvarAgendamento(forcar = false) {
+      const ag = {
+        aeronave: { matricula: aeronaveSelect.value },
+        aluno: { cpf: alunoSelect.value },
+        instrutor: { cpf: instrutorSelect.value },
+        partida: partidaInput.value.trim(),
+        destino: destinoInput.value.trim(),
+        tipo_voo: tipoVooSelect.value,
+        status: statusInput.value,
+        horario_partida: new Date(dataAgendamentoInput.value).toISOString(),
+        horario_retorno: new Date(retornoInput.value).toISOString()
+      };
+
+      // Validações
+      if (!ag.aeronave.matricula || !ag.aluno.cpf || !ag.instrutor.cpf) {
         Swal.fire("Atenção", "Aluno, Instrutor e Aeronave são obrigatórios.", "warning");
         return;
       }
-      if (!dataAgendamentoVal) {
-        Swal.fire("Atenção", "Informe a data e horário de partida.", "warning");
+      if (!dataAgendamentoInput.value || !retornoInput.value) {
+        Swal.fire("Atenção", "Informe horários de partida e retorno.", "warning");
         return;
       }
-      if (!retornoVal) {
-        Swal.fire("Atenção", "Informe a data e horário de retorno.", "warning");
-        return;
-      }
-
-      // Verifica se retorno é após partida
-      const partidaDate = new Date(dataAgendamentoVal);
-      const retornoDate = new Date(retornoVal);
-      if (retornoDate < partidaDate) {
+      if (new Date(ag.horario_retorno) < new Date(ag.horario_partida)) {
         Swal.fire("Atenção", "O retorno deve ser igual ou posterior à partida.", "warning");
         return;
       }
 
-      // Monta o objeto do agendamento
-      const agendamentocad = {
-        aeronave: { matricula: aeronaveMatricula },
-        aluno: { cpf: alunoCpf },
-        instrutor: { cpf: instrutorCpf },
-        partida: partida,
-        destino: destino,
-        tipo_voo: tipoVoo,
-        status: status,
-        horario_partida: partidaDate.toISOString(),
-        horario_retorno: retornoDate.toISOString()
-      };
+      const method = agendamentoId ? "PUT" : "POST";
+      const url = agendamentoId ? `${baseUrl}/agendamentos/${agendamentoId}?forcar=${forcar}` : `${baseUrl}/agendamentos?forcar=${forcar}`;
 
-      // Envia para a API
       try {
-        let res = await fetch(baseUrl + '/agendamentos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(agendamentocad)
+        const res = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(ag)
         });
         const body = await res.json();
 
-        // Verifica se houve erro na resposta
         if (!res.ok) {
-          Swal.fire("Erro", body.error || ('Erro: ' + res.statusText), "error");
+          Swal.fire("Erro", body.error || "Falha ao salvar agendamento.", "error");
           return;
         }
-        // Verifica se há aviso na resposta
+
         if (body.warn) {
           Swal.fire({
             title: "Atenção",
-            text: body.warn + "\n\nDeseja forçar o agendamento mesmo assim?",
+            text: body.warn + "\n\nDeseja forçar mesmo assim?",
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Forçar",
             cancelButtonText: "Cancelar"
-          }).then(async (result) => {
-            if (result.isConfirmed) {
-              const res2 = await fetch(baseUrl + '/agendamentos?forcar=true', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(agendamentocad)
-              });
-              // Verifica se houve erro na resposta
-              const body2 = await res2.json();
-              if (!res2.ok) {
-                Swal.fire("Erro", body2.error || ('Erro: ' + res2.statusText), "error");
-                return;
-              }
-              // Sucesso
-              Swal.fire("Sucesso", "Agendamento criado com sucesso (forçado). ID: " + (body2.agendamento || ""), "success").then(() => {
-                window.location.href = "agendamento.html";
-              });
-            } else {
-              Swal.fire("Cancelado", "Agendamento não cadastrado.", "info");
-            }
+          }).then(async result => {
+            if (result.isConfirmed) salvarAgendamento(true);
           });
           return;
         }
 
-        Swal.fire("Sucesso", "Agendamento criado com sucesso. ID: " + (body.agendamento || ""), "success").then(() => {
-          window.location.href = "agendamento.html";
-        });
+        Swal.fire("Sucesso", agendamentoId ? "Agendamento atualizado com sucesso!" : "Agendamento criado com sucesso!", "success")
+          .then(() => window.location.href = "agendamento.html");
 
       } catch (err) {
+        Swal.fire("Erro", "Não foi possível conectar à API.\n" + err, "error");
         console.error(err);
-        Swal.fire("Erro", "Erro ao comunicar com a API: " + err.message, "error");
       }
-    });
+    }
+
+    btnCadastrar.addEventListener('click', () => salvarAgendamento());
   </script>
 </body>
-
 </html>
