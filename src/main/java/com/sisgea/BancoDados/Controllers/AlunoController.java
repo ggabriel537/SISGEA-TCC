@@ -9,6 +9,7 @@ import com.sisgea.Entidades.Endereco;
 public class AlunoController {
     public static void salvarAluno(String cpf, Integer canac, String nome, String telefone, String email, String curso, Endereco endereco, Float horas_compradas, Float horas_voadas) {
         Aluno aluno = new Aluno();
+        aluno.setAtivo(true);
         aluno.setCpf(cpf);
         aluno.setCanac(canac);
         aluno.setNome(nome);
@@ -22,6 +23,7 @@ public class AlunoController {
     }
 
     public static void salvarAluno(Aluno aluno) {
+        aluno.setAtivo(true);
         AlunoModel.salvarAluno(aluno);
     }
 
@@ -34,7 +36,8 @@ public class AlunoController {
     }
 
     public static void deletarAluno(Aluno aluno) {
-        AlunoModel.excluirAluno(aluno);
+        aluno.setAtivo(false);
+        AlunoModel.atualizarAluno(aluno);
     }
 
     public static void atualizarAluno(Aluno aluno) {

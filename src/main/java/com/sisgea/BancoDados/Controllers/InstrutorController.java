@@ -12,10 +12,12 @@ public class InstrutorController {
                                        String usuarioStr, String senha, Integer permissao) {
         Usuario usuario = new Usuario(usuarioStr, senha, permissao);
         Instrutor instrutor = new Instrutor(usuario, nome, cpf, telefone, email, null, null);
+        instrutor.setAtivo(true);
         InstrutorModel.salvarInstrutor(instrutor);
     }
 
     public static void salvarInstrutor(Instrutor instrutor) {
+        instrutor.setAtivo(true);
         InstrutorModel.salvarInstrutor(instrutor);
     }
 
@@ -28,7 +30,11 @@ public class InstrutorController {
     }
 
     public static void deletarInstrutor(String id) {
-        InstrutorModel.excluirInstrutor(id);
+        Instrutor instrutor = InstrutorModel.buscarInstrutor(id);
+        if (instrutor != null) {
+            instrutor.setAtivo(false);
+            InstrutorModel.atualizarInstrutor(instrutor);
+        }
     }
 
     public static void atualizarInstrutor(Instrutor instrutor) {

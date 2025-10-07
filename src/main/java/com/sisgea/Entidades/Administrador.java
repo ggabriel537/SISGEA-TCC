@@ -16,6 +16,9 @@ public class Administrador {
 @JoinColumn(name = "usuario_id", unique = true)
     private Usuario usuario;
 
+    @Column(name = "ativo")
+    private boolean ativo;
+
     public Administrador() {
     }
 
@@ -46,5 +49,13 @@ public class Administrador {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 }

@@ -34,6 +34,9 @@ public class Aeronave {
     @OneToMany(mappedBy = "aeronaveId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<DiarioBordo> diarioBordos;
 
+    @Column(name = "ativo")
+    private boolean ativo;
+
     public Aeronave() {}
 
     public Aeronave(String matricula, String modelo, String fabricante, String habilitacao, String tipo_de_voo) {
@@ -106,5 +109,13 @@ public class Aeronave {
 
     public void setManutencoes(List<Manutencao> manutencoes) {
         this.manutencoes = manutencoes;
+    }
+
+    public boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 }

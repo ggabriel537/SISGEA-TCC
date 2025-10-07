@@ -10,6 +10,7 @@ public class AeronaveController {
     public static void salvarAeronave(
         String matricula, String modelo, String fabricante, String habilitacao, String tipo_de_voo, Float horas_de_voo, List<Manutencao> manutencoes) {
         Aeronave aeronave = new Aeronave();
+        aeronave.setAtivo(true);
         aeronave.setMatricula(matricula);
         aeronave.setModelo(modelo);
         aeronave.setFabricante(fabricante);
@@ -21,6 +22,7 @@ public class AeronaveController {
     }
 
     public static void salvarAeronave(Aeronave aeronave) {
+        aeronave.setAtivo(true);
         AeronaveModel.salvarAeronave(aeronave);
     }
 
@@ -33,7 +35,8 @@ public class AeronaveController {
     }
 
     public static void deletarAeronave(Aeronave aeronave) {
-        AeronaveModel.excluirAeronave(aeronave);
+        aeronave.setAtivo(false);
+        AeronaveModel.atualizarAeronave(aeronave);
     }
 
     public static void atualizarAeronave(Aeronave aeronave) {

@@ -25,6 +25,8 @@
   </div>
 
   <div class="main">
+    <a class="add-button" href="adicionarinstrutor.html">+</a>
+
     <h1>Lista de Instrutores</h1>
 
     <div class="filtros">
@@ -36,12 +38,18 @@
 
       <label>Filtrar por CANAC:</label>
       <input type="text" id="filtro-canac" placeholder="Digite o CANAC" oninput="aplicarFiltros()">
-      <br><br>
+
+      <label>Filtrar por Status:</label>
+      <select id="filtro-status" onchange="aplicarFiltros()">
+        <option value="ativos">Somente Ativos</option>
+        <option value="inativos">Somente Inativos</option>
+        <option value="todos">Todos</option>
+      </select>
     </div>
+    <br><br>
 
     <div class="container" id="lista-instrutores">
       <ul id="instrutores-list"></ul>
-      <a href="adicionarinstrutor.html" class="add-button">+</a>
     </div>
   </div>
 
@@ -74,18 +82,23 @@
       const filtroNome = document.getElementById("filtro-nome").value.toLowerCase();
       const filtroCPF = document.getElementById("filtro-cpf").value.replace(/\D/g, "");
       const filtroCANAC = document.getElementById("filtro-canac").value.toLowerCase();
+      const filtroStatus = document.getElementById("filtro-status").value;
 
       const lista = document.getElementById("instrutores-list");
       lista.innerHTML = "";
 
-      let filtrados = instrutoresCarregados.filter(inst => {
-        const nome = inst.nome?.toLowerCase() || "";
-        const cpf = inst.cpf?.replace(/\D/g, "") || "";
-        const canac = inst.canac ? inst.canac.toString().toLowerCase() : "";
+      let filtrados = instrutoresCarregados.filter(instrutor => {
+        const nome = instrutor.nome?.toLowerCase() || "";
+        const cpf = instrutor.cpf?.replace(/\D/g, "") || "";
+        const canac = instrutor.canac ? instrutor.canac.toString().toLowerCase() : "";
+        const ativo = instrutor.ativo === true;
 
         if (filtroNome && !nome.includes(filtroNome)) return false;
         if (filtroCPF && !cpf.includes(filtroCPF)) return false;
         if (filtroCANAC && !canac.includes(filtroCANAC)) return false;
+
+        if (filtroStatus === "ativos" && !ativo) return false;
+        if (filtroStatus === "inativos" && ativo) return false;
 
         return true;
       });
@@ -95,18 +108,18 @@
         return;
       }
 
-      // Cria os itens da lista para cada instrutor filtrado
-      filtrados.forEach(inst => {
+      filtrados.forEach(instrutor => {
         const item = document.createElement("li");
         item.innerHTML = `
-          <span>
-            ${inst.nome || "Sem nome"} - CPF: ${formatarCPF(inst.cpf) || "N/A"} - CANAC: ${inst.canac || "Sem CANAC"}
-          </span>
-          <div class="list-buttons">
-            <button onclick="editarInstrutor('${inst.cpf}')">Editar</button>
-            <button onclick="deletarInstrutor('${inst.cpf}')">Excluir</button>
-          </div>
-        `;
+        <span>${instrutor.nome || "Sem nome"} - CPF: ${formatarCPF(instrutor.cpf) || "N/A"} - CANAC: ${instrutor.canac || "Sem CANAC"} - ${(instrutor.ativo ? "Ativo" : "Inativo")}</span>
+        <div class="list-buttons">
+          <button onclick="editarInstrutor('${instrutor.cpf}')">Editar</button>
+          ${instrutor.ativo
+            ? `<button onclick="deletarInstrutor('${instrutor.cpf}')">Excluir</button>`
+            : `<button onclick="recuperarInstrutor('${instrutor.cpf}')">Recuperar</button>`
+          }
+        </div>
+      `;
         lista.appendChild(item);
       });
     }
@@ -116,12 +129,11 @@
       window.location.href = `adicionarinstrutor.html?cpf=${cpf}`;
     }
 
-
     // Deleta um instrutor com confirmação
     async function deletarInstrutor(cpf) {
       Swal.fire({
         title: 'Tem certeza?',
-        text: "O instrutor será excluído e você não poderá reverter esta ação!",
+        text: "O instrutor será removido e você não poderá reverter esta ação!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#c00',
@@ -133,12 +145,7 @@
           try {
             const response = await fetch(`http://localhost:8080/api/instrutores/${cpf}`, { method: "DELETE" });
             if (response.ok) {
-              Swal.fire({
-                title: 'Excluído!',
-                text: 'O instrutor foi removido com sucesso.',
-                icon: 'success',
-                confirmButtonColor: '#c00'
-              });
+              Swal.fire('Excluído!', 'O instrutor foi removido com sucesso.', 'success');
               carregarInstrutores();
             } else {
               Swal.fire('Erro', 'Não foi possível excluir o instrutor.', 'error');
@@ -151,9 +158,49 @@
       });
     }
 
-    // Inicializa a página carregando os instrutores
+    // Recupera instrutor (seta ativo = true)
+    async function recuperarInstrutor(cpf) {
+      try {
+        const response = await fetch(`http://localhost:8080/api/instrutores/${cpf}`);
+        if (!response.ok) throw new Error("Erro ao buscar instrutor");
+        const instrutor = await response.json();
+
+        instrutor.ativo = true;
+
+        const update = await fetch(`http://localhost:8080/api/instrutores/${cpf}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cpf: instrutor.cpf,
+            nome: instrutor.nome,
+            telefone: instrutor.telefone,
+            email: instrutor.email,
+            habilitacao: instrutor.habilitacao,
+            canac: instrutor.canac,
+            endereco: instrutor.endereco,
+            usuario: instrutor.usuario,
+            ativo: instrutor.ativo
+          })
+        });
+
+        if (update.ok) {
+          Swal.fire("Sucesso", "Instrutor recuperado com sucesso!", "success")
+            .then(() => carregarInstrutores());
+        } else {
+          Swal.fire("Erro", "Não foi possível recuperar o instrutor.", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Erro", "Falha de conexão com o servidor.", "error");
+      }
+    }
+
+
+
+
     carregarInstrutores();
   </script>
+
 </body>
 
 </html>

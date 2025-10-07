@@ -132,6 +132,7 @@ public class InstrutorAPI {
         existente.setHabilitacao(i.getHabilitacao());
         existente.setCanac(i.getCanac());
         existente.setEndereco(i.getEndereco());
+        existente.setAtivo(i.getAtivo());
 
         // Mantém o mesmo usuário (login) e só atualiza a senha
         Usuario user = existente.getUsuario();

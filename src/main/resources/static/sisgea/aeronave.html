@@ -25,6 +25,8 @@
   </div>
 
   <div class="main">
+    <a class="add-button" href="adicionaraeronave.html">+</a>
+
     <h1>Lista de Aeronaves</h1>
 
     <div class="filtros">
@@ -52,12 +54,18 @@
         <option>VFR-N</option>
         <option>IFR</option>
       </select>
+
+      <label>Status</label>
+      <select id="filtro-ativo" onchange="aplicarFiltros()">
+        <option value="true">Somente Ativos</option>
+        <option value="false">Somente Inativos</option>
+        <option value="">Todos</option>
+      </select>
     </div>
     <br><br>
 
     <div class="container" id="lista-aeronaves">
       <ul id="aeronaves-list"></ul>
-      <a href="adicionaraeronave.html" class="add-button">+</a>
     </div>
   </div>
 
@@ -67,16 +75,14 @@
 
     // Formata matrícula para o padrão XX-XXX
     function formatarMatricula(input) {
-            let valor = input.value.toUpperCase().replace(/[^A-Z]/g, "");
+      let valor = input.value.toUpperCase().replace(/[^A-Z]/g, "");
+      if (valor.length > 2) {
+        valor = valor.slice(0, 2) + "-" + valor.slice(2, 5);
+      }
+      input.value = valor;
+    }
 
-            if (valor.length > 2) {
-                valor = valor.slice(0, 2) + "-" + valor.slice(2, 5);
-            }
-
-            input.value = valor;
-        }
-
-        // Formata horas de voo
+    // Formata horas de voo
     function formatarHoras(horas) {
       return horas ? `${horas}h` : "0h";
     }
@@ -103,6 +109,7 @@
       const filtroFabricante = document.getElementById("filtro-fabricante").value.toLowerCase();
       const filtroHabilitacao = document.getElementById("filtro-habilitacao").value;
       const filtroTipo = document.getElementById("filtro-tipo").value;
+      const filtroAtivo = document.getElementById("filtro-ativo").value;
 
       const lista = document.getElementById("aeronaves-list");
       lista.innerHTML = "";
@@ -113,12 +120,14 @@
         const fabricante = aer.fabricante?.toLowerCase() || "";
         const habilitacao = aer.habilitacao || "";
         const tipo = aer.tipo_de_voo || "";
+        const ativo = aer.ativo !== undefined ? aer.ativo.toString() : "";
 
         if (filtroMatricula && !matricula.includes(filtroMatricula)) return false;
         if (filtroModelo && !modelo.includes(filtroModelo)) return false;
         if (filtroFabricante && !fabricante.includes(filtroFabricante)) return false;
         if (filtroHabilitacao && habilitacao !== filtroHabilitacao) return false;
         if (filtroTipo && tipo !== filtroTipo) return false;
+        if (filtroAtivo && ativo !== filtroAtivo) return false;
 
         return true;
       });
@@ -137,7 +146,11 @@
           </span>
           <div class="list-buttons">
             <button onclick="editarAeronave('${aer.matricula}')">Editar</button>
-            <button onclick="deletarAeronave('${aer.matricula}')">Excluir</button>
+            ${
+              aer.ativo
+                ? `<button onclick="deletarAeronave('${aer.matricula}')">Excluir</button>`
+                : `<button onclick="recuperarAeronave('${aer.matricula}')">Recuperar</button>`
+            }
           </div>
         `;
         lista.appendChild(item);
@@ -170,7 +183,8 @@
                 text: 'A aeronave foi removida com sucesso.',
                 icon: 'success',
                 confirmButtonColor: '#c00'
-              }).then(() => carregarAeronaves());
+              });
+              carregarAeronaves();
             } else {
               Swal.fire('Erro', 'Não foi possível excluir a aeronave.', 'error');
             }
@@ -180,6 +194,33 @@
           }
         }
       });
+    }
+
+    // Recupera aeronave (seta ativo = true)
+    async function recuperarAeronave(matricula) {
+      try {
+        const response = await fetch(`http://localhost:8080/api/aeronaves/${matricula}`);
+        if (!response.ok) throw new Error("Erro ao buscar aeronave");
+        const aeronave = await response.json();
+
+        aeronave.ativo = true;
+
+        const update = await fetch(`http://localhost:8080/api/aeronaves/${matricula}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(aeronave)
+        });
+
+        if (update.ok) {
+          Swal.fire("Sucesso", "Aeronave recuperada com sucesso!", "success")
+            .then(() => carregarAeronaves());
+        } else {
+          Swal.fire("Erro", "Não foi possível recuperar a aeronave.", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Erro", "Falha de conexão com o servidor.", "error");
+      }
     }
 
     // Inicializa a página carregando as aeronaves

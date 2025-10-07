@@ -32,6 +32,9 @@ public class Instrutor {
     @JoinColumn(name = "usuario_id", unique = true, nullable = false)
     private Usuario usuario;
 
+    @Column(name = "ativo")
+    private boolean ativo;
+
     public Instrutor() {
     }
 
@@ -107,5 +110,13 @@ public class Instrutor {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 }

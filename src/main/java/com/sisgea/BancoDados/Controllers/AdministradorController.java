@@ -11,10 +11,12 @@ public class AdministradorController {
     public static void salvarAdministrador(String nome, String usuario, String senha, Integer permissao) {
         Usuario user = new Usuario(usuario, senha, permissao);
         Administrador administrador = new Administrador(user, nome);
+        administrador.setAtivo(true);
         AdministradorModel.salvarAdministrador(administrador);
     }
 
     public static void salvarAdministrador(Administrador administrador) {
+        administrador.setAtivo(true);
         AdministradorModel.salvarAdministrador(administrador);
     }
 
@@ -27,7 +29,8 @@ public class AdministradorController {
     }
 
     public static void deletarAdministrador(Administrador administrador) {
-        AdministradorModel.excluirAdministrador(administrador);
+        administrador.setAtivo(false);
+        AdministradorModel.atualizarAdministrador(administrador);
     }
 
     public static void atualizarAdministrador(Administrador administrador) {

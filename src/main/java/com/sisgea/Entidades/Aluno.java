@@ -33,6 +33,9 @@ public class Aluno {
     @Column(name = "horas_voadas")
     private Float horas_voadas;
 
+    @Column(name = "ativo")
+    private boolean ativo;
+
     public Aluno() {}
 
     public Aluno(String nome, String cpf, String telefone, String email, String curso) {
@@ -113,5 +116,13 @@ public class Aluno {
 
     public void setHoras_voadas(Float horas_voadas) {
         this.horas_voadas = horas_voadas;
+    }
+
+    public boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 }
