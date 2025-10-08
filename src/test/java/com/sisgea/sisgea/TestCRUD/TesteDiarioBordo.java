@@ -23,7 +23,7 @@ class TesteDiarioBordo {
                 aeronaveId, 1, new Date(System.currentTimeMillis()), "AlunoFunc", "InstrutorFunc",
                 10f, new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()), 
                 "Origem", "Destino", new Date(System.currentTimeMillis()), 5f, 3f, 4f, 2f, 1f, 
-                100f, 3, 2, 200f, "Nat", "Ocorrencias");
+                "100kg", 3, 2, "200kg", "Nat", "Ocorrencias");
 
         List<DiarioBordo> lista = DiarioBordoController.listarDiariosBordo();
         assertFalse(lista.isEmpty(), "Diario de bordo não foi salvo.");
@@ -50,7 +50,7 @@ class TesteDiarioBordo {
                 aeronaveId, 2, new Date(System.currentTimeMillis()), "AlunoFunc2", "InstrutorFunc2",
                 20f, new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()), 
                 "Origem2", "Destino2", new Date(System.currentTimeMillis()), 6f, 4f, 5f, 3f, 2f, 
-                150f, 4, 3, 250f, "Nat2", "Ocorrencias2");
+                "150kg", 4, 3, "250kg", "Nat2", "Ocorrencias2");
 
         DiarioBordo diarioBordo = DiarioBordoController.listarDiariosBordo().stream()
                 .filter(d -> d.getAeronaveId().equals(aeronaveId) && d.getNroDiario() == 2)
@@ -78,7 +78,7 @@ class TesteDiarioBordo {
                 aeronaveId, 3, new Date(System.currentTimeMillis()), "AlunoFunc3", "InstrutorFunc3",
                 30f, new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()), 
                 "Origem3", "Destino3", new Date(System.currentTimeMillis()), 7f, 5f, 6f, 4f, 3f, 
-                200f, 5, 4, 300f, "Nat3", "Ocorrencias3");
+                "200lbs", 5, 4, "300lbs", "Nat3", "Ocorrencias3");
 
         DiarioBordo diarioBordo = DiarioBordoController.listarDiariosBordo().stream()
                 .filter(d -> d.getAeronaveId().equals(aeronaveId) && d.getNroDiario() == 3)

@@ -71,7 +71,7 @@ public class DiarioBordo {
     private Float horasIfrC;
 
     @Column(name = "combustivel_utilizado")
-    private Float combustivelUtilizado;
+    private String combustivelUtilizado;
 
     @Column(name = "ciclos")
     private Integer ciclos;
@@ -80,7 +80,7 @@ public class DiarioBordo {
     private Integer pob;
 
     @Column(name = "carga")
-    private Float carga;
+    private String carga;
 
     @Column(name = "nat")
     private String nat;
@@ -230,11 +230,11 @@ public class DiarioBordo {
         this.horasIfrC = horasIfrC;
     }
 
-    public Float getCombustivelUtilizado() {
+    public String getCombustivelUtilizado() {
         return combustivelUtilizado;
     }
 
-    public void setCombustivelUtilizado(Float combustivelUtilizado) {
+    public void setCombustivelUtilizado(String combustivelUtilizado) {
         this.combustivelUtilizado = combustivelUtilizado;
     }
 
@@ -254,11 +254,11 @@ public class DiarioBordo {
         this.pob = pob;
     }
 
-    public Float getCarga() {
+    public String getCarga() {
         return carga;
     }
 
-    public void setCarga(Float carga) {
+    public void setCarga(String carga) {
         this.carga = carga;
     }
 

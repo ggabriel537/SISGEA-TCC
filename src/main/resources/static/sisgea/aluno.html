@@ -67,6 +67,19 @@
     // Lista alunos
     let alunosCarregados = [];
 
+    function formatarHorasDecimais(valor) {
+      if (!valor || isNaN(valor)) return "0h";
+
+      const horas = Math.floor(valor);
+      const minutos = Math.round((valor - horas) * 60);
+
+      let texto = "";
+      if (horas > 0) texto += `${horas} ${horas === 1 ? "Hora" : "Horas"}`;
+      if (minutos > 0) texto += `${texto ? " e " : ""}${minutos} Minutos`;
+
+      return texto || "0h";
+    }
+
 
     // Formata CPF no padrão xxx.xxx.xxx-xx
     function formatarCPF(cpf) {
@@ -124,14 +137,13 @@
       filtrados.forEach(aluno => {
         const item = document.createElement("li");
         item.innerHTML = `
-          <span>${aluno.nome || "Sem nome"} - CPF: ${formatarCPF(aluno.cpf) || "N/A"} - CANAC: ${aluno.canac || "Sem CANAC"} - Curso: ${aluno.curso || "Sem curso"} - ${aluno.horas_compradas || 0}h - ${(aluno.ativo ? "Ativo" : "Inativo")}</span>
+          <span>${aluno.nome || "Sem nome"} - CPF: ${formatarCPF(aluno.cpf) || "N/A"} - CANAC: ${aluno.canac || "Sem CANAC"} - Curso: ${aluno.curso || "Sem curso"} - ${formatarHorasDecimais(aluno.horas_compradas || 0)} - ${(aluno.ativo ? "Ativo" : "Inativo")}</span>
           <div class="list-buttons">
             <button onclick="editarAluno('${aluno.cpf}')">Editar</button>
-            ${
-              aluno.ativo
-                ? `<button onclick="deletarAluno('${aluno.cpf}')">Excluir</button>`
-                : `<button onclick="recuperarAluno('${aluno.cpf}')">Recuperar</button>`
-            }
+            ${aluno.ativo
+            ? `<button onclick="deletarAluno('${aluno.cpf}')">Excluir</button>`
+            : `<button onclick="recuperarAluno('${aluno.cpf}')">Recuperar</button>`
+          }
           </div>
         `;
         lista.appendChild(item);

@@ -39,10 +39,10 @@
     </select>
 
     <label>Origem:</label>
-    <input type="text" id="filtro-origem" placeholder="Código do aeroporto" oninput="aplicarFiltros()">
+    <input type="text" id="filtro-origem" placeholder="Código do aeroporto" oninput="caixaAlta(this)" maxlength="4">
 
     <label>Destino:</label>
-    <input type="text" id="filtro-destino" placeholder="Código do aeroporto" oninput="aplicarFiltros()">
+    <input type="text" id="filtro-destino" placeholder="Código do aeroporto" oninput="caixaAlta(this)" maxlength="4">
 
     <label>Instrutor:</label>
     <select id="filtro-instrutor" onchange="aplicarFiltros()">
@@ -67,6 +67,11 @@ let diariosCarregados = [];
 let alunosCarregados = [];
 let instrutoresCarregados = [];
 let aeronavesCarregadas = [];
+
+function caixaAlta(input) {
+  input.value = input.value.toUpperCase();
+  aplicarFiltros();
+}
 
 // Carrega diários do backend
 async function carregarDiarios() {

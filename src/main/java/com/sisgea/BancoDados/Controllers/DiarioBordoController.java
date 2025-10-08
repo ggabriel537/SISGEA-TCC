@@ -24,10 +24,10 @@ public class DiarioBordoController {
             Float horasVfr,
             Float horasIfr,
             Float horasIfrC,
-            Float combustivelUtilizado,
+            String combustivelUtilizado,
             Integer ciclos,
             Integer pob,
-            Float carga,
+            String carga,
             String nat,
             String ocorrencias) {
         DiarioBordo diario = new DiarioBordo();

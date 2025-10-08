@@ -27,12 +27,12 @@
         <h1 id="titulo">Cadastro de Diário de Bordo</h1>
         <div class="container" id="diario-container">
             <label>Aeronave</label>
-            <select id="aeronave">
-                <option value="" disabled selected>Selecione a Aeronave...</option>
+            <select id="aeronave" onchange="gerarNumeroDiario(this.value); atualizarHoraAeronave();">
+                <option value="" selected>Selecione a Aeronave...</option>
             </select>
 
             <label>Número do Diário</label>
-            <input type="number" id="nro-diario">
+            <input type="number" id="nro-diario" readonly>
 
             <label>Data</label>
             <input type="date" id="data">
@@ -43,7 +43,22 @@
             </select>
 
             <label>Função do Aluno</label>
-            <input type="text" id="funcao-aluno" placeholder="Ex: Piloto em comando, Copiloto...">
+            <select id="funcao-aluno">
+                <option value="" selected>Selecione a Função...</option>
+                <option value="P1">P1 - Piloto em Comando</option>
+                <option value="I1">I1 - Piloto em Instrução</option>
+                <option value="I2">I2 - Piloto em Instrução para Comando</option>
+                <option value="O1">O1 - Segundo em Comando (Copiloto)</option>
+                <option value="O2">O2 - Segundo em Comando (Copiloto) Regulamentar</option>
+                <option value="O3">O3 - Segundo em Comando (Copiloto) Dual Pilot</option>
+                <option value="V1">V1 - Instrutor de Voo</option>
+                <option value="V2">V2 - Instrutor Voo em Solo</option>
+                <option value="V3">V3 - Instrutor Observador</option>
+                <option value="C">C - Comissário</option>
+                <option value="M">M - Mecânico de Voo</option>
+                <option value="X">X - Tripulante Extra</option>
+                <option value="D">D - Outro</option>
+            </select>
 
             <label>Instrutor</label>
             <select id="instrutor">
@@ -51,10 +66,25 @@
             </select>
 
             <label>Função do Instrutor</label>
-            <input type="text" id="funcao-instrutor" placeholder="Ex: Instrutor de voo, Observador...">
+            <select id="funcao-instrutor">
+                <option value="" selected>Selecione a Função...</option>
+                <option value="P1">P1 - Piloto em Comando</option>
+                <option value="I1">I1 - Piloto em Instrução</option>
+                <option value="I2">I2 - Piloto em Instrução para Comando</option>
+                <option value="O1">O1 - Segundo em Comando (Copiloto)</option>
+                <option value="O2">O2 - Segundo em Comando (Copiloto) Regulamentar</option>
+                <option value="O3">O3 - Segundo em Comando (Copiloto) Dual Pilot</option>
+                <option value="V1">V1 - Instrutor de Voo</option>
+                <option value="V2">V2 - Instrutor Voo em Solo</option>
+                <option value="V3">V3 - Instrutor Observador</option>
+                <option value="C">C - Comissário</option>
+                <option value="M">M - Mecânico de Voo</option>
+                <option value="X">X - Tripulante Extra</option>
+                <option value="D">D - Outro</option>
+            </select>
 
             <label>Hora Aeronave</label>
-            <input type="number" step="0.1" id="hora-aeronave">
+            <input type="number" id="hora-aeronave" readonly>
 
             <label>Data de Decolagem</label>
             <input type="datetime-local" id="data-decolagem">
@@ -63,31 +93,31 @@
             <input type="datetime-local" id="data-pouso">
 
             <label>Local de Decolagem</label>
-            <input type="text" id="local-decolagem">
+            <input type="text" id="local-decolagem" maxlength="4" oninput="caixaAlta(this)">
 
             <label>Local de Pouso</label>
-            <input type="text" id="local-pouso">
+            <input type="text" id="local-pouso" maxlength="4" oninput="caixaAlta(this)">
 
             <label>Data de Corte</label>
             <input type="datetime-local" id="data-corte">
 
             <label>Horas Diurno</label>
-            <input type="number" step="0.1" id="horas-diu">
+            <input type="number" step="0.1" id="horas-diu" oninput="atualizarHoraAeronave()">
 
             <label>Horas Noturno</label>
-            <input type="number" step="0.1" id="horas-not">
+            <input type="number" step="0.1" id="horas-not" oninput="atualizarHoraAeronave()">
 
             <label>Horas VFR</label>
-            <input type="number" step="0.1" id="horas-vfr">
+            <input type="number" step="0.1" id="horas-vfr" oninput="atualizarHoraAeronave()">
 
             <label>Horas IFR</label>
-            <input type="number" step="0.1" id="horas-ifr">
+            <input type="number" step="0.1" id="horas-ifr" oninput="atualizarHoraAeronave()">
 
-            <label>Horas IFR C</label>
-            <input type="number" step="0.1" id="horas-ifr-c">
+            <label>Horas IFR Sob Capota</label>
+            <input type="number" step="0.1" id="horas-ifr-c" oninput="atualizarHoraAeronave()">
 
             <label>Combustível Utilizado</label>
-            <input type="number" step="0.1" id="combustivel">
+            <input type="text" id="combustivel">
 
             <label>Ciclos</label>
             <input type="number" step="1" id="ciclos">
@@ -96,10 +126,21 @@
             <input type="number" step="1" id="pob">
 
             <label>Carga</label>
-            <input type="number" step="0.1" id="carga">
+            <input type="text" id="carga">
 
             <label>Natureza</label>
-            <input type="text" id="nat">
+            <select id="nat">
+                <option value="" selected>Selecione a Natureza...</option>
+                <option value="AE">AE - Autorização Especial</option>
+                <option value="CQ">CQ - Exame Prático (Voo de Cheque)</option>
+                <option value="EX">EX - Experiência</option>
+                <option value="NR">NR - Voo Não Regular</option>
+                <option value="RE">RE - Voo Regular</option>
+                <option value="PV">PV - Uso Privado</option>
+                <option value="SA">SA - Serviço Aéreo</option>
+                <option value="AE">TN - Treinamento</option>
+                <option value="AE">TR - Traslado</option>
+            </select>
 
             <label>Ocorrências</label>
             <textarea id="ocorrencias" rows="4"></textarea>
@@ -119,6 +160,54 @@
         let instrutoresCarregados = [];
         let diarioId = new URLSearchParams(window.location.search).get("id");
         let editar = diarioId !== null;
+        let aeronave_selecionada = null;
+
+        function caixaAlta(input) {
+            input.value = input.value.toUpperCase();
+            aplicarFiltros();
+        }
+
+        function formatarDataHoraLocal(dateString) {
+            if (!dateString) return "";
+            const d = new Date(dateString);
+            const hasTZ = /Z$|[+\-]\d{2}:\d{2}$/.test(dateString);
+            const ano = hasTZ ? d.getUTCFullYear() : d.getFullYear();
+            const mes = (hasTZ ? d.getUTCMonth() : d.getMonth()) + 1;
+            const dia = hasTZ ? d.getUTCDate() : d.getDate();
+            const hora = hasTZ ? d.getUTCHours() : d.getHours();
+            const minuto = hasTZ ? d.getUTCMinutes() : d.getMinutes();
+            return `${ano}-${String(mes).padStart(2, "0")}-${String(dia).padStart(2, "0")}T${String(hora).padStart(2, "0")}:${String(minuto).padStart(2, "0")}`;
+        }
+
+
+
+        async function gerarNumeroDiario(aeronaveId) {
+            const diariosCarregados = await fetch("http://localhost:8080/api/diarios-bordo").then(res => res.json());
+            let ultimoNumero = 0;
+
+            for (let i = 0; i < diariosCarregados.length; i++) {
+                const d = diariosCarregados[i];
+                if (d.aeronaveId === aeronaveId && d.nroDiario > ultimoNumero) {
+                    ultimoNumero = d.nroDiario;
+                }
+            }
+            document.getElementById("nro-diario").value = ultimoNumero + 1;
+        }
+
+
+        async function atualizarHoraAeronave() {
+            let res = await fetch("http://localhost:8080/api/aeronaves/" + document.getElementById("aeronave").value);
+            let aeronave = await res.json();
+            let hora_aeronave = aeronave.horas_de_voo || 0;
+            let horas_diario = 0;
+            horas_diario += parseFloat(document.getElementById("horas-diu").value) || 0;
+            horas_diario += parseFloat(document.getElementById("horas-not").value) || 0;
+            horas_diario += parseFloat(document.getElementById("horas-vfr").value) || 0;
+            horas_diario += parseFloat(document.getElementById("horas-ifr").value) || 0;
+            horas_diario += parseFloat(document.getElementById("horas-ifr-c").value) || 0;
+            hora_aeronave += horas_diario;
+            document.getElementById("hora-aeronave").value = hora_aeronave || 0;
+        }
 
         // Carrega aeronaves, alunos e instrutores do backend
         async function carregarAeronaves() {
@@ -193,11 +282,11 @@
             document.getElementById("aluno").value = diario.alunoId;
             document.getElementById("instrutor").value = diario.instrutorId;
             document.getElementById("hora-aeronave").value = diario.horaAeronave;
-            document.getElementById("data-decolagem").value = diario.dataDecolagem;
-            document.getElementById("data-pouso").value = diario.dataPouso;
+            document.getElementById("data-decolagem").value = formatarDataHoraLocal(diario.dataDecolagem);
+            document.getElementById("data-pouso").value = formatarDataHoraLocal(diario.dataPouso);
             document.getElementById("local-decolagem").value = diario.localDecolagem;
             document.getElementById("local-pouso").value = diario.localPouso;
-            document.getElementById("data-corte").value = diario.dataCorte;
+            document.getElementById("data-corte").value = formatarDataHoraLocal(diario.dataCorte);
             document.getElementById("horas-diu").value = diario.horasDiu;
             document.getElementById("horas-not").value = diario.horasNot;
             document.getElementById("horas-vfr").value = diario.horasVfr;
