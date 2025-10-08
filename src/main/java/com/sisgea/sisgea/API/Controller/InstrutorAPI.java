@@ -36,7 +36,7 @@ public class InstrutorAPI {
 
     @GetMapping("/todos")
     public ResponseEntity<List<Instrutor>> listarTodos() {
-        return ResponseEntity.ok(InstrutorController.listarInstrutores());
+        return ResponseEntity.ok(InstrutorController.listarTodosInstrutores());
     }
 
     @PostMapping

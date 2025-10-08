@@ -24,21 +24,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class LoginController {
 
     public static boolean validarLogin(String usuario, String senha) {
-        List<Instrutor> instrutores = InstrutorController.listarInstrutores();
-        List<Administrador> administradores = AdministradorController.listarAdministradores();
         Usuario u = UsuarioController.buscarUsuarioUsername(usuario);
-        if (u != null) {
-            for (Instrutor inst : instrutores) {
-                if (inst.getUsuario() == u) {
-                    BCryptPasswordEncoder senhahash = new BCryptPasswordEncoder();
-                    return senhahash.matches(senha, u.getSenha());
-                }
+        if (u == null) {
+            return false;
+        }
+        BCryptPasswordEncoder senhahash = new BCryptPasswordEncoder();
+        if (!senhahash.matches(senha, u.getSenha())) {
+            return false;
+        }
+        List<Administrador> administradores = AdministradorController.listarAdministradores();
+        for (Administrador adm : administradores) {
+            if (adm.getUsuario().getUsuario().equals(u.getUsuario()) && adm.getAtivo()) {
+                return true;
             }
-            for (Administrador adm : administradores) {
-                if (adm.getUsuario() == u) {
-                    BCryptPasswordEncoder senhahash = new BCryptPasswordEncoder();
-                    return senhahash.matches(senha, u.getSenha());
-                }
+        }
+        List<Instrutor> instrutores = InstrutorController.listarInstrutores();
+        for (Instrutor inst : instrutores) {
+            if (inst.getUsuario().getUsuario().equals(u.getUsuario()) && inst.getAtivo()) {
+                return true;
             }
         }
         return false;
