@@ -30,6 +30,10 @@ public class AeronaveController {
         return AeronaveModel.listarAeronaves();
     }
 
+    public static List<Aeronave> listarTodasAeronaves() {
+        return AeronaveModel.listarTodasAeronaves();
+    }
+
     public static Aeronave buscarId(String id) {
         return AeronaveModel.buscarAeronave(id);
     }

@@ -77,7 +77,7 @@
     // Carrega alunos do backend
     async function carregarAlunos() {
       try {
-        const response = await fetch("http://localhost:8080/api/alunos");
+        const response = await fetch("http://localhost:8080/api/alunos/todos");
         if (!response.ok) throw new Error("Erro ao buscar alunos");
 
         alunosCarregados = await response.json();

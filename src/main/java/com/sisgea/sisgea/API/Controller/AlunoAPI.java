@@ -15,8 +15,14 @@ public class AlunoAPI {
 
     @GetMapping
     public List<Aluno> listar() {
-        // Lista todos os alunos
+        // Lista todos os alunos ativos
         return AlunoController.listarAlunos();
+    }
+
+    @GetMapping("/todos")
+    public List<Aluno> listarTodos() {
+        // Lista todos os alunos
+        return AlunoController.listarTodosAlunos();
     }
 
     @GetMapping("/{cpf}")
@@ -39,7 +45,7 @@ public class AlunoAPI {
         //
         List<Aluno> alunosExistentes;
         try {
-            alunosExistentes = AlunoController.listarAlunos();
+            alunosExistentes = AlunoController.listarTodosAlunos();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Erro ao listar alunos existentes para validação: " + e.getMessage()));

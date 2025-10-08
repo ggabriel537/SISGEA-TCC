@@ -19,6 +19,13 @@ public class AeronaveModel {
 
     public static List<Aeronave> listarAeronaves() {
         EntityManager em = JPAUtil.getEntityManager();
+        List<Aeronave> lista = em.createQuery("SELECT a FROM Aeronave a where ativo = true", Aeronave.class).getResultList();
+        em.close();
+        return lista;
+    }
+
+    public static List<Aeronave> listarTodasAeronaves() {
+        EntityManager em = JPAUtil.getEntityManager();
         List<Aeronave> lista = em.createQuery("SELECT a FROM Aeronave a", Aeronave.class).getResultList();
         em.close();
         return lista;

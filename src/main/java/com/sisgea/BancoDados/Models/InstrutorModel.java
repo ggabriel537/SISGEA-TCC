@@ -21,6 +21,13 @@ public class InstrutorModel {
 
     public static List<Instrutor> listarInstrutores() {
         EntityManager em = JPAUtil.getEntityManager();
+        List<Instrutor> lista = em.createQuery("SELECT i FROM Instrutor i where ativo = true", Instrutor.class).getResultList();
+        em.close();
+        return lista;
+    }
+
+    public static List<Instrutor> listarTodosInstrutores() {
+        EntityManager em = JPAUtil.getEntityManager();
         List<Instrutor> lista = em.createQuery("SELECT i FROM Instrutor i", Instrutor.class).getResultList();
         em.close();
         return lista;

@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.sisgea.BancoDados.Controllers.DiarioBordoController;
+import com.sisgea.BancoDados.Controllers.AlunoController;
+import com.sisgea.BancoDados.Controllers.AeronaveController;
+import com.sisgea.Entidades.Aluno;
+import com.sisgea.Entidades.Aeronave;
 import com.sisgea.Entidades.DiarioBordo;
 
 @CrossOrigin(origins = "*")
@@ -55,6 +59,35 @@ public class DiarioBordoAPI {
         // CADASTRO DO DIÁRIO DE BORDO
         //
         DiarioBordoController.salvarDiarioBordo(d);
+
+        //
+        // DESCONTA HORAS DO ALUNO
+        //
+        Float horasTotais = (d.getHorasDiu() == null ? 0 : d.getHorasDiu())
+                + (d.getHorasNot() == null ? 0 : d.getHorasNot())
+                + (d.getHorasVfr() == null ? 0 : d.getHorasVfr())
+                + (d.getHorasIfr() == null ? 0 : d.getHorasIfr())
+                + (d.getHorasIfrC() == null ? 0 : d.getHorasIfrC());
+
+        Aluno aluno = AlunoController.buscarId(d.getAlunoId());
+        if (aluno != null) {
+            Float compradas = aluno.getHoras_compradas() == null ? 0 : aluno.getHoras_compradas();
+            Float voadas = aluno.getHoras_voadas() == null ? 0 : aluno.getHoras_voadas();
+            aluno.setHoras_compradas(compradas - horasTotais);
+            aluno.setHoras_voadas(voadas + horasTotais);
+            AlunoController.atualizarAluno(aluno);
+        }
+
+        //
+        // SOMA HORAS NA AERONAVE
+        //
+        Aeronave aeronave = AeronaveController.buscarId(d.getAeronaveId());
+        if (aeronave != null) {
+            Float horasAeronave = aeronave.getHoras_de_voo() == null ? 0 : aeronave.getHoras_de_voo();
+            aeronave.setHoras_de_voo(horasAeronave + horasTotais);
+            AeronaveController.atualizarAeronave(aeronave);
+        }
+
         return ResponseEntity.ok(Map.of("status", "sucesso", "diario", d.getId()));
     }
 
@@ -88,6 +121,43 @@ public class DiarioBordoAPI {
         //
         d.setId(UUID.fromString(id));
         DiarioBordoController.atualizarDiarioBordo(d);
+
+        //
+        // AJUSTA HORAS DO ALUNO
+        //
+        Float horasExistentes = (existente.getHorasDiu() == null ? 0 : existente.getHorasDiu())
+                + (existente.getHorasNot() == null ? 0 : existente.getHorasNot())
+                + (existente.getHorasVfr() == null ? 0 : existente.getHorasVfr())
+                + (existente.getHorasIfr() == null ? 0 : existente.getHorasIfr())
+                + (existente.getHorasIfrC() == null ? 0 : existente.getHorasIfrC());
+
+        Float horasNovas = (d.getHorasDiu() == null ? 0 : d.getHorasDiu())
+                + (d.getHorasNot() == null ? 0 : d.getHorasNot())
+                + (d.getHorasVfr() == null ? 0 : d.getHorasVfr())
+                + (d.getHorasIfr() == null ? 0 : d.getHorasIfr())
+                + (d.getHorasIfrC() == null ? 0 : d.getHorasIfrC());
+
+        Float diferenca = horasNovas - horasExistentes;
+
+        Aluno aluno = AlunoController.buscarId(d.getAlunoId());
+        if (aluno != null) {
+            Float compradas = aluno.getHoras_compradas() == null ? 0 : aluno.getHoras_compradas();
+            Float voadas = aluno.getHoras_voadas() == null ? 0 : aluno.getHoras_voadas();
+            aluno.setHoras_compradas(compradas - diferenca);
+            aluno.setHoras_voadas(voadas + diferenca);
+            AlunoController.atualizarAluno(aluno);
+        }
+
+        //
+        // AJUSTA HORAS DA AERONAVE
+        //
+        Aeronave aeronave = AeronaveController.buscarId(d.getAeronaveId());
+        if (aeronave != null) {
+            Float horasAeronave = aeronave.getHoras_de_voo() == null ? 0 : aeronave.getHoras_de_voo();
+            aeronave.setHoras_de_voo(horasAeronave + diferenca);
+            AeronaveController.atualizarAeronave(aeronave);
+        }
+
         return ResponseEntity.ok(Map.of("status", "sucesso", "diario", d.getId()));
     }
 

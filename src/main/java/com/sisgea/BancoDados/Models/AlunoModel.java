@@ -19,6 +19,13 @@ public class AlunoModel {
 
     public static List<Aluno> listarAlunos() {
         EntityManager em = JPAUtil.getEntityManager();
+        List<Aluno> lista = em.createQuery("SELECT a FROM Aluno a where ativo = true", Aluno.class).getResultList();
+        em.close();
+        return lista;
+    }
+
+    public static List<Aluno> listarTodosAlunos() {
+        EntityManager em = JPAUtil.getEntityManager();
         List<Aluno> lista = em.createQuery("SELECT a FROM Aluno a", Aluno.class).getResultList();
         em.close();
         return lista;

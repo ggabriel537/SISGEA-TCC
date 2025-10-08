@@ -31,6 +31,10 @@ public class AlunoController {
         return AlunoModel.listarAlunos();
     }
 
+    public static List<Aluno> listarTodosAlunos() {
+        return AlunoModel.listarTodosAlunos();
+    }
+
     public static Aluno buscarId(String id) {
         return AlunoModel.buscarAluno(id);
     }

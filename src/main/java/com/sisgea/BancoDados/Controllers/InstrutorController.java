@@ -25,6 +25,10 @@ public class InstrutorController {
         return InstrutorModel.listarInstrutores();
     }
 
+    public static List<Instrutor> listarTodosInstrutores() {
+        return InstrutorModel.listarTodosInstrutores();
+    }
+
     public static Instrutor buscarId(String id) {
         return InstrutorModel.buscarInstrutor(id);
     }

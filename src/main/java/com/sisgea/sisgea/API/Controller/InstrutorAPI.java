@@ -34,9 +34,14 @@ public class InstrutorAPI {
         return ResponseEntity.ok(InstrutorController.listarInstrutores());
     }
 
+    @GetMapping("/todos")
+    public ResponseEntity<List<Instrutor>> listarTodos() {
+        return ResponseEntity.ok(InstrutorController.listarInstrutores());
+    }
+
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Instrutor i) {
-        List<Instrutor> instrutores = InstrutorController.listarInstrutores();
+        List<Instrutor> instrutores = InstrutorController.listarTodosInstrutores();
         List<Administrador> administradores = AdministradorController.listarAdministradores();
 
         String conflito_str = "";

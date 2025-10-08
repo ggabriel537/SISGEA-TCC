@@ -30,6 +30,11 @@ public class AeronaveAPI {
         return AeronaveController.listarAeronaves();
     }
 
+    @GetMapping("/todos")
+    public List<Aeronave> listarTodos() {
+        return AeronaveController.listarTodasAeronaves();
+    }
+
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Aeronave aer) {
         // Limitações de Cadastro das aeronaves

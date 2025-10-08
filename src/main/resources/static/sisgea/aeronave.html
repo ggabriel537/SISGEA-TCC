@@ -90,7 +90,7 @@
     // Carrega aeronaves do backend
     async function carregarAeronaves() {
       try {
-        const response = await fetch("http://localhost:8080/api/aeronaves");
+        const response = await fetch("http://localhost:8080/api/aeronaves/todos");
         if (!response.ok) throw new Error("Erro ao buscar aeronaves");
 
         aeronavesCarregadas = await response.json();
