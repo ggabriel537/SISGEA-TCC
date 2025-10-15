@@ -1,5 +1,7 @@
 package com.sisgea.sisgea.API.Controller;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -110,8 +112,9 @@ public class AgendamentoAPI {
 
         if (!conflito) {
             Aeronave aeronave = AeronaveController.buscarId(ag.getAeronave().getMatricula());
-            int hora = ag.getHorario_partida().getHours();
-            if ("VFR-D".equals(aeronave.getHabilitacao()) && (hora >= 18 || hora < 6)) {
+            LocalDateTime ldt = ag.getHorario_partida().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            int hora = ldt.getHour();
+            if ("VFR-D".equals(aeronave.getTipo_de_voo()) && (hora >= 18 || hora < 6)) {
                 warn = true;
                 warn_str += "Aeronave não homologada para o horário selecionado, confirme seus dados antes de prosseguir\n";
             }
@@ -200,8 +203,9 @@ public class AgendamentoAPI {
 
         if (!conflito) {
             Aeronave aeronave = AeronaveController.buscarId(ag.getAeronave().getMatricula());
-            int hora = ag.getHorario_partida().getHours();
-            if ("VFR-D".equals(aeronave.getHabilitacao()) && (hora >= 18 || hora < 6)) {
+            LocalDateTime ldt = ag.getHorario_partida().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            int hora = ldt.getHour();
+            if ("VFR-D".equals(aeronave.getTipo_de_voo()) && (hora >= 18 || hora < 6)) {
                 warn = true;
                 warn_str += "Aeronave não homologada para o horário selecionado, confirme seus dados antes de prosseguir\n";
             }

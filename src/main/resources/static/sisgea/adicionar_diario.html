@@ -32,7 +32,7 @@
             </select>
 
             <label>Número do Diário</label>
-            <input type="number" id="nro-diario" readonly>
+            <input type="number" id="nro-diario" placeholder="Número do Diario" readonly>
 
             <label>Data</label>
             <input type="date" id="data">
@@ -84,7 +84,7 @@
             </select>
 
             <label>Hora Aeronave</label>
-            <input type="number" id="hora-aeronave" readonly>
+            <input type="number" id="hora-aeronave" placeholder="Quantidade total de horas da aeronave" readonly>
 
             <label>Data de Decolagem</label>
             <input type="datetime-local" id="data-decolagem">
@@ -93,40 +93,42 @@
             <input type="datetime-local" id="data-pouso">
 
             <label>Local de Decolagem</label>
-            <input type="text" id="local-decolagem" maxlength="4" oninput="caixaAlta(this)">
+            <input type="text" id="local-decolagem" maxlength="4" oninput="caixaAlta(this)" placeholder="Ex: SBDO">
 
             <label>Local de Pouso</label>
-            <input type="text" id="local-pouso" maxlength="4" oninput="caixaAlta(this)">
+            <input type="text" id="local-pouso" maxlength="4" oninput="caixaAlta(this)" placeholder="Ex: SBCG">
 
             <label>Data de Corte</label>
-            <input type="datetime-local" id="data-corte">
+            <input type="datetime-local" id="data-corte" placeholder="Data e Hora do Corte de Motor">
 
             <label>Horas Diurno</label>
-            <input type="number" step="0.1" id="horas-diu" oninput="atualizarHoraAeronave()">
+            <input type="number" step="0.1" id="horas-diu" oninput="atualizarHoraAeronave()" placeholder="Horas Diurno">
 
             <label>Horas Noturno</label>
-            <input type="number" step="0.1" id="horas-not" oninput="atualizarHoraAeronave()">
+            <input type="number" step="0.1" id="horas-not" oninput="atualizarHoraAeronave()"
+                placeholder="Horas Noturno">
 
             <label>Horas VFR</label>
-            <input type="number" step="0.1" id="horas-vfr" oninput="atualizarHoraAeronave()">
+            <input type="number" step="0.1" id="horas-vfr" oninput="atualizarHoraAeronave()" placeholder="Horas VFR">
 
             <label>Horas IFR</label>
-            <input type="number" step="0.1" id="horas-ifr" oninput="atualizarHoraAeronave()">
+            <input type="number" step="0.1" id="horas-ifr" oninput="atualizarHoraAeronave()" placeholder="Horas IFR">
 
             <label>Horas IFR Sob Capota</label>
-            <input type="number" step="0.1" id="horas-ifr-c" oninput="atualizarHoraAeronave()">
+            <input type="number" step="0.1" id="horas-ifr-c" oninput="atualizarHoraAeronave()"
+                placeholder="Horas IFR Sob Capota">
 
             <label>Combustível Utilizado</label>
-            <input type="text" id="combustivel">
+            <input type="text" id="combustivel" placeholder="Combustível Utilizado (Litros, Kg, Lbs, etc...)">
 
             <label>Ciclos</label>
-            <input type="number" step="1" id="ciclos">
+            <input type="number" step="1" id="ciclos" placeholder="Número de Ciclos">
 
             <label>POB</label>
-            <input type="number" step="1" id="pob">
+            <input type="number" step="1" id="pob" placeholder="Número de Pessoas a Bordo">
 
             <label>Carga</label>
-            <input type="text" id="carga">
+            <input type="text" id="carga" placeholder="Carga (Kg, Lbs, etc...)">
 
             <label>Natureza</label>
             <select id="nat">
@@ -143,7 +145,7 @@
             </select>
 
             <label>Ocorrências</label>
-            <textarea id="ocorrencias" rows="4"></textarea>
+            <textarea id="ocorrencias" rows="4" placeholder="Digite as ocorrências do voo"></textarea>
 
             <label>Discrepâncias</label>
             <div id="discrepancias-container"></div>

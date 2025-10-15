@@ -50,10 +50,10 @@
       <input type="datetime-local" id="retorno">
 
       <label>Origem (local)</label>
-      <input type="text" id="partida" placeholder="Ex: SBDO - Dourados">
+      <input type="text" id="partida" placeholder="Ex: SBDO - Dourados" maxlength="4" oninput="caixaAlta(this)">
 
       <label>Destino (local)</label>
-      <input type="text" id="destino" placeholder="Ex: SBCG - Campo Grande">
+      <input type="text" id="destino" placeholder="Ex: SBCG - Campo Grande" maxlength="4" oninput="caixaAlta(this)">
 
       <label>Tipo de Voo</label>
       <select id="tipoVoo">
@@ -84,6 +84,23 @@
     const tipoVooSelect = document.getElementById('tipoVoo');
     const statusInput = document.getElementById('status');
     const btnCadastrar = document.getElementById('btnCadastrar');
+
+    function formatarData(dateStr) {
+      const date = new Date(dateStr);
+      const pad = n => n.toString().padStart(2, '0');
+      const ano = date.getFullYear();
+      const mes = pad(date.getMonth() + 1);
+      const dia = pad(date.getDate());
+      const hora = pad(date.getHours());
+      const min = pad(date.getMinutes());
+      return `${ano}-${mes}-${dia}T${hora}:${min}`;
+    }
+
+
+    function caixaAlta(input) {
+      input.value = input.value.toUpperCase();
+      aplicarFiltros();
+    }
 
     // Carrega lista de itens
     async function carregarDados(url, selectElem, valueField, textFields, placeholder) {
@@ -123,8 +140,8 @@
         instrutorSelect.value = ag.instrutor.cpf;
         alunoSelect.value = ag.aluno.cpf;
         aeronaveSelect.value = ag.aeronave.matricula;
-        dataAgendamentoInput.value = new Date(ag.horario_partida).toISOString().slice(0,16);
-        retornoInput.value = new Date(ag.horario_retorno).toISOString().slice(0,16);
+        dataAgendamentoInput.value = formatarData(ag.horario_partida);
+        retornoInput.value = formatarData(ag.horario_retorno);
         partidaInput.value = ag.partida;
         destinoInput.value = ag.destino;
         tipoVooSelect.value = ag.tipo_voo;
@@ -184,7 +201,7 @@
         if (body.warn) {
           Swal.fire({
             title: "Atenção",
-            text: body.warn + "\n\nDeseja forçar mesmo assim?",
+            text: body.warn + "\n\n- Deseja forçar mesmo assim?",
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Forçar",
@@ -207,4 +224,5 @@
     btnCadastrar.addEventListener('click', () => salvarAgendamento());
   </script>
 </body>
+
 </html>
