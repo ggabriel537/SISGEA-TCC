@@ -74,6 +74,18 @@
     let instrutoresCarregados = [];
     let aeronavesCarregadas = [];
 
+    function formatarDataHoraLocal(dateString) {
+            if (!dateString) return "";
+            const d = new Date(dateString);
+            const hasTZ = /Z$|[+\-]\d{2}:\d{2}$/.test(dateString);
+            const ano = hasTZ ? d.getUTCFullYear() : d.getFullYear();
+            const mes = (hasTZ ? d.getUTCMonth() : d.getMonth()) + 1;
+            const dia = hasTZ ? d.getUTCDate() : d.getDate();
+            const hora = hasTZ ? d.getUTCHours() : d.getHours();
+            const minuto = hasTZ ? d.getUTCMinutes() : d.getMinutes();
+            return `${String(dia).padStart(2, "0")}/${String(mes).padStart(2, "0")}/${ano} - ${String(hora).padStart(2, "0")}:${String(minuto).padStart(2, "0")}`;
+        }
+
     // Carrega agendamentos do backend
     async function carregarAgendamentos() {
       try {
@@ -175,12 +187,11 @@
       // Cria os itens da lista para cada agendamento filtrado
       filtrados.forEach(ag => {
         const data = new Date(ag.horario_partida);
-        const dataFormatada = data.toLocaleDateString("pt-BR");
-        const horaFormatada = data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+        const dataFormatada = formatarDataHoraLocal(data);
 
         const item = document.createElement("li");
         item.innerHTML = `
-          <span>${dataFormatada} - ${horaFormatada} - ${ag.aluno?.nome || "Aluno"} - ${ag.instrutor?.nome || "Instrutor"} - ${ag.aeronave?.modelo || "Aeronave"} - ${ag.tipo_voo || "Tipo não definido"} - ${ag.status || "Status"}</span>
+          <span>${dataFormatada} - ${ag.aluno?.nome || "Aluno"} - ${ag.instrutor?.nome || "Instrutor"} - ${ag.aeronave?.modelo || "Aeronave"} - ${ag.tipo_voo || "Tipo não definido"} - ${ag.status || "Status"}</span>
           <div class="list-buttons">
             <button onclick="editarAgendamento('${ag.id}')">Editar</button>
             <button onclick="deletarAgendamento('${ag.id}')">Excluir</button>
