@@ -19,6 +19,7 @@ import com.sisgea.BancoDados.Controllers.InstrutorController;
 import com.sisgea.Entidades.Aeronave;
 import com.sisgea.Entidades.Agendamento;
 import com.sisgea.Entidades.Aluno;
+import com.sisgea.Entidades.Manutencao;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -51,7 +52,7 @@ public class AgendamentoAPI {
         boolean warn = false;
 
         //
-        // DADOS OBRIGATÓRIOS
+        // DADOS OBRIGATÃ"RIOS
         //
         conflito_str += validarCamposObrigatorios(ag);
         if (!conflito_str.isEmpty()) {
@@ -61,11 +62,26 @@ public class AgendamentoAPI {
         //
         // CONFLITOS
         //
-        
+
+        // Verifica manutenções pendentes
+        if (ag.getAeronave() != null && ag.getAeronave().getMatricula() != null) {
+            Aeronave aeronave = AeronaveController.buscarId(ag.getAeronave().getMatricula());
+            if (aeronave != null && aeronave.getManutencoes() != null) {
+                for (Manutencao manutencao : aeronave.getManutencoes()) {
+                    if (manutencao.getStatus() != null && 
+                        (manutencao.getStatus().equalsIgnoreCase("pendente") || 
+                         manutencao.getStatus().equalsIgnoreCase("em andamento"))) {
+                        conflito = true;
+                        conflito_str += "A aeronave está com manutenção pendente e não pode ser agendada.\n";
+                        break;
+                    }
+                }
+            }
+        }
 
         if (ag.getHorario_partida().before(new Date())) {
             conflito = true;
-            conflito_str += "O horário de partida não pode ser no passado.\n";
+            conflito_str += "O horário se partida não pode ser no passado.\n";
         }
 
         List<Agendamento> agendamentosExistentes = AgendamentoController.listarAgendamentos();
@@ -152,9 +168,24 @@ public class AgendamentoAPI {
         boolean conflito = false;
         boolean warn = false;
 
+        if (ag.getAeronave() != null && ag.getAeronave().getMatricula() != null) {
+            Aeronave aeronave = AeronaveController.buscarId(ag.getAeronave().getMatricula());
+            if (aeronave != null && aeronave.getManutencoes() != null) {
+                for (Manutencao manutencao : aeronave.getManutencoes()) {
+                    if (manutencao.getStatus() != null && 
+                        (manutencao.getStatus().equalsIgnoreCase("Pendente") || 
+                         manutencao.getStatus().equalsIgnoreCase("Em andamento"))) {
+                        conflito = true;
+                        conflito_str += "A aeronave está com manutenção pendente e não pode ser agendada.\n";
+                        break;
+                    }
+                }
+            }
+        }
+
         if (ag.getHorario_partida().before(new Date())) {
             conflito = true;
-            conflito_str += "O horário de partida não pode ser no passado.\n";
+            conflito_str += "O horário se partida não pode ser no passado.\n";
         }
 
         List<Agendamento> agendamentosExistentes = AgendamentoController.listarAgendamentos();

@@ -2,6 +2,7 @@ package com.sisgea.sisgea.TesteAPI;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -159,5 +160,110 @@ public class TestAeronave {
         if (checar != null) {
             AeronaveModel.excluirAeronave(checar);
         }
+    }
+
+    @Test
+    public void testMatriculaDuplicada() {
+        Aeronave aeronave1 = new Aeronave();
+        aeronave1.setMatricula("PT-DUP");
+        aeronave1.setModelo("Cessna 152");
+        aeronave1.setFabricante("Cessna");
+        aeronave1.setHabilitacao("MNTE");
+        aeronave1.setTipo_de_voo("VFR-D");
+        aeronave1.setHoras_de_voo(1000.0f);
+        aeronave1.setAtivo(true);
+        
+        Request request = new Request();
+        String retorno1 = request.requisicao(aeronave1, "api/aeronaves", "POST");
+        System.out.println("Primeira aeronave: " + retorno1);
+        
+        Aeronave aeronave2 = new Aeronave();
+        aeronave2.setMatricula("PT-DUP");
+        aeronave2.setModelo("Piper PA-28");
+        aeronave2.setFabricante("Piper");
+        aeronave2.setHabilitacao("MNTE");
+        aeronave2.setTipo_de_voo("VFR-D");
+        aeronave2.setHoras_de_voo(500.0f);
+        aeronave2.setAtivo(true);
+        
+        String retorno2 = request.requisicao(aeronave2, "api/aeronaves", "POST");
+        System.out.println("Segunda aeronave (matrícula duplicada): " + retorno2);
+        
+        List<Aeronave> aeronaves = AeronaveModel.listarTodasAeronaves();
+        for (Aeronave a : aeronaves) {
+            if (a.getMatricula().equals("PT-DUP")) {
+                AeronaveModel.excluirAeronave(a);
+            }
+        }
+        
+        assertTrue(retorno1.contains("\"status\":\"sucesso\""), "Primeira aeronave deveria ter sucesso: " + retorno1);
+        assertTrue(retorno2.contains("existe uma aeronave com esta matrícula") || retorno2.contains("error") || retorno2.contains("CONFLITO"), 
+                  "Segunda aeronave deveria gerar conflito de matrícula: " + retorno2);
+    }
+
+    @Test
+    public void testMatriculaInvalida() {
+        Aeronave aeronave1 = new Aeronave();
+        aeronave1.setMatricula("XX-ABC");
+        aeronave1.setModelo("Cessna 152");
+        aeronave1.setFabricante("Cessna");
+        aeronave1.setHabilitacao("MNTE");
+        aeronave1.setTipo_de_voo("VFR-D");
+        aeronave1.setHoras_de_voo(1000.0f);
+        aeronave1.setAtivo(true);
+        
+        Request request = new Request();
+        String retorno1 = request.requisicao(aeronave1, "api/aeronaves", "POST");
+        System.out.println("Aeronave com prefixo inválido: " + retorno1);
+        
+        Aeronave aeronave2 = new Aeronave();
+        aeronave2.setMatricula("PT-ABCD");
+        aeronave2.setModelo("Piper PA-28");
+        aeronave2.setFabricante("Piper");
+        aeronave2.setHabilitacao("MNTE");
+        aeronave2.setTipo_de_voo("VFR-D");
+        aeronave2.setHoras_de_voo(500.0f);
+        aeronave2.setAtivo(true);
+        
+        String retorno2 = request.requisicao(aeronave2, "api/aeronaves", "POST");
+        System.out.println("Aeronave com formato inválido: " + retorno2);
+        
+        List<Aeronave> aeronaves = AeronaveModel.listarTodasAeronaves();
+        for (Aeronave a : aeronaves) {
+            if (a.getMatricula().equals("XX-ABC") || a.getMatricula().equals("PT-ABCD")) {
+                AeronaveModel.excluirAeronave(a);
+            }
+        }
+        
+        assertTrue(retorno1.contains("Matrícula inválida") || retorno1.contains("error") || retorno1.contains("CONFLITO"), 
+                  "Deveria rejeitar matrícula com prefixo inválido: " + retorno1);
+        assertTrue(retorno2.contains("Matrícula inválida") || retorno2.contains("error") || retorno2.contains("CONFLITO"), 
+                  "Deveria rejeitar matrícula com formato inválido: " + retorno2);
+    }
+
+    @Test
+    public void testCamposObrigatorios() {
+        Aeronave aeronave = new Aeronave();
+        aeronave.setMatricula("PT-OBG");
+        aeronave.setModelo("");
+        aeronave.setFabricante("");
+        aeronave.setHabilitacao("MNTE");
+        aeronave.setTipo_de_voo("VFR-D");
+        aeronave.setHoras_de_voo(1000.0f);
+        aeronave.setAtivo(true);
+        
+        Request request = new Request();
+        String retorno = request.requisicao(aeronave, "api/aeronaves", "POST");
+        System.out.println("Resposta do servidor: " + retorno);
+        
+        List<Aeronave> aeronaves = AeronaveModel.listarTodasAeronaves();
+        for (Aeronave a : aeronaves) {
+            if (a.getMatricula().equals("PT-OBG")) {
+                AeronaveModel.excluirAeronave(a);
+            }
+        }
+        
+        assertTrue(retorno.contains("Modelo é obrigatório") || retorno.contains("Fabricante é obrigatório") || retorno.contains("error"), 
+                  "Deveria rejeitar aeronave sem campos obrigatórios: " + retorno);
     }
 }
