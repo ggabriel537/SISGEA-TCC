@@ -226,4 +226,216 @@ public class TestInstrutor {
 
         InstrutorModel.excluirInstrutor(checar.getCpf());
     }
+
+    @Test
+    public void testValidacaoUsuarioObrigatorio() {
+        Instrutor instrutor = new Instrutor();
+        instrutor.setNome("Instrutor Teste");
+        instrutor.setCpf("44444444444");
+        instrutor.setCanac(444444);
+        instrutor.setEmail("teste@instrutor.com");
+        
+        Request request = new Request();
+        String retorno = request.requisicao(instrutor, "api/instrutores", "POST");
+        System.out.println("Resposta do servidor: " + retorno);
+        
+        assertTrue(retorno.contains("error"), "Deveria retornar erro de usuário obrigatório: " + retorno);
+        assertTrue(retorno.contains("Usuário") || retorno.contains("senha"), 
+                "Mensagem de erro não menciona usuário/senha: " + retorno);
+    }
+
+    @Test
+    public void testValidacaoUsuarioDuplicado() {
+        Instrutor instrutor1 = new Instrutor();
+        instrutor1.setCpf("10101010101");
+        instrutor1.setCanac(101010);
+        instrutor1.setNome("Instrutor Usuario");
+        instrutor1.setTelefone("67999999999");
+        instrutor1.setEmail("usuario1@teste.com");
+        instrutor1.setHabilitacao("INVA");
+        instrutor1.setAtivo(true);
+        
+        Usuario usuario1 = new Usuario();
+        usuario1.setUsuario("inst_user_dup");
+        usuario1.setSenha("123");
+        usuario1.setPermissao(0);
+        instrutor1.setUsuario(usuario1);
+        
+        Endereco endereco1 = new Endereco();
+        endereco1.setCep("79800000");
+        endereco1.setCidade("Dourados");
+        endereco1.setUF("MS");
+        endereco1.setLogradouro("Rua Teste");
+        endereco1.setNumero("100");
+        endereco1.setBairro("Centro");
+        endereco1.setComplemento("Apto 1");
+        instrutor1.setEndereco(endereco1);
+        
+        Request request = new Request();
+        String retorno1 = request.requisicao(instrutor1, "api/instrutores", "POST");
+        System.out.println("Resposta do servidor: " + retorno1);
+        
+        Instrutor instrutor2 = new Instrutor();
+        instrutor2.setCpf("20202020202");
+        instrutor2.setCanac(202020);
+        instrutor2.setNome("Instrutor Usuario 2");
+        instrutor2.setTelefone("67988888888");
+        instrutor2.setEmail("usuario2@teste.com");
+        instrutor2.setHabilitacao("PLA");
+        instrutor2.setAtivo(true);
+        
+        Usuario usuario2 = new Usuario();
+        usuario2.setUsuario("inst_user_dup");
+        usuario2.setSenha("123");
+        usuario2.setPermissao(0);
+        instrutor2.setUsuario(usuario2);
+        
+        Endereco endereco2 = new Endereco();
+        endereco2.setCep("79800000");
+        endereco2.setCidade("Dourados");
+        endereco2.setUF("MS");
+        endereco2.setLogradouro("Rua Teste");
+        endereco2.setNumero("200");
+        endereco2.setBairro("Centro");
+        endereco2.setComplemento("Apto 2");
+        instrutor2.setEndereco(endereco2);
+        
+        String retorno2 = request.requisicao(instrutor2, "api/instrutores", "POST");
+        System.out.println("Resposta do servidor (duplicado): " + retorno2);
+        
+        InstrutorModel.excluirInstrutor("10101010101");
+        
+        assertTrue(retorno2.contains("error"), "Deveria retornar erro de usuário duplicado: " + retorno2);
+        assertTrue(retorno2.contains("usuário"), "Mensagem de erro não menciona usuário: " + retorno2);
+    }
+
+    @Test
+    public void testValidacaoCpfDuplicado() {
+        Instrutor instrutor1 = new Instrutor();
+        instrutor1.setCpf("77777777777");
+        instrutor1.setCanac(777777);
+        instrutor1.setNome("Instrutor Duplicado");
+        instrutor1.setTelefone("67999999999");
+        instrutor1.setEmail("duplicado@teste.com");
+        instrutor1.setHabilitacao("INVA");
+        instrutor1.setAtivo(true);
+        
+        Usuario usuario1 = new Usuario();
+        usuario1.setUsuario("inst_dup1");
+        usuario1.setSenha("123");
+        usuario1.setPermissao(0);
+        instrutor1.setUsuario(usuario1);
+        
+        Endereco endereco1 = new Endereco();
+        endereco1.setCep("79800000");
+        endereco1.setCidade("Dourados");
+        endereco1.setUF("MS");
+        endereco1.setLogradouro("Rua Teste");
+        endereco1.setNumero("100");
+        endereco1.setBairro("Centro");
+        endereco1.setComplemento("Apto 1");
+        instrutor1.setEndereco(endereco1);
+        
+        Request request = new Request();
+        String retorno1 = request.requisicao(instrutor1, "api/instrutores", "POST");
+        System.out.println("Resposta do servidor: " + retorno1);
+        
+        Instrutor instrutor2 = new Instrutor();
+        instrutor2.setCpf("77777777777");
+        instrutor2.setCanac(888888);
+        instrutor2.setNome("Instrutor Duplicado 2");
+        instrutor2.setTelefone("67988888888");
+        instrutor2.setEmail("duplicado2@teste.com");
+        instrutor2.setHabilitacao("PLA");
+        instrutor2.setAtivo(true);
+        
+        Usuario usuario2 = new Usuario();
+        usuario2.setUsuario("inst_dup2");
+        usuario2.setSenha("123");
+        usuario2.setPermissao(0);
+        instrutor2.setUsuario(usuario2);
+        
+        Endereco endereco2 = new Endereco();
+        endereco2.setCep("79800000");
+        endereco2.setCidade("Dourados");
+        endereco2.setUF("MS");
+        endereco2.setLogradouro("Rua Teste");
+        endereco2.setNumero("200");
+        endereco2.setBairro("Centro");
+        endereco2.setComplemento("Apto 2");
+        instrutor2.setEndereco(endereco2);
+        
+        String retorno2 = request.requisicao(instrutor2, "api/instrutores", "POST");
+        System.out.println("Resposta do servidor (duplicado): " + retorno2);
+        
+        InstrutorModel.excluirInstrutor("77777777777");
+        
+        assertTrue(retorno2.contains("error"), "Deveria retornar erro de CPF duplicado: " + retorno2);
+        assertTrue(retorno2.contains("CPF"), "Mensagem de erro não menciona CPF: " + retorno2);
+    }
+
+    @Test
+    public void testValidacaoCanacDuplicado() {
+        Instrutor instrutor1 = new Instrutor();
+        instrutor1.setCpf("88888888888");
+        instrutor1.setCanac(999999);
+        instrutor1.setNome("Instrutor CANAC");
+        instrutor1.setTelefone("67999999999");
+        instrutor1.setEmail("canac1@teste.com");
+        instrutor1.setHabilitacao("INVA");
+        instrutor1.setAtivo(true);
+        
+        Usuario usuario1 = new Usuario();
+        usuario1.setUsuario("inst_canac1");
+        usuario1.setSenha("123");
+        usuario1.setPermissao(0);
+        instrutor1.setUsuario(usuario1);
+        
+        Endereco endereco1 = new Endereco();
+        endereco1.setCep("79800000");
+        endereco1.setCidade("Dourados");
+        endereco1.setUF("MS");
+        endereco1.setLogradouro("Rua Teste");
+        endereco1.setNumero("100");
+        endereco1.setBairro("Centro");
+        endereco1.setComplemento("Apto 1");
+        instrutor1.setEndereco(endereco1);
+        
+        Request request = new Request();
+        String retorno1 = request.requisicao(instrutor1, "api/instrutores", "POST");
+        System.out.println("Resposta do servidor: " + retorno1);
+        
+        Instrutor instrutor2 = new Instrutor();
+        instrutor2.setCpf("99999999999");
+        instrutor2.setCanac(999999);
+        instrutor2.setNome("Instrutor CANAC 2");
+        instrutor2.setTelefone("67988888888");
+        instrutor2.setEmail("canac2@teste.com");
+        instrutor2.setHabilitacao("PLA");
+        instrutor2.setAtivo(true);
+        
+        Usuario usuario2 = new Usuario();
+        usuario2.setUsuario("inst_canac2");
+        usuario2.setSenha("123");
+        usuario2.setPermissao(0);
+        instrutor2.setUsuario(usuario2);
+        
+        Endereco endereco2 = new Endereco();
+        endereco2.setCep("79800000");
+        endereco2.setCidade("Dourados");
+        endereco2.setUF("MS");
+        endereco2.setLogradouro("Rua Teste");
+        endereco2.setNumero("200");
+        endereco2.setBairro("Centro");
+        endereco2.setComplemento("Apto 2");
+        instrutor2.setEndereco(endereco2);
+        
+        String retorno2 = request.requisicao(instrutor2, "api/instrutores", "POST");
+        System.out.println("Resposta do servidor (duplicado): " + retorno2);
+        
+        InstrutorModel.excluirInstrutor("88888888888");
+        
+        assertTrue(retorno2.contains("error"), "Deveria retornar erro de CANAC duplicado: " + retorno2);
+        assertTrue(retorno2.contains("CANAC"), "Mensagem de erro não menciona CANAC: " + retorno2);
+    }
 }

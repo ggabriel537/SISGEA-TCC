@@ -195,4 +195,152 @@ public class TestManutencao {
         
         AeronaveModel.excluirAeronave(aeronave);
     }
+
+    @Test
+    public void testValidacaoDescricaoObrigatoria() {
+        Aeronave aeronave = new Aeronave();
+        aeronave.setMatricula("PT-VAL1");
+        aeronave.setModelo("Cessna 152");
+        aeronave.setFabricante("Cessna");
+        aeronave.setHabilitacao("MNTE");
+        aeronave.setTipo_de_voo("VFR-D");
+        aeronave.setHoras_de_voo(1000.0f);
+        aeronave.setAtivo(true);
+        AeronaveModel.salvarAeronave(aeronave);
+        
+        Manutencao manutencao = new Manutencao();
+        manutencao.setData_est_man(new Date(System.currentTimeMillis() + 86400000));
+        manutencao.setStatus("Pendente");
+        manutencao.setAeronave(aeronave);
+        
+        Request request = new Request();
+        String retorno = request.requisicao(manutencao, "api/manutencoes", "POST");
+        System.out.println("Resposta do servidor: " + retorno);
+        
+        AeronaveModel.excluirAeronave(aeronave);
+        
+        assertTrue(retorno.contains("ERRO"), "Deveria retornar erro de descrição obrigatória: " + retorno);
+        assertTrue(retorno.contains("Descrição") || retorno.contains("obrigatória"), 
+                "Mensagem de erro não menciona descrição: " + retorno);
+    }
+
+    @Test
+    public void testValidacaoDataEstimadaObrigatoria() {
+        Aeronave aeronave = new Aeronave();
+        aeronave.setMatricula("PT-VAL2");
+        aeronave.setModelo("Cessna 152");
+        aeronave.setFabricante("Cessna");
+        aeronave.setHabilitacao("MNTE");
+        aeronave.setTipo_de_voo("VFR-D");
+        aeronave.setHoras_de_voo(1000.0f);
+        aeronave.setAtivo(true);
+        AeronaveModel.salvarAeronave(aeronave);
+        
+        Manutencao manutencao = new Manutencao();
+        manutencao.setDescricao("Teste sem data");
+        manutencao.setStatus("Pendente");
+        manutencao.setAeronave(aeronave);
+        
+        Request request = new Request();
+        String retorno = request.requisicao(manutencao, "api/manutencoes", "POST");
+        System.out.println("Resposta do servidor: " + retorno);
+        
+        AeronaveModel.excluirAeronave(aeronave);
+        
+        assertTrue(retorno.contains("ERRO"), "Deveria retornar erro de data estimada obrigatória: " + retorno);
+        assertTrue(retorno.contains("Data estimada") || retorno.contains("obrigatória"), 
+                "Mensagem de erro não menciona data estimada: " + retorno);
+    }
+
+    @Test
+    public void testValidacaoStatusObrigatorio() {
+        Aeronave aeronave = new Aeronave();
+        aeronave.setMatricula("PT-VAL3");
+        aeronave.setModelo("Cessna 152");
+        aeronave.setFabricante("Cessna");
+        aeronave.setHabilitacao("MNTE");
+        aeronave.setTipo_de_voo("VFR-D");
+        aeronave.setHoras_de_voo(1000.0f);
+        aeronave.setAtivo(true);
+        AeronaveModel.salvarAeronave(aeronave);
+        
+        Manutencao manutencao = new Manutencao();
+        manutencao.setDescricao("Teste sem status");
+        manutencao.setData_est_man(new Date(System.currentTimeMillis() + 86400000));
+        manutencao.setAeronave(aeronave);
+        
+        Request request = new Request();
+        String retorno = request.requisicao(manutencao, "api/manutencoes", "POST");
+        System.out.println("Resposta do servidor: " + retorno);
+        
+        AeronaveModel.excluirAeronave(aeronave);
+        
+        assertTrue(retorno.contains("ERRO"), "Deveria retornar erro de status obrigatório: " + retorno);
+        assertTrue(retorno.contains("Status") || retorno.contains("obrigatório"), 
+                "Mensagem de erro não menciona status: " + retorno);
+    }
+
+    @Test
+    public void testValidacaoAeronaveObrigatoria() {
+        Manutencao manutencao = new Manutencao();
+        manutencao.setDescricao("Teste sem aeronave");
+        manutencao.setData_est_man(new Date(System.currentTimeMillis() + 86400000));
+        manutencao.setStatus("Pendente");
+        
+        Request request = new Request();
+        String retorno = request.requisicao(manutencao, "api/manutencoes", "POST");
+        System.out.println("Resposta do servidor: " + retorno);
+        
+        assertTrue(retorno.contains("ERRO"), "Deveria retornar erro de aeronave obrigatória: " + retorno);
+        assertTrue(retorno.contains("Aeronave") || retorno.contains("obrigatória"), 
+                "Mensagem de erro não menciona aeronave: " + retorno);
+    }
+
+    @Test
+    public void testValidacaoAeronaveInexistente() {
+        Aeronave aeronave = new Aeronave();
+        aeronave.setMatricula("PT-INEX");
+        
+        Manutencao manutencao = new Manutencao();
+        manutencao.setDescricao("Teste aeronave inexistente");
+        manutencao.setData_est_man(new Date(System.currentTimeMillis() + 86400000));
+        manutencao.setStatus("Pendente");
+        manutencao.setAeronave(aeronave);
+        
+        Request request = new Request();
+        String retorno = request.requisicao(manutencao, "api/manutencoes", "POST");
+        System.out.println("Resposta do servidor: " + retorno);
+        
+        assertTrue(retorno.contains("ERRO"), "Deveria retornar erro de aeronave não encontrada: " + retorno);
+        assertTrue(retorno.contains("Aeronave") && retorno.contains("encontrada"), 
+                "Mensagem de erro não menciona aeronave não encontrada: " + retorno);
+    }
+
+    @Test
+    public void testWarningDataNoPassado() {
+        Aeronave aeronave = new Aeronave();
+        aeronave.setMatricula("PT-WARN");
+        aeronave.setModelo("Cessna 152");
+        aeronave.setFabricante("Cessna");
+        aeronave.setHabilitacao("MNTE");
+        aeronave.setTipo_de_voo("VFR-D");
+        aeronave.setHoras_de_voo(1000.0f);
+        aeronave.setAtivo(true);
+        AeronaveModel.salvarAeronave(aeronave);
+        
+        Manutencao manutencao = new Manutencao();
+        manutencao.setDescricao("Teste warning data passado");
+        manutencao.setData_est_man(new Date(System.currentTimeMillis() - 86400000));
+        manutencao.setStatus("Pendente");
+        manutencao.setAeronave(aeronave);
+        
+        Request request = new Request();
+        String retorno = request.requisicao(manutencao, "api/manutencoes", "POST");
+        System.out.println("Resposta do servidor: " + retorno);
+        
+        AeronaveModel.excluirAeronave(aeronave);
+        
+        assertTrue(retorno.contains("AVISO"), "Deveria retornar aviso de data no passado: " + retorno);
+        assertTrue(retorno.contains("passado"), "Mensagem de aviso não menciona data no passado: " + retorno);
+    }
 }

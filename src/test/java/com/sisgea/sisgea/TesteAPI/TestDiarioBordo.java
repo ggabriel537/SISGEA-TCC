@@ -471,4 +471,772 @@ public class TestDiarioBordo {
         AlunoModel.excluirAluno(aluno);
         AeronaveModel.excluirAeronave(aeronave);
     }
+
+    @Test
+    public void testAtualizacaoHorasAeronave() {
+        Aeronave aeronave = new Aeronave();
+        aeronave.setMatricula("PT-AERO");
+        aeronave.setModelo("Cessna 152");
+        aeronave.setFabricante("Cessna");
+        aeronave.setHabilitacao("MNTE");
+        aeronave.setTipo_de_voo("VFR-D");
+        aeronave.setHoras_de_voo(1000.0f);
+        aeronave.setAtivo(true);
+        AeronaveModel.salvarAeronave(aeronave);
+        
+        Float horasAeronaveAntes = aeronave.getHoras_de_voo();
+        
+        Aluno aluno = new Aluno();
+        aluno.setCpf("87878787878");
+        aluno.setCanac(878787);
+        aluno.setNome("Aluno Aeronave");
+        aluno.setTelefone("67999999999");
+        aluno.setEmail("aluno@aero.com");
+        aluno.setCurso("Piloto Privado");
+        aluno.setHoras_compradas(50.0f);
+        aluno.setHoras_voadas(10.0f);
+        aluno.setAtivo(true);
+        Endereco endAluno = new Endereco();
+        endAluno.setCep("79800000");
+        endAluno.setCidade("Dourados");
+        endAluno.setUF("MS");
+        endAluno.setLogradouro("Rua Aeronave");
+        endAluno.setNumero("100");
+        endAluno.setBairro("Centro");
+        endAluno.setComplemento("Apto Aero");
+        aluno.setEndereco(endAluno);
+        AlunoModel.salvarAluno(aluno);
+        
+        Instrutor instrutor = new Instrutor();
+        instrutor.setCpf("76767676767");
+        instrutor.setCanac(767676);
+        instrutor.setNome("Instrutor Aeronave");
+        instrutor.setTelefone("67988888888");
+        instrutor.setEmail("instrutor@aero.com");
+        instrutor.setHabilitacao("INVA");
+        instrutor.setAtivo(true);
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("inst_aero");
+        usuario.setSenha("123");
+        usuario.setPermissao(0);
+        instrutor.setUsuario(usuario);
+        Endereco endInst = new Endereco();
+        endInst.setCep("79800000");
+        endInst.setCidade("Dourados");
+        endInst.setUF("MS");
+        endInst.setLogradouro("Rua Instrutor");
+        endInst.setNumero("200");
+        endInst.setBairro("Centro");
+        endInst.setComplemento("Casa");
+        instrutor.setEndereco(endInst);
+        InstrutorModel.salvarInstrutor(instrutor);
+        
+        DiarioBordo diario = new DiarioBordo();
+        diario.setAeronaveId("PT-AERO");
+        diario.setNroDiario(1);
+        diario.setData(new Date());
+        diario.setAlunoId("87878787878");
+        diario.setInstrutorId("76767676767");
+        diario.setFuncaoAluno("I1");
+        diario.setFuncaoInstrutor("V1");
+        diario.setHoraAeronave(1005.0f);
+        diario.setDataDecolagem(new Date(System.currentTimeMillis() - 7200000));
+        diario.setDataPouso(new Date(System.currentTimeMillis() - 3600000));
+        diario.setLocalDecolagem("SBDO");
+        diario.setLocalPouso("SBCG");
+        diario.setDataCorte(new Date(System.currentTimeMillis() - 3000000));
+        diario.setHorasDiu(1.5f);
+        diario.setHorasNot(0.5f);
+        diario.setHorasVfr(2.0f);
+        diario.setHorasIfr(0.0f);
+        diario.setHorasIfrC(0.0f);
+        diario.setCombustivelUtilizado("50L");
+        diario.setCiclos(2);
+        diario.setPob(2);
+        diario.setCarga("50kg");
+        diario.setNat("TN");
+        diario.setOcorrencias("Teste de horas aeronave");
+        
+        Request request = new Request();
+        String retorno = request.requisicao(diario, "api/diarios-bordo", "POST");
+        System.out.println("Resposta do servidor: " + retorno);
+        
+        DiarioBordo encontrado = null;
+        List<DiarioBordo> diarios = DiarioBordoModel.listarDiariosBordo();
+        for (DiarioBordo d : diarios) {
+            if (d.getAeronaveId() != null && d.getAeronaveId().equals("PT-AERO") && 
+                d.getNroDiario() != null && d.getNroDiario().equals(1)) {
+                encontrado = d;
+                break;
+            }
+        }
+        
+        Aeronave aeronaveDepois = AeronaveModel.buscarAeronave(aeronave.getMatricula());
+        Float horasAeronaveDepois = aeronaveDepois.getHoras_de_voo();
+        
+        if (encontrado != null) {
+            DiarioBordoModel.excluirDiarioBordo(encontrado.getId().toString());
+        }
+        InstrutorModel.excluirInstrutor(instrutor.getCpf());
+        AlunoModel.excluirAluno(aluno);
+        AeronaveModel.excluirAeronave(aeronave);
+        
+        assertTrue(retorno.contains("\"status\":\"sucesso\""), "Status diferente de sucesso: " + retorno);
+        assertEquals(horasAeronaveAntes + 4.0f, horasAeronaveDepois, 0.01f, 
+                "Horas da aeronave não foram incrementadas corretamente");
+    }
+
+    @Test
+    public void testListarDiariosBordo() {
+        Aeronave aeronave = new Aeronave();
+        aeronave.setMatricula("PT-LIST");
+        aeronave.setModelo("Cessna 152");
+        aeronave.setFabricante("Cessna");
+        aeronave.setHabilitacao("MNTE");
+        aeronave.setTipo_de_voo("VFR-D");
+        aeronave.setHoras_de_voo(1000.0f);
+        aeronave.setAtivo(true);
+        AeronaveModel.salvarAeronave(aeronave);
+        
+        Aluno aluno = new Aluno();
+        aluno.setCpf("65656565656");
+        aluno.setCanac(656565);
+        aluno.setNome("Aluno Lista");
+        aluno.setTelefone("67999999999");
+        aluno.setEmail("aluno@list.com");
+        aluno.setCurso("Piloto Privado");
+        aluno.setHoras_compradas(50.0f);
+        aluno.setHoras_voadas(10.0f);
+        aluno.setAtivo(true);
+        Endereco endAluno = new Endereco();
+        endAluno.setCep("79800000");
+        endAluno.setCidade("Dourados");
+        endAluno.setUF("MS");
+        endAluno.setLogradouro("Rua Lista");
+        endAluno.setNumero("100");
+        endAluno.setBairro("Centro");
+        endAluno.setComplemento("Apto List");
+        aluno.setEndereco(endAluno);
+        AlunoModel.salvarAluno(aluno);
+        
+        Instrutor instrutor = new Instrutor();
+        instrutor.setCpf("54545454545");
+        instrutor.setCanac(545454);
+        instrutor.setNome("Instrutor Lista");
+        instrutor.setTelefone("67988888888");
+        instrutor.setEmail("instrutor@list.com");
+        instrutor.setHabilitacao("INVA");
+        instrutor.setAtivo(true);
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("inst_list");
+        usuario.setSenha("123");
+        usuario.setPermissao(0);
+        instrutor.setUsuario(usuario);
+        Endereco endInst = new Endereco();
+        endInst.setCep("79800000");
+        endInst.setCidade("Dourados");
+        endInst.setUF("MS");
+        endInst.setLogradouro("Rua Instrutor");
+        endInst.setNumero("200");
+        endInst.setBairro("Centro");
+        endInst.setComplemento("Casa");
+        instrutor.setEndereco(endInst);
+        InstrutorModel.salvarInstrutor(instrutor);
+        
+        DiarioBordo diario = new DiarioBordo();
+        diario.setAeronaveId("PT-LIST");
+        diario.setNroDiario(1);
+        diario.setData(new Date());
+        diario.setAlunoId("65656565656");
+        diario.setInstrutorId("54545454545");
+        diario.setFuncaoAluno("I1");
+        diario.setFuncaoInstrutor("V1");
+        diario.setHoraAeronave(1005.0f);
+        diario.setDataDecolagem(new Date(System.currentTimeMillis() - 7200000));
+        diario.setDataPouso(new Date(System.currentTimeMillis() - 3600000));
+        diario.setLocalDecolagem("SBDO");
+        diario.setLocalPouso("SBCG");
+        diario.setDataCorte(new Date(System.currentTimeMillis() - 3000000));
+        diario.setHorasDiu(1.0f);
+        diario.setHorasNot(0.0f);
+        diario.setHorasVfr(1.0f);
+        diario.setHorasIfr(0.0f);
+        diario.setHorasIfrC(0.0f);
+        diario.setCombustivelUtilizado("50L");
+        diario.setCiclos(2);
+        diario.setPob(2);
+        diario.setCarga("50kg");
+        diario.setNat("TN");
+        diario.setOcorrencias("Teste listagem");
+        
+        Request request = new Request();
+        String retorno = request.requisicao(diario, "api/diarios-bordo", "POST");
+        System.out.println("Resposta do servidor: " + retorno);
+        
+        String respostaLista = request.requisicao(null, "api/diarios-bordo", "GET");
+        System.out.println("Resposta GET lista: " + respostaLista);
+        
+        DiarioBordo encontrado = null;
+        List<DiarioBordo> diarios = DiarioBordoModel.listarDiariosBordo();
+        for (DiarioBordo d : diarios) {
+            if (d.getAeronaveId() != null && d.getAeronaveId().equals("PT-LIST") && 
+                d.getNroDiario() != null && d.getNroDiario().equals(1)) {
+                encontrado = d;
+                break;
+            }
+        }
+        
+        if (encontrado != null) {
+            DiarioBordoModel.excluirDiarioBordo(encontrado.getId().toString());
+        }
+        InstrutorModel.excluirInstrutor(instrutor.getCpf());
+        AlunoModel.excluirAluno(aluno);
+        AeronaveModel.excluirAeronave(aeronave);
+        
+        assertTrue(respostaLista.contains("PT-LIST"), "Lista não contém o diário criado: " + respostaLista);
+        assertTrue(respostaLista.contains("Teste listagem"), "Lista não contém as ocorrências: " + respostaLista);
+    }
+
+    @Test
+    public void testValidacaoDataPousoAntesDecolagem() {
+        Aeronave aeronave = new Aeronave();
+        aeronave.setMatricula("PT-VAL1");
+        aeronave.setModelo("Cessna 152");
+        aeronave.setFabricante("Cessna");
+        aeronave.setHabilitacao("MNTE");
+        aeronave.setTipo_de_voo("VFR-D");
+        aeronave.setHoras_de_voo(1000.0f);
+        aeronave.setAtivo(true);
+        AeronaveModel.salvarAeronave(aeronave);
+        
+        Aluno aluno = new Aluno();
+        aluno.setCpf("11111111111");
+        aluno.setCanac(111111);
+        aluno.setNome("Aluno Val1");
+        aluno.setTelefone("67999999999");
+        aluno.setEmail("aluno@val1.com");
+        aluno.setCurso("Piloto Privado");
+        aluno.setHoras_compradas(50.0f);
+        aluno.setHoras_voadas(10.0f);
+        aluno.setAtivo(true);
+        Endereco endAluno = new Endereco();
+        endAluno.setCep("79800000");
+        endAluno.setCidade("Dourados");
+        endAluno.setUF("MS");
+        endAluno.setLogradouro("Rua Val1");
+        endAluno.setNumero("100");
+        endAluno.setBairro("Centro");
+        endAluno.setComplemento("Apto 1");
+        aluno.setEndereco(endAluno);
+        AlunoModel.salvarAluno(aluno);
+        
+        Instrutor instrutor = new Instrutor();
+        instrutor.setCpf("22222222222");
+        instrutor.setCanac(222222);
+        instrutor.setNome("Instrutor Val1");
+        instrutor.setTelefone("67988888888");
+        instrutor.setEmail("instrutor@val1.com");
+        instrutor.setHabilitacao("INVA");
+        instrutor.setAtivo(true);
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("inst_val1");
+        usuario.setSenha("123");
+        usuario.setPermissao(0);
+        instrutor.setUsuario(usuario);
+        Endereco endInst = new Endereco();
+        endInst.setCep("79800000");
+        endInst.setCidade("Dourados");
+        endInst.setUF("MS");
+        endInst.setLogradouro("Rua Instrutor");
+        endInst.setNumero("200");
+        endInst.setBairro("Centro");
+        endInst.setComplemento("Casa");
+        instrutor.setEndereco(endInst);
+        InstrutorModel.salvarInstrutor(instrutor);
+        
+        DiarioBordo diario = new DiarioBordo();
+        diario.setAeronaveId("PT-VAL1");
+        diario.setNroDiario(1);
+        diario.setData(new Date());
+        diario.setAlunoId("11111111111");
+        diario.setInstrutorId("22222222222");
+        diario.setFuncaoAluno("I1");
+        diario.setFuncaoInstrutor("V1");
+        diario.setHoraAeronave(1005.0f);
+        diario.setDataDecolagem(new Date(System.currentTimeMillis() - 3600000));
+        diario.setDataPouso(new Date(System.currentTimeMillis() - 7200000));
+        diario.setLocalDecolagem("SBDO");
+        diario.setLocalPouso("SBCG");
+        diario.setDataCorte(new Date(System.currentTimeMillis() - 3000000));
+        diario.setHorasDiu(1.0f);
+        diario.setHorasNot(0.0f);
+        diario.setHorasVfr(1.0f);
+        diario.setHorasIfr(0.0f);
+        diario.setHorasIfrC(0.0f);
+        diario.setCombustivelUtilizado("50L");
+        diario.setCiclos(2);
+        diario.setPob(2);
+        diario.setCarga("50kg");
+        diario.setNat("TN");
+        diario.setOcorrencias("Teste validação");
+        
+        Request request = new Request();
+        String retorno = request.requisicao(diario, "api/diarios-bordo", "POST");
+        System.out.println("Resposta do servidor: " + retorno);
+        
+        InstrutorModel.excluirInstrutor(instrutor.getCpf());
+        AlunoModel.excluirAluno(aluno);
+        AeronaveModel.excluirAeronave(aeronave);
+        
+        assertTrue(retorno.contains("error") || retorno.contains("CONFLITO"), 
+                "Deveria retornar erro de data de pouso antes da decolagem: " + retorno);
+        assertTrue(retorno.contains("decolagem") || retorno.contains("pouso"), 
+                "Mensagem de erro não menciona decolagem/pouso: " + retorno);
+    }
+
+    @Test
+    public void testValidacaoDataCorteAntesPouso() {
+        Aeronave aeronave = new Aeronave();
+        aeronave.setMatricula("PT-VAL2");
+        aeronave.setModelo("Cessna 152");
+        aeronave.setFabricante("Cessna");
+        aeronave.setHabilitacao("MNTE");
+        aeronave.setTipo_de_voo("VFR-D");
+        aeronave.setHoras_de_voo(1000.0f);
+        aeronave.setAtivo(true);
+        AeronaveModel.salvarAeronave(aeronave);
+        
+        Aluno aluno = new Aluno();
+        aluno.setCpf("33333333333");
+        aluno.setCanac(333333);
+        aluno.setNome("Aluno Val2");
+        aluno.setTelefone("67999999999");
+        aluno.setEmail("aluno@val2.com");
+        aluno.setCurso("Piloto Privado");
+        aluno.setHoras_compradas(50.0f);
+        aluno.setHoras_voadas(10.0f);
+        aluno.setAtivo(true);
+        Endereco endAluno = new Endereco();
+        endAluno.setCep("79800000");
+        endAluno.setCidade("Dourados");
+        endAluno.setUF("MS");
+        endAluno.setLogradouro("Rua Val2");
+        endAluno.setNumero("100");
+        endAluno.setBairro("Centro");
+        endAluno.setComplemento("Apto 2");
+        aluno.setEndereco(endAluno);
+        AlunoModel.salvarAluno(aluno);
+        
+        Instrutor instrutor = new Instrutor();
+        instrutor.setCpf("44444444444");
+        instrutor.setCanac(444444);
+        instrutor.setNome("Instrutor Val2");
+        instrutor.setTelefone("67988888888");
+        instrutor.setEmail("instrutor@val2.com");
+        instrutor.setHabilitacao("INVA");
+        instrutor.setAtivo(true);
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("inst_val2");
+        usuario.setSenha("123");
+        usuario.setPermissao(0);
+        instrutor.setUsuario(usuario);
+        Endereco endInst = new Endereco();
+        endInst.setCep("79800000");
+        endInst.setCidade("Dourados");
+        endInst.setUF("MS");
+        endInst.setLogradouro("Rua Instrutor");
+        endInst.setNumero("200");
+        endInst.setBairro("Centro");
+        endInst.setComplemento("Casa");
+        instrutor.setEndereco(endInst);
+        InstrutorModel.salvarInstrutor(instrutor);
+        
+        DiarioBordo diario = new DiarioBordo();
+        diario.setAeronaveId("PT-VAL2");
+        diario.setNroDiario(1);
+        diario.setData(new Date());
+        diario.setAlunoId("33333333333");
+        diario.setInstrutorId("44444444444");
+        diario.setFuncaoAluno("I1");
+        diario.setFuncaoInstrutor("V1");
+        diario.setHoraAeronave(1005.0f);
+        diario.setDataDecolagem(new Date(System.currentTimeMillis() - 7200000));
+        diario.setDataPouso(new Date(System.currentTimeMillis() - 3600000));
+        diario.setLocalDecolagem("SBDO");
+        diario.setLocalPouso("SBCG");
+        diario.setDataCorte(new Date(System.currentTimeMillis() - 7200000));
+        diario.setHorasDiu(1.0f);
+        diario.setHorasNot(0.0f);
+        diario.setHorasVfr(1.0f);
+        diario.setHorasIfr(0.0f);
+        diario.setHorasIfrC(0.0f);
+        diario.setCombustivelUtilizado("50L");
+        diario.setCiclos(2);
+        diario.setPob(2);
+        diario.setCarga("50kg");
+        diario.setNat("TN");
+        diario.setOcorrencias("Teste validação");
+        
+        Request request = new Request();
+        String retorno = request.requisicao(diario, "api/diarios-bordo", "POST");
+        System.out.println("Resposta do servidor: " + retorno);
+        
+        InstrutorModel.excluirInstrutor(instrutor.getCpf());
+        AlunoModel.excluirAluno(aluno);
+        AeronaveModel.excluirAeronave(aeronave);
+        
+        assertTrue(retorno.contains("error") || retorno.contains("CONFLITO"), 
+                "Deveria retornar erro de data de corte antes do pouso: " + retorno);
+        assertTrue(retorno.contains("corte") || retorno.contains("pouso"), 
+                "Mensagem de erro não menciona corte/pouso: " + retorno);
+    }
+
+    @Test
+    public void testValidacaoNroDiarioDuplicado() {
+        Aeronave aeronave = new Aeronave();
+        aeronave.setMatricula("PT-VAL3");
+        aeronave.setModelo("Cessna 152");
+        aeronave.setFabricante("Cessna");
+        aeronave.setHabilitacao("MNTE");
+        aeronave.setTipo_de_voo("VFR-D");
+        aeronave.setHoras_de_voo(1000.0f);
+        aeronave.setAtivo(true);
+        AeronaveModel.salvarAeronave(aeronave);
+        
+        Aluno aluno = new Aluno();
+        aluno.setCpf("55555555555");
+        aluno.setCanac(555555);
+        aluno.setNome("Aluno Val3");
+        aluno.setTelefone("67999999999");
+        aluno.setEmail("aluno@val3.com");
+        aluno.setCurso("Piloto Privado");
+        aluno.setHoras_compradas(50.0f);
+        aluno.setHoras_voadas(10.0f);
+        aluno.setAtivo(true);
+        Endereco endAluno = new Endereco();
+        endAluno.setCep("79800000");
+        endAluno.setCidade("Dourados");
+        endAluno.setUF("MS");
+        endAluno.setLogradouro("Rua Val3");
+        endAluno.setNumero("100");
+        endAluno.setBairro("Centro");
+        endAluno.setComplemento("Apto 3");
+        aluno.setEndereco(endAluno);
+        AlunoModel.salvarAluno(aluno);
+        
+        Instrutor instrutor = new Instrutor();
+        instrutor.setCpf("66666666666");
+        instrutor.setCanac(666666);
+        instrutor.setNome("Instrutor Val3");
+        instrutor.setTelefone("67988888888");
+        instrutor.setEmail("instrutor@val3.com");
+        instrutor.setHabilitacao("INVA");
+        instrutor.setAtivo(true);
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("inst_val3");
+        usuario.setSenha("123");
+        usuario.setPermissao(0);
+        instrutor.setUsuario(usuario);
+        Endereco endInst = new Endereco();
+        endInst.setCep("79800000");
+        endInst.setCidade("Dourados");
+        endInst.setUF("MS");
+        endInst.setLogradouro("Rua Instrutor");
+        endInst.setNumero("200");
+        endInst.setBairro("Centro");
+        endInst.setComplemento("Casa");
+        instrutor.setEndereco(endInst);
+        InstrutorModel.salvarInstrutor(instrutor);
+        
+        DiarioBordo diario1 = new DiarioBordo();
+        diario1.setAeronaveId("PT-VAL3");
+        diario1.setNroDiario(1);
+        diario1.setData(new Date());
+        diario1.setAlunoId("55555555555");
+        diario1.setInstrutorId("66666666666");
+        diario1.setFuncaoAluno("I1");
+        diario1.setFuncaoInstrutor("V1");
+        diario1.setHoraAeronave(1005.0f);
+        diario1.setDataDecolagem(new Date(System.currentTimeMillis() - 7200000));
+        diario1.setDataPouso(new Date(System.currentTimeMillis() - 3600000));
+        diario1.setLocalDecolagem("SBDO");
+        diario1.setLocalPouso("SBCG");
+        diario1.setDataCorte(new Date(System.currentTimeMillis() - 3000000));
+        diario1.setHorasDiu(1.0f);
+        diario1.setHorasNot(0.0f);
+        diario1.setHorasVfr(1.0f);
+        diario1.setHorasIfr(0.0f);
+        diario1.setHorasIfrC(0.0f);
+        diario1.setCombustivelUtilizado("50L");
+        diario1.setCiclos(2);
+        diario1.setPob(2);
+        diario1.setCarga("50kg");
+        diario1.setNat("TN");
+        diario1.setOcorrencias("Primeiro diário");
+        
+        Request request = new Request();
+        String retorno1 = request.requisicao(diario1, "api/diarios-bordo", "POST");
+        System.out.println("Resposta do servidor: " + retorno1);
+        
+        DiarioBordo encontrado = null;
+        List<DiarioBordo> diarios = DiarioBordoModel.listarDiariosBordo();
+        for (DiarioBordo d : diarios) {
+            if (d.getAeronaveId() != null && d.getAeronaveId().equals("PT-VAL3") && 
+                d.getNroDiario() != null && d.getNroDiario().equals(1)) {
+                encontrado = d;
+                break;
+            }
+        }
+        
+        DiarioBordo diario2 = new DiarioBordo();
+        diario2.setAeronaveId("PT-VAL3");
+        diario2.setNroDiario(1);
+        diario2.setData(new Date());
+        diario2.setAlunoId("55555555555");
+        diario2.setInstrutorId("66666666666");
+        diario2.setFuncaoAluno("I1");
+        diario2.setFuncaoInstrutor("V1");
+        diario2.setHoraAeronave(1006.0f);
+        diario2.setDataDecolagem(new Date(System.currentTimeMillis() - 7200000));
+        diario2.setDataPouso(new Date(System.currentTimeMillis() - 3600000));
+        diario2.setLocalDecolagem("SBCG");
+        diario2.setLocalPouso("SBDO");
+        diario2.setDataCorte(new Date(System.currentTimeMillis() - 3000000));
+        diario2.setHorasDiu(1.0f);
+        diario2.setHorasNot(0.0f);
+        diario2.setHorasVfr(1.0f);
+        diario2.setHorasIfr(0.0f);
+        diario2.setHorasIfrC(0.0f);
+        diario2.setCombustivelUtilizado("50L");
+        diario2.setCiclos(2);
+        diario2.setPob(2);
+        diario2.setCarga("50kg");
+        diario2.setNat("TN");
+        diario2.setOcorrencias("Segundo diário");
+        
+        String retorno2 = request.requisicao(diario2, "api/diarios-bordo", "POST");
+        System.out.println("Resposta do servidor (duplicado): " + retorno2);
+        
+        if (encontrado != null) {
+            DiarioBordoModel.excluirDiarioBordo(encontrado.getId().toString());
+        }
+        InstrutorModel.excluirInstrutor(instrutor.getCpf());
+        AlunoModel.excluirAluno(aluno);
+        AeronaveModel.excluirAeronave(aeronave);
+        
+        assertTrue(retorno2.contains("error") || retorno2.contains("CONFLITO"), 
+                "Deveria retornar erro de número de diário duplicado: " + retorno2);
+        assertTrue(retorno2.contains("diário") || retorno2.contains("aeronave"), 
+                "Mensagem de erro não menciona conflito de número: " + retorno2);
+    }
+
+    @Test
+    public void testValidacaoSemHoras() {
+        Aeronave aeronave = new Aeronave();
+        aeronave.setMatricula("PT-VAL4");
+        aeronave.setModelo("Cessna 152");
+        aeronave.setFabricante("Cessna");
+        aeronave.setHabilitacao("MNTE");
+        aeronave.setTipo_de_voo("VFR-D");
+        aeronave.setHoras_de_voo(1000.0f);
+        aeronave.setAtivo(true);
+        AeronaveModel.salvarAeronave(aeronave);
+        
+        Aluno aluno = new Aluno();
+        aluno.setCpf("77777777777");
+        aluno.setCanac(777777);
+        aluno.setNome("Aluno Val4");
+        aluno.setTelefone("67999999999");
+        aluno.setEmail("aluno@val4.com");
+        aluno.setCurso("Piloto Privado");
+        aluno.setHoras_compradas(50.0f);
+        aluno.setHoras_voadas(10.0f);
+        aluno.setAtivo(true);
+        Endereco endAluno = new Endereco();
+        endAluno.setCep("79800000");
+        endAluno.setCidade("Dourados");
+        endAluno.setUF("MS");
+        endAluno.setLogradouro("Rua Val4");
+        endAluno.setNumero("100");
+        endAluno.setBairro("Centro");
+        endAluno.setComplemento("Apto 4");
+        aluno.setEndereco(endAluno);
+        AlunoModel.salvarAluno(aluno);
+        
+        Instrutor instrutor = new Instrutor();
+        instrutor.setCpf("88888888888");
+        instrutor.setCanac(888888);
+        instrutor.setNome("Instrutor Val4");
+        instrutor.setTelefone("67988888888");
+        instrutor.setEmail("instrutor@val4.com");
+        instrutor.setHabilitacao("INVA");
+        instrutor.setAtivo(true);
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("inst_val4");
+        usuario.setSenha("123");
+        usuario.setPermissao(0);
+        instrutor.setUsuario(usuario);
+        Endereco endInst = new Endereco();
+        endInst.setCep("79800000");
+        endInst.setCidade("Dourados");
+        endInst.setUF("MS");
+        endInst.setLogradouro("Rua Instrutor");
+        endInst.setNumero("200");
+        endInst.setBairro("Centro");
+        endInst.setComplemento("Casa");
+        instrutor.setEndereco(endInst);
+        InstrutorModel.salvarInstrutor(instrutor);
+        
+        DiarioBordo diario = new DiarioBordo();
+        diario.setAeronaveId("PT-VAL4");
+        diario.setNroDiario(1);
+        diario.setData(new Date());
+        diario.setAlunoId("77777777777");
+        diario.setInstrutorId("88888888888");
+        diario.setFuncaoAluno("I1");
+        diario.setFuncaoInstrutor("V1");
+        diario.setHoraAeronave(1005.0f);
+        diario.setDataDecolagem(new Date(System.currentTimeMillis() - 7200000));
+        diario.setDataPouso(new Date(System.currentTimeMillis() - 3600000));
+        diario.setLocalDecolagem("SBDO");
+        diario.setLocalPouso("SBCG");
+        diario.setDataCorte(new Date(System.currentTimeMillis() - 3000000));
+        diario.setCombustivelUtilizado("50L");
+        diario.setCiclos(2);
+        diario.setPob(2);
+        diario.setCarga("50kg");
+        diario.setNat("TN");
+        diario.setOcorrencias("Teste sem horas");
+        
+        Request request = new Request();
+        String retorno = request.requisicao(diario, "api/diarios-bordo", "POST");
+        System.out.println("Resposta do servidor: " + retorno);
+        
+        InstrutorModel.excluirInstrutor(instrutor.getCpf());
+        AlunoModel.excluirAluno(aluno);
+        AeronaveModel.excluirAeronave(aeronave);
+        
+        assertTrue(retorno.contains("error") || retorno.contains("CONFLITO"), 
+                "Deveria retornar erro quando nenhuma hora é preenchida: " + retorno);
+        assertTrue(retorno.contains("hora") || retorno.contains("preenchida"), 
+                "Mensagem de erro não menciona necessidade de preencher horas: " + retorno);
+    }
+
+    @Test
+public void testAtualizacaoHorasAluno() {
+    Aeronave aeronave = new Aeronave();
+    aeronave.setMatricula("PT-HRS");
+    aeronave.setModelo("Cessna 152");
+    aeronave.setFabricante("Cessna");
+    aeronave.setHabilitacao("MNTE");
+    aeronave.setTipo_de_voo("VFR-D");
+    aeronave.setHoras_de_voo(1000.0f);
+    aeronave.setAtivo(true);
+    AeronaveModel.salvarAeronave(aeronave);
+    
+    Aluno aluno = new Aluno();
+    aluno.setCpf("99999999999");
+    aluno.setCanac(999999);
+    aluno.setNome("Aluno Horas");
+    aluno.setTelefone("67999999999");
+    aluno.setEmail("aluno@horas.com");
+    aluno.setCurso("Piloto Privado");
+    aluno.setHoras_compradas(50.0f);
+    aluno.setHoras_voadas(10.0f);
+    aluno.setAtivo(true);
+    Endereco endAluno = new Endereco();
+    endAluno.setCep("79800000");
+    endAluno.setCidade("Dourados");
+    endAluno.setUF("MS");
+    endAluno.setLogradouro("Rua Horas");
+    endAluno.setNumero("100");
+    endAluno.setBairro("Centro");
+    endAluno.setComplemento("Apto Horas");
+    aluno.setEndereco(endAluno);
+    AlunoModel.salvarAluno(aluno);
+    
+    Instrutor instrutor = new Instrutor();
+    instrutor.setCpf("98989898989");
+    instrutor.setCanac(989898);
+    instrutor.setNome("Instrutor Horas");
+    instrutor.setTelefone("67988888888");
+    instrutor.setEmail("instrutor@horas.com");
+    instrutor.setHabilitacao("INVA");
+    instrutor.setAtivo(true);
+    Usuario usuario = new Usuario();
+    usuario.setUsuario("inst_horas");
+    usuario.setSenha("123");
+    usuario.setPermissao(0);
+    instrutor.setUsuario(usuario);
+    Endereco endInst = new Endereco();
+    endInst.setCep("79800000");
+    endInst.setCidade("Dourados");
+    endInst.setUF("MS");
+    endInst.setLogradouro("Rua Instrutor");
+    endInst.setNumero("200");
+    endInst.setBairro("Centro");
+    endInst.setComplemento("Casa");
+    instrutor.setEndereco(endInst);
+    InstrutorModel.salvarInstrutor(instrutor);
+    
+    Float horasCompradasAntes = aluno.getHoras_compradas();
+    Float horasVoadasAntes = aluno.getHoras_voadas();
+    
+    DiarioBordo diario = new DiarioBordo();
+    diario.setAeronaveId("PT-HRS");
+    diario.setNroDiario(1);
+    diario.setData(new Date());
+    diario.setAlunoId("99999999999");
+    diario.setInstrutorId("98989898989");
+    diario.setFuncaoAluno("I1");
+    diario.setFuncaoInstrutor("V1");
+    diario.setHoraAeronave(1005.0f);
+    diario.setDataDecolagem(new Date(System.currentTimeMillis() - 7200000));
+    diario.setDataPouso(new Date(System.currentTimeMillis() - 3600000));
+    diario.setLocalDecolagem("SBDO");
+    diario.setLocalPouso("SBCG");
+    diario.setDataCorte(new Date(System.currentTimeMillis() - 3000000));
+    diario.setHorasDiu(2.0f);
+    diario.setHorasNot(1.0f);
+    diario.setHorasVfr(3.0f);
+    diario.setHorasIfr(0.0f);
+    diario.setHorasIfrC(0.0f);
+    diario.setCombustivelUtilizado("50L");
+    diario.setCiclos(2);
+    diario.setPob(2);
+    diario.setCarga("50kg");
+    diario.setNat("TN");
+    diario.setOcorrencias("Teste de horas");
+    
+    Request request = new Request();
+    String retorno = request.requisicao(diario, "api/diarios-bordo", "POST");
+    System.out.println("Resposta do servidor: " + retorno);
+    
+    DiarioBordo encontrado = null;
+    List<DiarioBordo> diarios = DiarioBordoModel.listarDiariosBordo();
+    for (DiarioBordo d : diarios) {
+        if (d.getAeronaveId() != null && d.getAeronaveId().equals("PT-HRS") && 
+            d.getNroDiario() != null && d.getNroDiario().equals(1)) {
+            encontrado = d;
+            break;
+        }
+    }
+    
+    Aluno alunoDepois = AlunoModel.buscarAluno(aluno.getCpf());
+    Float horasCompradasDepois = alunoDepois.getHoras_compradas();
+    Float horasVoadasDepois = alunoDepois.getHoras_voadas();
+    
+    if (encontrado != null) {
+        DiarioBordoModel.excluirDiarioBordo(encontrado.getId().toString());
+    }
+    InstrutorModel.excluirInstrutor(instrutor.getCpf());
+    AlunoModel.excluirAluno(aluno);
+    AeronaveModel.excluirAeronave(aeronave);
+    
+    assertTrue(retorno.contains("\"status\":\"sucesso\""), "Status diferente de sucesso: " + retorno);
+    assertEquals(horasCompradasAntes - 6.0f, horasCompradasDepois, 0.01f, 
+            "Horas compradas não foram descontadas corretamente");
+    assertEquals(horasVoadasAntes + 6.0f, horasVoadasDepois, 0.01f, 
+            "Horas voadas não foram incrementadas corretamente");
 }
+}   
